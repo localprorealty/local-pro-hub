@@ -1,0 +1,215 @@
+{
+  "name": "LocalPRO — Listing Go Live",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localpro-listing-live",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "gl-0001-4000-8000-000000000001",
+      "name": "Webhook — Listing live",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "localpro-listing-live"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f-event",
+              "name": "event",
+              "value": "={{ $json.body?.event ?? $json.event }}",
+              "type": "string"
+            },
+            {
+              "id": "f-listing-id",
+              "name": "listing_id",
+              "value": "={{ $json.body?.listing_id ?? $json.listing_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f-address",
+              "name": "property_address",
+              "value": "={{ $json.body?.property_address ?? $json.property_address }}",
+              "type": "string"
+            },
+            {
+              "id": "f-price",
+              "name": "list_price",
+              "value": "={{ $json.body?.list_price ?? $json.list_price }}",
+              "type": "string"
+            },
+            {
+              "id": "f-beds",
+              "name": "bedrooms",
+              "value": "={{ $json.body?.bedrooms ?? $json.bedrooms }}",
+              "type": "string"
+            },
+            {
+              "id": "f-baths",
+              "name": "bathrooms",
+              "value": "={{ $json.body?.bathrooms ?? $json.bathrooms }}",
+              "type": "string"
+            },
+            {
+              "id": "f-sqft",
+              "name": "sqft",
+              "value": "={{ $json.body?.sqft ?? $json.sqft }}",
+              "type": "string"
+            },
+            {
+              "id": "f-desc",
+              "name": "property_description",
+              "value": "={{ $json.body?.property_description ?? $json.property_description }}",
+              "type": "string"
+            },
+            {
+              "id": "f-school",
+              "name": "school_district",
+              "value": "={{ $json.body?.school_district ?? $json.school_district }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-name",
+              "name": "agent_name",
+              "value": "={{ $json.body?.agent_name ?? $json.agent_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-email",
+              "name": "agent_email",
+              "value": "={{ $json.body?.agent_email ?? $json.agent_email }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-phone",
+              "name": "agent_phone",
+              "value": "={{ $json.body?.agent_phone ?? $json.agent_phone }}",
+              "type": "string"
+            },
+            {
+              "id": "f-url",
+              "name": "listing_url",
+              "value": "={{ $json.body?.listing_url ?? $json.listing_url }}",
+              "type": "string"
+            },
+            {
+              "id": "f-lofty",
+              "name": "lofty_webhook_url",
+              "value": "={{ $json.body?.lofty_webhook_url ?? $json.lofty_webhook_url ?? $env.LOFTY_WEBHOOK_URL ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f-admin",
+              "name": "admin_email",
+              "value": "={{ $env.LOCALPRO_ADMIN_EMAIL ?? 'admin@localprorealty.com' }}",
+              "type": "string"
+            },
+            {
+              "id": "f-marketing",
+              "name": "marketing_email",
+              "value": "={{ $env.LOCALPRO_MARKETING_EMAIL ?? 'marketing@localprorealty.com' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "gl-0002-4000-8000-000000000002",
+      "name": "Format go-live payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $json.admin_email }}",
+        "subject": "=New Listing Live — {{ $json.property_address }}",
+        "emailFormat": "html",
+        "html": "=<p>A listing just went <strong>live</strong> on LocalPRO Hub.</p>\n<table cellpadding=\"6\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;\">\n  <tr><td><strong>Property</strong></td><td>{{ $json.property_address }}</td></tr>\n  <tr><td><strong>Price</strong></td><td>${{ $json.list_price }}</td></tr>\n  <tr><td><strong>Beds / Baths</strong></td><td>{{ $json.bedrooms }} / {{ $json.bathrooms }}</td></tr>\n  <tr><td><strong>Agent</strong></td><td>{{ $json.agent_name }} ({{ $json.agent_phone }})</td></tr>\n</table>\n<p style=\"margin-top:20px;\"><a href=\"{{ $json.listing_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">View listing</a></p>",
+        "options": {}
+      },
+      "id": "gl-0003-4000-8000-000000000003",
+      "name": "Send Email — Admin",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [520, -120],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $json.marketing_email }}",
+        "subject": "=Marketing Brief — {{ $json.property_address }}",
+        "emailFormat": "html",
+        "html": "=<p>New listing is <strong>live</strong> and ready for marketing.</p>\n<p><strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Price:</strong> ${{ $json.list_price }}<br/>\n<strong>Beds/Baths:</strong> {{ $json.bedrooms }} bed / {{ $json.bathrooms }} bath<br/>\n<strong>Sq Ft:</strong> {{ $json.sqft }}<br/>\n<strong>School District:</strong> {{ $json.school_district }}<br/>\n<strong>Agent:</strong> {{ $json.agent_name }} ({{ $json.agent_phone }})</p>\n<p><strong>Listing URL:</strong> <a href=\"{{ $json.listing_url }}\">{{ $json.listing_url }}</a></p>\n<p><strong>MLS Description:</strong></p>\n<p style=\"white-space:pre-wrap;\">{{ $json.property_description }}</p>\n<p>Please create social media assets and schedule posts.</p>",
+        "options": {}
+      },
+      "id": "gl-0004-4000-8000-000000000004",
+      "name": "Send Email — Marketing",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [520, 40],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.lofty_webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ listing_id: $json.listing_id, address: $json.property_address, price: $json.list_price, status: 'live' }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "gl-0005-4000-8000-000000000005",
+      "name": "Lofty webhook (stub)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 200],
+      "notes": "Configure LOFTY_WEBHOOK_URL in n8n env or backend .env when Lofty is ready. Skips if URL empty."
+    }
+  ],
+  "connections": {
+    "Webhook — Listing live": {
+      "main": [[{ "node": "Format go-live payload", "type": "main", "index": 0 }]]
+    },
+    "Format go-live payload": {
+      "main": [
+        [
+          { "node": "Send Email — Admin", "type": "main", "index": 0 },
+          { "node": "Send Email — Marketing", "type": "main", "index": 0 },
+          { "node": "Lofty webhook (stub)", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

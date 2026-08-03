@@ -1,0 +1,160 @@
+{
+  "name": "LocalPRO — Photography Booked",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localpro-photography-booked",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "ph-book-0001-4000-8000-000000000001",
+      "name": "Webhook — Photography booked",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "localpro-photography-booked"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f-event",
+              "name": "event",
+              "value": "={{ $json.body?.event ?? $json.event }}",
+              "type": "string"
+            },
+            {
+              "id": "f-booking-id",
+              "name": "booking_id",
+              "value": "={{ $json.body?.booking_id ?? $json.booking_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f-name",
+              "name": "photographer_name",
+              "value": "={{ $json.body?.photographer_name ?? $json.photographer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f-email",
+              "name": "photographer_email",
+              "value": "={{ $json.body?.photographer_email ?? $json.photographer_email }}",
+              "type": "string"
+            },
+            {
+              "id": "f-phone",
+              "name": "photographer_phone",
+              "value": "={{ $json.body?.photographer_phone ?? $json.photographer_phone }}",
+              "type": "string"
+            },
+            {
+              "id": "f-address",
+              "name": "property_address",
+              "value": "={{ $json.body?.property_address ?? $json.property_address }}",
+              "type": "string"
+            },
+            {
+              "id": "f-date",
+              "name": "shoot_date",
+              "value": "={{ $json.body?.shoot_date ?? $json.shoot_date }}",
+              "type": "string"
+            },
+            {
+              "id": "f-time",
+              "name": "shoot_time",
+              "value": "={{ $json.body?.shoot_time ?? $json.shoot_time }}",
+              "type": "string"
+            },
+            {
+              "id": "f-notes",
+              "name": "access_notes",
+              "value": "={{ $json.body?.access_notes ?? $json.access_notes }}",
+              "type": "string"
+            },
+            {
+              "id": "f-type",
+              "name": "listing_type",
+              "value": "={{ $json.body?.listing_type ?? $json.listing_type }}",
+              "type": "string"
+            },
+            {
+              "id": "f-app-url",
+              "name": "app_calendar_url",
+              "value": "={{ $env.LOCALPRO_APP_URL ?? 'http://localhost:5173' }}/photographer/calendar",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ph-book-0002-4000-8000-000000000002",
+      "name": "Format booking payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $json.photographer_email }}",
+        "subject": "=New Shoot Booked — {{ $json.property_address }}",
+        "emailFormat": "html",
+        "html": "=<p>Hi {{ $json.photographer_name }},</p>\n<p>A new photography shoot has been booked.</p>\n<p><strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Date:</strong> {{ $json.shoot_date }}<br/>\n<strong>Time:</strong> {{ $json.shoot_time }}<br/>\n<strong>Type:</strong> {{ $json.listing_type }}</p>\n<p><strong>Access Instructions:</strong><br/>{{ $json.access_notes }}</p>\n<p><a href=\"{{ $json.app_calendar_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Open LP Hub calendar</a></p>\n<p>Thank you,<br/>Local Pro Realty</p>",
+        "options": {}
+      },
+      "id": "ph-book-0003-4000-8000-000000000003",
+      "name": "Send Email — Photographer",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [520, -80],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "={{ $env.TWILIO_FROM_NUMBER }}",
+        "to": "={{ $json.photographer_phone }}",
+        "message": "=New shoot booked — {{ $json.property_address }} on {{ $json.shoot_date }} at {{ $json.shoot_time }}. Check LP Hub for details.",
+        "options": {}
+      },
+      "id": "ph-book-0004-4000-8000-000000000004",
+      "name": "Send SMS — Photographer",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [520, 100],
+      "credentials": {
+        "twilioApi": {
+          "id": "REPLACE_WITH_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio — LocalPRO"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Photography booked": {
+      "main": [[{ "node": "Format booking payload", "type": "main", "index": 0 }]]
+    },
+    "Format booking payload": {
+      "main": [
+        [
+          { "node": "Send Email — Photographer", "type": "main", "index": 0 },
+          { "node": "Send SMS — Photographer", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

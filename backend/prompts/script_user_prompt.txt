@@ -1,0 +1,17 @@
+Agent Name: {agent_name}
+Brokerage: Local Pro Realty (Dallas-Fort Worth, Texas)
+Topic: {topic_line}
+Pacing: {pacing}
+Tone: {tone}
+Outfit Style Preference: {outfit_description}
+End with: "{cta_text}"
+
+Agent's Custom Script Goal / Scenario:
+"{scenario_prompt}"
+
+Desired Video Visual Environment / Scenes:
+"{visual_environment}"
+
+Additional context:
+"{extra}"
+"{extra_context}"

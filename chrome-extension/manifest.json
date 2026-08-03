@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "LocalPRO Hub Helper",
+  "version": "1.0.0",
+  "description": "Chrome extension to assist agents in completing Matrix listing inputs using LocalPRO Hub.",
+  "permissions": ["storage", "scripting"],
+  "host_permissions": [
+    "http://localhost:8000/",
+    "https://ntrdd.mlsmatrix.com/"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://ntrdd.mlsmatrix.com/Matrix/Input/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "name": "LocalPRO — Marketing Pending",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localpro-marketing-pending",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "mkt-pending-0001",
+      "name": "Webhook — Marketing pending",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "localpro-marketing-pending"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f-event",
+              "name": "event",
+              "value": "={{ $json.body?.event ?? $json.event }}",
+              "type": "string"
+            },
+            {
+              "id": "f-listing-id",
+              "name": "listing_id",
+              "value": "={{ $json.body?.listing_id ?? $json.listing_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f-address",
+              "name": "property_address",
+              "value": "={{ $json.body?.property_address ?? $json.property_address }}",
+              "type": "string"
+            },
+            {
+              "id": "f-price",
+              "name": "list_price",
+              "value": "={{ $json.body?.list_price ?? $json.list_price }}",
+              "type": "string"
+            },
+            {
+              "id": "f-type",
+              "name": "listing_type",
+              "value": "={{ $json.body?.listing_type ?? $json.listing_type }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-name",
+              "name": "agent_name",
+              "value": "={{ $json.body?.agent_name ?? $json.agent_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-email",
+              "name": "agent_email",
+              "value": "={{ $json.body?.agent_email ?? $json.agent_email }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-phone",
+              "name": "agent_phone",
+              "value": "={{ $json.body?.agent_phone ?? $json.agent_phone }}",
+              "type": "string"
+            },
+            {
+              "id": "f-listing-url",
+              "name": "listing_url",
+              "value": "={{ $json.body?.listing_url ?? $json.listing_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "mkt-pending-0002",
+      "name": "Format marketing payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $env.MARKETING_EMAIL }}",
+        "subject": "=Marketing Pending — {{ $json.property_address }}",
+        "emailFormat": "html",
+        "html": "=<p>Hi Marketing Team,</p>\n<p>A listing has transitioned to the <strong>Marketing</strong> stage and needs your attention.</p>\n<p><strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Price:</strong> ${{ $json.list_price }}<br/>\n<strong>Type:</strong> {{ $json.listing_type }}</p>\n<p><strong>Agent:</strong> {{ $json.agent_name }} ({{ $json.agent_email }}, {{ $json.agent_phone }})</p>\n<p><a href=\"{{ $json.listing_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Open listing details</a></p>\n<p>Thank you,<br/>Local Pro Realty</p>",
+        "options": {}
+      },
+      "id": "mkt-pending-0003",
+      "name": "Send Email — Marketing Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [520, 0],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Marketing pending": {
+      "main": [[{ "node": "Format marketing payload", "type": "main", "index": 0 }]]
+    },
+    "Format marketing payload": {
+      "main": [
+        [
+          { "node": "Send Email — Marketing Team", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+@import 'react-day-picker/style.css';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --color-black: #000000;
+  --color-gold: #cfb87c;
+  --color-gold-dim: rgba(207, 184, 124, 0.13);
+  --color-gold-border: rgba(207, 184, 124, 0.33);
+  --color-white: #ffffff;
+  --color-surface: #0a0a0a;
+  --color-surface-2: #111111;
+  --color-surface-3: #1a1a1a;
+  --color-border: #2a2a2a;
+  --color-text: #ffffff;
+  --color-text-secondary: #888888;
+  --color-text-tertiary: #555555;
+
+  --font-display: 'Mont', system-ui, sans-serif;
+  --font-body: 'Glacial Indifference', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --background: var(--color-black);
+  --foreground: var(--color-text);
+  --card: var(--color-surface-2);
+  --card-foreground: var(--color-text);
+  --popover: var(--color-surface-3);
+  --popover-foreground: var(--color-text);
+  --primary: var(--color-gold);
+  --primary-foreground: var(--color-black);
+  --secondary: var(--color-surface-3);
+  --secondary-foreground: var(--color-text);
+  --muted: var(--color-surface-2);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-gold-dim);
+  --accent-foreground: var(--color-gold);
+  --destructive: #dc2626;
+  --destructive-foreground: var(--color-white);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-gold);
+  --radius: 0.375rem;
+  --chart-1: var(--color-gold);
+  --chart-2: var(--color-text-secondary);
+  --chart-3: var(--color-text-tertiary);
+  --chart-4: var(--color-surface-3);
+  --chart-5: var(--color-surface);
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-text);
+  --sidebar-primary: var(--color-gold);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-accent: var(--color-surface-3);
+  --sidebar-accent-foreground: var(--color-text);
+  --sidebar-border: var(--color-border);
+  --sidebar-ring: var(--color-gold);
+}
+
+.dark {
+  --background: var(--color-black);
+  --foreground: var(--color-text);
+  --card: var(--color-surface-2);
+  --card-foreground: var(--color-text);
+  --popover: var(--color-surface-3);
+  --popover-foreground: var(--color-text);
+  --primary: var(--color-gold);
+  --primary-foreground: var(--color-black);
+  --secondary: var(--color-surface-3);
+  --secondary-foreground: var(--color-text);
+  --muted: var(--color-surface-2);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-gold-dim);
+  --accent-foreground: var(--color-gold);
+  --destructive: #dc2626;
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-gold);
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-text);
+  --sidebar-primary: var(--color-gold);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-accent: var(--color-surface-3);
+  --sidebar-accent-foreground: var(--color-text);
+  --sidebar-border: var(--color-border);
+  --sidebar-ring: var(--color-gold);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
+  --font-mono: var(--font-mono);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    min-height: 100svh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+
+  #root {
+    min-height: 100svh;
+  }
+}
+
+/* Classic Mission Control grid (matches login brand panel) */
+.lp-grid-dark {
+  background-color: var(--color-black);
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.lp-grid-light {
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}

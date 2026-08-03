@@ -1,0 +1,61 @@
+# Local / agent tooling
+.agents/
+skills-lock.json
+
+# Project docs & prompts (local reference only)
+Documents/
+antigravity_start_prompt.md
+instructions.md
+Doubts.md
+stitch_page_prompts.md
+groq_test_results.md
+
+# Legacy demos & assets
+demo-extension/
+demo-form/
+
+# Secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/scratch
+backend/agents_info.md
+backend/test_brokermint.py
+backend/transaction_info.md
+backend/01_dump_known_agents.py
+backend/02_dump_all_users.py
+backend/03_analyze_dump.py
+backend/04_probe_endpoints.py
+backend/05_dump_plans_and_reports.py
+backend/06_investigate_matching_issues.py
+backend/07_test_custom_field_write.py
+backend/07b_test_adjusted_money_field.py
+backend/08_check_field_is_account_wide.py
+backend/09_backfill_adjusted_money_field.py
+backend/10_check_for_unintended_field_wipes.py
+backend/11_restore_wiped_teams.py
+backend/12_backfill_new_fields.py
+backend/13_restore_other_notes.py
+backend/test_revenue_share.py
+backend/inspect_commissions_detail.py
+backend/bm_dumps/
+
+#agent-hq
+agenthq
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

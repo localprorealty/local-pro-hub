@@ -1,0 +1,456 @@
+{
+  "name": "LocalPRO — All Automations",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localpro-signup-pending",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "c1c2c3d4-0001-4000-8000-000000000001",
+      "name": "Webhook — Signup pending",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "localpro-signup-pending"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-pending-status",
+              "leftValue": "={{ $json.body.record?.status ?? $json.record?.status ?? $json.status }}",
+              "rightValue": "pending",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c1c2c3d4-0002-4000-8000-000000000002",
+      "name": "IF status is pending",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-email",
+              "name": "applicant_email",
+              "value": "={{ $json.body.record?.email ?? $json.record?.email ?? $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "field-name",
+              "name": "applicant_name",
+              "value": "={{ $json.body.record?.full_name ?? $json.record?.full_name ?? 'Unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "field-mls",
+              "name": "applicant_mls_id",
+              "value": "={{ $json.body.record?.mls_id ?? $json.record?.mls_id ?? '—' }}",
+              "type": "string"
+            },
+            {
+              "id": "field-phone",
+              "name": "applicant_phone",
+              "value": "={{ $json.body.record?.phone ?? $json.record?.phone ?? '—' }}",
+              "type": "string"
+            },
+            {
+              "id": "field-created",
+              "name": "submitted_at",
+              "value": "={{ $json.body.record?.created_at ?? $json.record?.created_at ?? $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "field-admin-email",
+              "name": "admin_notify_email",
+              "value": "={{ $env.LOCALPRO_ADMIN_EMAIL ?? 'admin@localprorealty.com' }}",
+              "type": "string"
+            },
+            {
+              "id": "field-app-url",
+              "name": "app_login_url",
+              "value": "={{ $env.LOCALPRO_APP_URL ?? 'http://localhost:5173' }}/login",
+              "type": "string"
+            },
+            {
+              "id": "field-approvals-url",
+              "name": "app_approvals_url",
+              "value": "={{ $env.LOCALPRO_APP_URL ?? 'http://localhost:5173' }}/admin/approvals",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1c2c3d4-0003-4000-8000-000000000003",
+      "name": "Format signup payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, -80]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $json.admin_notify_email }}",
+        "subject": "=LocalPRO Hub — New signup pending approval: {{ $json.applicant_name }}",
+        "emailFormat": "html",
+        "html": "=<p>A new user signed up and is waiting for admin approval.</p>\n<table cellpadding=\"6\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;\">\n  <tr><td><strong>Name</strong></td><td>{{ $json.applicant_name }}</td></tr>\n  <tr><td><strong>Email</strong></td><td>{{ $json.applicant_email }}</td></tr>\n  <tr><td><strong>MLS ID</strong></td><td>{{ $json.applicant_mls_id }}</td></tr>\n  <tr><td><strong>Phone</strong></td><td>{{ $json.applicant_phone }}</td></tr>\n  <tr><td><strong>Submitted</strong></td><td>{{ $json.submitted_at }}</td></tr>\n</table>\n<p style=\"margin-top:20px;\">\n  <a href=\"{{ $json.app_login_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Log in as admin</a>\n  &nbsp;&nbsp;\n  <a href=\"{{ $json.app_approvals_url }}\" style=\"color:#CFB87C;\">Go to Approvals (after login)</a>\n</p>\n<p style=\"color:#666;font-size:12px;\">LocalPRO Hub · Local Pro Realty</p>",
+        "options": {}
+      },
+      "id": "c1c2c3d4-0004-4000-8000-000000000004",
+      "name": "Send Email — Signup (Gmail)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [720, -80],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "c1c2c3d4-0005-4000-8000-000000000005",
+      "name": "No-op (not pending)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [480, 120]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c1c2c3d4-0010-4000-8000-000000000010",
+      "name": "Schedule — Daily 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 320]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localpro-run-milestones",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "c1c2c3d4-0020-4000-8000-000000000020",
+      "name": "Webhook — Run milestones now",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 480],
+      "webhookId": "localpro-run-milestones"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/rpc/get_milestones_due_on",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ p_force: $json.force === true || $json.body?.force === true }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "c1c2c3d4-0011-4000-8000-000000000011",
+      "name": "Fetch due milestones",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 320],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_SUPABASE_SERVICE_CREDENTIAL_ID",
+          "name": "Supabase Service Role"
+        }
+      },
+      "notes": "HTTP Header Auth: apikey + Authorization Bearer = service role key"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst rows = Array.isArray(raw) ? raw : raw?.milestone_id ? [raw] : [];\nconst today = new Date().toISOString().slice(0, 10);\nif (rows.length === 0) {\n  return [{ json: { _no_milestones: true, sent_on: today } }];\n}\nreturn rows.map((row) => ({ json: row }));"
+      },
+      "id": "c1c2c3d4-0012-4000-8000-000000000012",
+      "name": "Normalize milestone rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 320]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-has-milestone-id",
+              "leftValue": "={{ $json.milestone_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c1c2c3d4-0017-4000-8000-000000000017",
+      "name": "IF milestone due",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst today = new Date().toISOString().slice(0, 10);\n\nfunction render(template, vars) {\n  if (!template) return '';\n  return template.replace(/\\{\\{(\\w+)\\}\\}/g, (_, key) => {\n    const val = vars[key];\n    return val === undefined || val === null ? '' : String(val);\n  });\n}\n\nreturn items.map((item) => {\n  const m = item.json;\n  const vars = {\n    agent_name: m.agent_name ?? '',\n    person_name: m.person_name ?? '',\n    custom_label: m.custom_label ?? '',\n    years: m.years_elapsed ?? 0,\n    event_date: m.event_date ?? '',\n    milestone_type: m.milestone_type ?? '',\n  };\n  return {\n    json: {\n      ...m,\n      sent_on: today,\n      email_subject: render(m.subject_template, vars),\n      email_html: render(m.html_body, vars),\n      agent_to_email: m.agent_email,\n    },\n  };\n});"
+      },
+      "id": "c1c2c3d4-0013-4000-8000-000000000013",
+      "name": "Render milestone emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 320]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $json.agent_to_email }}",
+        "subject": "={{ $json.email_subject }}",
+        "emailFormat": "html",
+        "html": "={{ $json.email_html }}",
+        "options": {}
+      },
+      "id": "c1c2c3d4-0014-4000-8000-000000000014",
+      "name": "Send Email — Milestone (Gmail)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [960, 320],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const m = $('Render milestone emails').item.json;\nreturn [{\n  json: {\n    user_id: m.user_id,\n    milestone_id: m.milestone_id,\n    sent_on: m.sent_on,\n  },\n}];"
+      },
+      "id": "c1c2c3d4-0016-4000-8000-000000000016",
+      "name": "Prepare log payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/milestone_email_log",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "c1c2c3d4-0015-4000-8000-000000000015",
+      "name": "Log milestone email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 320],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_SUPABASE_SERVICE_CREDENTIAL_ID",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "c1c2c3d4-0018-4000-8000-000000000018",
+      "name": "No milestones today",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [720, 480]
+    }
+  ],
+  "connections": {
+    "Webhook — Signup pending": {
+      "main": [
+        [
+          {
+            "node": "IF status is pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF status is pending": {
+      "main": [
+        [
+          {
+            "node": "Format signup payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No-op (not pending)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format signup payload": {
+      "main": [
+        [
+          {
+            "node": "Send Email — Signup (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule — Daily 8am": {
+      "main": [
+        [
+          {
+            "node": "Fetch due milestones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook — Run milestones now": {
+      "main": [
+        [
+          {
+            "node": "Fetch due milestones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch due milestones": {
+      "main": [
+        [
+          {
+            "node": "Normalize milestone rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize milestone rows": {
+      "main": [
+        [
+          {
+            "node": "IF milestone due",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF milestone due": {
+      "main": [
+        [
+          {
+            "node": "Render milestone emails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No milestones today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render milestone emails": {
+      "main": [
+        [
+          {
+            "node": "Send Email — Milestone (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email — Milestone (Gmail)": {
+      "main": [
+        [
+          {
+            "node": "Prepare log payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare log payload": {
+      "main": [
+        [
+          {
+            "node": "Log milestone email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

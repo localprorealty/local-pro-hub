@@ -249,6 +249,7 @@ async def mark_listing_live(
         payload = {
             "event": "listing_live",
             "listing_id": listing_id,
+            "brokermint_transaction_id": listing.get("brokermint_transaction_id"),
             "property_address": listing.get("address_full")
             or _pick(form_data, "address_full"),
             "list_price": _pick(form_data, "list_price", "list_price_total")
@@ -428,6 +429,54 @@ def date_to_epoch_ms(date_str: str | None) -> int:
         return int(dt.replace(tzinfo=timezone.utc).timestamp() * 1000)
     except Exception:
         return int(datetime.utcnow().timestamp() * 1000)
+
+
+async def _trigger_docs_pending_notification(
+    client: Any,
+    listing_id: str,
+    agent_id: str,
+    listing: dict[str, Any],
+    txn_id: str,
+) -> None:
+    settings = get_settings()
+    webhook_url = settings.n8n_docs_pending_webhook_url.strip()
+    if not webhook_url:
+        return
+
+    agent = _single_row(
+        client.table("users")
+        .select("full_name, email")
+        .eq("id", agent_id),
+    ) or {}
+
+    agent_email = agent.get("email")
+    if not agent_email:
+        return
+
+    form_data = listing.get("form_data") or {}
+    frontend_url = settings.frontend_url.strip() or (
+        settings.cors_origin_list[0] if settings.cors_origin_list else "http://localhost:5173"
+    )
+
+    payload = {
+        "event": "docs_pending",
+        "listing_id": listing_id,
+        "brokermint_transaction_id": txn_id,
+        "property_address": listing.get("address_full") or _pick(form_data, "address_full") or "New Listing",
+        "agent_name": agent.get("full_name", ""),
+        "recipients": [agent_email],
+        "listing_url": f"{frontend_url.rstrip('/')}/listing/{listing_id}",
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as http_client:
+            await http_client.post(
+                webhook_url,
+                json=payload,
+                headers={"Content-Type": "application/json"},
+            )
+    except httpx.HTTPError:
+        pass
 
 
 async def _trigger_marketing_notification(
@@ -671,6 +720,9 @@ async def transition_listing(
             "stage": target_stage,
             "brokermint_transaction_id": str(txn_id)
         }).eq("id", listing_id).execute()
+        
+        # 9. Trigger docs_pending notification
+        await _trigger_docs_pending_notification(client, listing_id, agent_id, listing, str(txn_id))
         
     else:
         # Standard transition

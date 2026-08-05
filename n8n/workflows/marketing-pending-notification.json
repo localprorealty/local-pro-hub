@@ -89,7 +89,7 @@
         "toEmail": "={{ $env.MARKETING_EMAIL }}",
         "subject": "=Marketing Pending — {{ $json.property_address }}",
         "emailFormat": "html",
-        "html": "=<p>Hi Marketing Team,</p>\n<p>A listing has transitioned to the <strong>Marketing</strong> stage and needs your attention.</p>\n<p><strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Price:</strong> ${{ $json.list_price }}<br/>\n<strong>Type:</strong> {{ $json.listing_type }}</p>\n<p><strong>Agent:</strong> {{ $json.agent_name }} ({{ $json.agent_email }}, {{ $json.agent_phone }})</p>\n<p><a href=\"{{ $json.listing_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Open listing details</a></p>\n<p>Thank you,<br/>Local Pro Realty</p>",
+        "html": "=<p>Hi Marketing Team,</p>\n<p>A listing has transitioned to the <strong>Marketing</strong> stage and needs your attention.</p>\n<p><strong>Listing ID:</strong> {{ $json.listing_id }}<br/>\n<strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Price:</strong> ${{ $json.list_price }}<br/>\n<strong>Type:</strong> {{ $json.listing_type }}</p>\n<p><strong>Agent:</strong> {{ $json.agent_name }} ({{ $json.agent_email }}, {{ $json.agent_phone }})</p>\n<p><a href=\"{{ $json.listing_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Open listing details</a></p>\n<p>Thank you,<br/>Local Pro Realty</p>",
         "options": {}
       },
       "id": "mkt-pending-0003",

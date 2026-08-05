@@ -217,7 +217,8 @@ Optional env vars on your n8n Docker container (so the workflow can read them):
 
 ```env
 GMAIL_USER=your@gmail.com
-LOCALPRO_ADMIN_EMAIL=admin@localprorealty.com
+LOCALPRO_ADMIN_EMAIL=admin@localprorealty.com (supports comma-separated list of multiple recipients)
+LOCALPRO_MARKETING_EMAIL=marketing@localprorealty.com (supports comma-separated list of multiple recipients)
 LOCALPRO_APP_URL=http://localhost:5173
 SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 ```
@@ -314,7 +315,9 @@ Repeat the same headers on **Log milestone email** (URL ends with `/rest/v1/mile
 
 ```env
 GMAIL_USER=your@gmail.com
-LOCALPRO_ADMIN_EMAIL=admin@localprorealty.com
+LOCALPRO_ADMIN_EMAIL=admin@localprorealty.com (supports comma-separated list of multiple recipients)
+LOCALPRO_MARKETING_EMAIL=marketing@localprorealty.com (supports comma-separated list of multiple recipients)
+MARKETING_EMAIL=marketing@localprorealty.com (supports comma-separated list of multiple recipients)
 LOCALPRO_APP_URL=http://localhost:5173
 SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 ```
@@ -550,4 +553,5 @@ Optional seed: `supabase/seeds/agent_milestones_seed.sql` for `test@localproreal
 | `n8n/workflows/localpro-automations.json` | Single workflow — signup webhook + daily milestone emails |
 | `n8n/workflows/photography-booked-notification.json` | Shoot request → photographer email + SMS |
 | `n8n/workflows/listing-go-live.json` | Listing live → admin email, marketing brief, Lofty HTTP stub |
+| `n8n/workflows/listing-docs-pending-notification.json` | Listing registered → agent registered notification |
 | `n8n/README.md` | This guide |

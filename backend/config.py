@@ -36,8 +36,6 @@ class Settings(BaseSettings):
     heygen_api_key: str = ""
 
     # Email
-    gmail_user: str = "noreply@localpro.com"
-    gmail_app_password: str = ""
     resend_api_key: str = ""
 
     # Twilio
@@ -61,6 +59,7 @@ class Settings(BaseSettings):
     n8n_booking_webhook_url: str = ""
     n8n_go_live_webhook_url: str = ""
     n8n_marketing_webhook_url: str = ""
+    n8n_docs_pending_webhook_url: str = ""
 
     # Integrations
     lofty_webhook_url: str = ""

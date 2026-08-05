@@ -1,0 +1,116 @@
+{
+  "name": "LocalPRO — Listing Registered (Docs Pending)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localpro-listing-docs-pending",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "doc-pending-0001",
+      "name": "Webhook — Docs pending",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "localpro-listing-docs-pending"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f-event",
+              "name": "event",
+              "value": "={{ $json.body?.event ?? $json.event }}",
+              "type": "string"
+            },
+            {
+              "id": "f-listing-id",
+              "name": "listing_id",
+              "value": "={{ $json.body?.listing_id ?? $json.listing_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f-brokermint-transaction-id",
+              "name": "brokermint_transaction_id",
+              "value": "={{ $json.body?.brokermint_transaction_id ?? $json.brokermint_transaction_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f-address",
+              "name": "property_address",
+              "value": "={{ $json.body?.property_address ?? $json.property_address }}",
+              "type": "string"
+            },
+            {
+              "id": "f-agent-name",
+              "name": "agent_name",
+              "value": "={{ $json.body?.agent_name ?? $json.agent_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f-recipients",
+              "name": "recipients",
+              "value": "={{ $json.body?.recipients ?? $json.recipients }}",
+              "type": "array"
+            },
+            {
+              "id": "f-listing-url",
+              "name": "listing_url",
+              "value": "={{ $json.body?.listing_url ?? $json.listing_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "doc-pending-0002",
+      "name": "Format docs pending payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "toEmail": "={{ $json.recipients.join(', ') }}",
+        "subject": "=Listing Registered — {{ $json.property_address }}",
+        "emailFormat": "html",
+        "html": "=<p>Hi {{ $json.agent_name }},</p>\n<p>Your listing has been successfully registered with BrokerMint and moved to the <strong>Docs Pending</strong> stage.</p>\n<table cellpadding=\"6\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;\">\n  <tr><td><strong>Listing ID</strong></td><td>{{ $json.listing_id }}</td></tr>\n  <tr><td><strong>BrokerMint ID</strong></td><td>{{ $json.brokermint_transaction_id }}</td></tr>\n  <tr><td><strong>Property</strong></td><td>{{ $json.property_address }}</td></tr>\n</table>\n<p style=\"margin-top:20px;\"><a href=\"{{ $json.listing_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;display:inline-block;\">View listing in LocalPRO Hub</a></p>\n<p>Thank you,<br/>Local Pro Realty</p>",
+        "options": {}
+      },
+      "id": "doc-pending-0003",
+      "name": "Send Email — Listing Registered",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [520, 0],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Gmail SMTP — LocalPRO"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Docs pending": {
+      "main": [[{ "node": "Format docs pending payload", "type": "main", "index": 0 }]]
+    },
+    "Format docs pending payload": {
+      "main": [
+        [
+          { "node": "Send Email — Listing Registered", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

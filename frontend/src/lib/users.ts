@@ -147,6 +147,16 @@ export async function adminPatchUser(
   })
 }
 
+export async function adminResetPassword(
+  userId: string,
+  payload: { password: string },
+): Promise<{ success: boolean; message: string }> {
+  return api<{ success: boolean; message: string }>(`/admin/users/${userId}/reset-password`, {
+    method: 'POST',
+    body: payload,
+  })
+}
+
 export async function adminCreateUser(
   payload: AdminCreateUserPayload,
 ): Promise<{ id: string; email: string }> {

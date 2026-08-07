@@ -25,6 +25,7 @@ import {
   adminCreateUser,
   adminDeleteUser,
   adminUpdateUser,
+  adminResetPassword,
   diffProfileFields,
   fetchUsersByRole,
   type AdminCreateUserPayload,
@@ -44,6 +45,105 @@ type AdminUserRosterProps = {
   roleFilter: UserRole | 'all'
   title: string
   description: string
+}
+
+function AdminPasswordResetSection({ userId, userEmail }: { userId: string; userEmail: string }) {
+  const [newPassword, setNewPassword] = useState('')
+  const [isResetting, setIsResetting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [showInput, setShowInput] = useState(false)
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
+
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters long.')
+      return
+    }
+
+    setIsResetting(true)
+    try {
+      const response = await adminResetPassword(userId, { password: newPassword })
+      if (response.success) {
+        setSuccess(`Password reset successfully for ${userEmail}.`)
+        setNewPassword('')
+        setShowInput(false)
+      } else {
+        setError(response.message || 'Failed to reset password.')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred.')
+    } finally {
+      setIsResetting(false)
+    }
+  }
+
+  return (
+    <div className="border-t border-[var(--color-border)] pt-6 mt-4 space-y-4">
+      <div>
+        <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Reset Password</h4>
+        <p className="text-[11px] text-[var(--color-text-secondary)] mt-0.5">
+          Manually set a new password for this user's account.
+        </p>
+      </div>
+
+      {error ? <p className="text-xs text-red-300">{error}</p> : null}
+      {success ? <p className="text-xs text-emerald-300">{success}</p> : null}
+
+      {!showInput ? (
+        <Button
+          type="button"
+          onClick={() => setShowInput(true)}
+          className="h-9 rounded-sm border border-red-900 bg-red-950/40 text-red-200 hover:bg-red-900/60"
+        >
+          Reset User Password
+        </Button>
+      ) : (
+        <form onSubmit={handleReset} className="flex gap-2 items-end max-w-md">
+          <div className="flex-1 space-y-1.5">
+            <Label htmlFor="admin-reset-password-input" className="text-[11px] text-[#888888] uppercase tracking-wider">
+              New Password
+            </Label>
+            <Input
+              id="admin-reset-password-input"
+              type="password"
+              required
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Min 8 characters"
+              disabled={isResetting}
+              className="h-9 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              disabled={isResetting}
+              className="h-9 bg-red-900 text-white hover:bg-red-800 disabled:opacity-50"
+            >
+              {isResetting ? 'Saving...' : 'Save'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowInput(false)
+                setError(null)
+                setSuccess(null)
+              }}
+              disabled={isResetting}
+              className="h-9 border-[var(--color-border)] bg-transparent text-[var(--color-white)]"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      )}
+    </div>
+  )
 }
 
 function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRosterProps) {
@@ -521,6 +621,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                   onRequestSave={handleEditSaveRequest}
                   isSaving={isSaving || milestonesLoading}
                 />
+                <AdminPasswordResetSection userId={editingUser.id} userEmail={editingUser.email} />
                 {editingUser.role === 'agent' ? (
                   milestonesLoading ? (
                     <p className="border-t border-[var(--color-border)] pt-6 text-xs text-[var(--color-text-secondary)]">

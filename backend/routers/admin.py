@@ -245,6 +245,52 @@ def patch_user(
     return updated.data
 
 
+class AdminResetPasswordBody(BaseModel):
+    password: str = Field(min_length=8)
+
+
+@router.post("/users/{user_id}/reset-password")
+def reset_user_password(
+    user_id: str,
+    body: AdminResetPasswordBody,
+    _admin_id: str = Depends(require_admin),
+) -> dict[str, Any]:
+    client = get_service_client()
+
+    # Verify user exists in public.users roster
+    existing = (
+        client.table("users")
+        .select("id, email")
+        .eq("id", user_id)
+        .maybe_single()
+        .execute()
+    )
+    if not existing.data:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    try:
+        client.auth.admin.update_user_by_id(
+            user_id,
+            {"password": body.password},
+        )
+        # Invalidate active sessions to revoke existing JWT refresh capability immediately
+        try:
+            client.rpc(
+                "admin_void_user_sessions",
+                {"target_user_id": user_id},
+            ).execute()
+        except Exception as rpc_exc:
+            msg = str(rpc_exc)
+            if "PGRST202" in msg or "schema cache" in msg:
+                print("Warning: admin_void_user_sessions RPC function not found in database. Session invalidation skipped.")
+            else:
+                raise rpc_exc
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"success": True, "message": "Password updated successfully."}
+
+
 class MilestoneInput(BaseModel):
     milestone_type: MilestoneType
     event_date: date

@@ -31,6 +31,7 @@ import ProfilePage from '@/pages/profile/ProfilePage'
 import LoginPage from '@/pages/auth/Login'
 import SignupPage from '@/pages/auth/Signup'
 import SignupPendingPage from '@/pages/auth/SignupPending'
+import ResetPasswordPage from '@/pages/auth/ResetPassword'
 import PhotographerCalendarPage from '@/pages/photographer/PhotographerCalendar'
 
 type AuthState = {
@@ -206,6 +207,10 @@ function App() {
                 <LoginPage />
               </PublicOnlyRoute>
             }
+          />
+          <Route
+            path="/reset-password"
+            element={<ResetPasswordPage />}
           />
           <Route
             path="/signup"

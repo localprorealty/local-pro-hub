@@ -48,7 +48,20 @@ async def extension_login(req: LoginRequest) -> dict[str, Any]:
     except Exception as exc:
         if isinstance(exc, HTTPException):
             raise exc
-        raise HTTPException(status_code=401, detail=str(exc))
+        
+        # Check if it's a known AuthApiError (from supabase_auth)
+        exc_type_name = type(exc).__name__
+        if exc_type_name == "AuthApiError":
+            raise HTTPException(status_code=401, detail=str(exc))
+            
+        # Log unexpected system exceptions (e.g. FileNotFoundError, ConnectionError)
+        import traceback
+        print("Unexpected system error during extension login:")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail="Login failed, please try again."
+        )
 
 @router.get("/listing/{listing_id}")
 async def get_extension_listing(

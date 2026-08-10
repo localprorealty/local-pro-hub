@@ -652,16 +652,16 @@ function clickTabLink(tabName) {
   for (const td of tds) {
     const a = td.querySelector('a');
     if (a && a.textContent.trim().toLowerCase() === tabName.toLowerCase()) {
-      const href = a.getAttribute('href') || '';
-      const match = href.match(/__doPostBack\s*\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
-      if (match) {
-        chrome.runtime.sendMessage({
-          action: 'executePostBack',
-          target: match[1],
-          argument: match[2]
-        });
-        return true;
+      let id = a.id;
+      if (!id) {
+        id = `localpro-temp-click-${Date.now()}`;
+        a.id = id;
       }
+      chrome.runtime.sendMessage({
+        action: 'executeTabClick',
+        elementId: id
+      });
+      return true;
     }
   }
   console.warn(`[LocalPRO] Clickable tab link for "${tabName}" not found on page.`);

@@ -6,7 +6,9 @@
   "permissions": ["storage", "scripting"],
   "host_permissions": [
     "http://localhost:8000/",
-    "https://ntrdd.mlsmatrix.com/"
+    "https://ntrdd.mlsmatrix.com/",
+    "https://*.railway.app/",
+    "https://*.up.railway.app/"
   ],
   "action": {
     "default_popup": "popup.html"

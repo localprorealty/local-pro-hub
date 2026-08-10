@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "zip-extension": "mkdir -p public && (cd ../chrome-extension && zip -r ../frontend/public/extension.zip . -x '*.git*' -x '*.DS_Store*')",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "(npm run zip-extension || echo 'WARNING: extension zip packaging failed, continuing build') && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

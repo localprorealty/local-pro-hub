@@ -33,6 +33,7 @@ import SignupPage from '@/pages/auth/Signup'
 import SignupPendingPage from '@/pages/auth/SignupPending'
 import ResetPasswordPage from '@/pages/auth/ResetPassword'
 import PhotographerCalendarPage from '@/pages/photographer/PhotographerCalendar'
+import ExtensionInstallPage from '@/pages/ExtensionInstall'
 
 type AuthState = {
   isLoading: boolean
@@ -211,6 +212,10 @@ function App() {
           <Route
             path="/reset-password"
             element={<ResetPasswordPage />}
+          />
+          <Route
+            path="/extension"
+            element={<ExtensionInstallPage state={authState} />}
           />
           <Route
             path="/signup"

@@ -2,6 +2,24 @@ import { useEffect, useState } from 'react'
 import { LogOut, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
+const ChromeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="4" />
+    <line x1="21.17" y1="8" x2="12" y2="8" />
+    <line x1="3.95" y1="6.06" x2="8.54" y2="14" />
+    <line x1="10.88" y1="21.94" x2="15.46" y2="14" />
+  </svg>
+)
+
 import { useAuth } from '@/hooks/useAuth'
 import type { UserRole } from '@/lib/auth'
 import { getSupabaseClient } from '@/lib/supabase'
@@ -118,6 +136,13 @@ export function ProfileMenu({ role, email }: ProfileMenuProps) {
         >
           <User className="mr-2 size-4" aria-hidden />
           Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={() => navigate('/extension')}
+          className="cursor-pointer rounded-sm py-2 text-[var(--color-white)] focus:bg-[var(--color-gold-dim)]"
+        >
+          <ChromeIcon className="mr-2 size-4" aria-hidden />
+          Chrome Extension
         </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => void handleLogout()}

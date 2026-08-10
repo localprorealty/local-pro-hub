@@ -1,4 +1,20 @@
-const API_BASE_URL = 'http://localhost:8000';
+let API_BASE_URL = 'https://local-pro-hub-production.up.railway.app';
+
+// Load stored API base URL on startup
+chrome.storage.local.get('apiBaseUrl', (data) => {
+  if (data.apiBaseUrl) {
+    API_BASE_URL = data.apiBaseUrl;
+    console.log('[LocalPRO] Initial API Base URL:', API_BASE_URL);
+  }
+});
+
+// Watch for API base URL updates
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.apiBaseUrl) {
+    API_BASE_URL = changes.apiBaseUrl.newValue;
+    console.log('[LocalPRO] API Base URL updated to:', API_BASE_URL);
+  }
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
@@ -69,23 +85,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: true, listingData: listingData || null });
       }
 
-      else if (message.action === 'executePostBack') {
+      else if (message.action === 'executeTabClick') {
         const tabId = sender.tab.id;
+        const elementId = message.elementId;
         chrome.scripting.executeScript({
           target: { tabId },
           world: 'MAIN',
-          func: (target, arg) => {
+          func: (id) => {
             const script = document.createElement('script');
-            // Escape single quotes in target/arg to prevent breaking the string literal
-            const safeTarget = target.replace(/'/g, "\\'");
-            const safeArg = arg.replace(/'/g, "\\'");
-            script.textContent = `__doPostBack('${safeTarget}', '${safeArg}');`;
+            const safeId = id.replace(/'/g, "\\'");
+            script.textContent = `const el = document.getElementById('${safeId}'); if (el) { el.click(); if (safeId.startsWith('localpro-temp-click-')) { el.removeAttribute('id'); } }`;
             document.documentElement.appendChild(script);
             script.remove();
           },
-          args: [message.target, message.argument]
+          args: [elementId]
         }).catch((err) => {
-          console.error('[LocalPRO] executeScript failed:', err);
+          console.error('[LocalPRO] executeScript for tab click failed:', err);
         });
         sendResponse({ success: true });
       }

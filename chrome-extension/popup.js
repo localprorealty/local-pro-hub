@@ -26,6 +26,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const actionSection = document.getElementById('action-section');
   const fillStatus = document.getElementById('fill-status');
 
+  const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+  const settingsSection = document.getElementById('settings-section');
+  const apiUrlInput = document.getElementById('api-url-input');
+  const saveSettingsBtn = document.getElementById('save-settings-btn');
+  const resetSettingsBtn = document.getElementById('reset-settings-btn');
+  const settingsStatus = document.getElementById('settings-status');
+
   // Check auth state on open
   try {
     const userRes = await chrome.runtime.sendMessage({ action: 'getUser' });
@@ -240,5 +247,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       console.error(err);
     }
+  });
+
+  const DEFAULT_API_URL = 'https://local-pro-hub-production.up.railway.app';
+
+  // Load and pre-populate stored API URL
+  chrome.storage.local.get('apiBaseUrl', (data) => {
+    apiUrlInput.value = data.apiBaseUrl || DEFAULT_API_URL;
+  });
+
+  // Toggle settings panel
+  settingsToggleBtn.addEventListener('click', () => {
+    settingsSection.classList.toggle('hidden');
+  });
+
+  // Save Settings
+  saveSettingsBtn.addEventListener('click', () => {
+    let url = apiUrlInput.value.trim();
+    if (!url) {
+      apiUrlInput.value = DEFAULT_API_URL;
+      url = DEFAULT_API_URL;
+    }
+    // Remove trailing slash if present
+    url = url.replace(/\/+$/, '');
+    chrome.storage.local.set({ apiBaseUrl: url }, () => {
+      settingsStatus.textContent = 'Settings saved successfully!';
+      setTimeout(() => { settingsStatus.textContent = ''; }, 3000);
+    });
+  });
+
+  // Reset Settings
+  resetSettingsBtn.addEventListener('click', () => {
+    apiUrlInput.value = DEFAULT_API_URL;
+    chrome.storage.local.set({ apiBaseUrl: DEFAULT_API_URL }, () => {
+      settingsStatus.textContent = 'Reset to default URL!';
+      setTimeout(() => { settingsStatus.textContent = ''; }, 3000);
+    });
   });
 });

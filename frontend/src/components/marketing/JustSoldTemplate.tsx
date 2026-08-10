@@ -25,7 +25,7 @@ function JustSoldBody({
         className="relative flex shrink-0 items-end justify-between bg-black px-10 pb-6"
         style={{ height: 180 }}
       >
-        <div className="relative">
+        <div className="relative" style={{ height: 140 }}>
           <p className="text-[96px] font-bold leading-none text-white" style={EXPORT_BODY_TEXT}>
             JUST
           </p>

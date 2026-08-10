@@ -18,9 +18,14 @@ def _single_row(builder: Any) -> dict[str, Any] | None:
 
 @router.post("/auth/login")
 async def extension_login(req: LoginRequest) -> dict[str, Any]:
-    client = get_service_client()
+    # Use a temporary client for password validation to prevent mutating global service client headers
+    settings = get_settings()
+    url, key = settings.require_supabase()
+    from supabase import create_client
+    temp_client = create_client(url, key)
+
     try:
-        res = client.auth.sign_in_with_password({
+        res = temp_client.auth.sign_in_with_password({
             "email": req.email,
             "password": req.password
         })
@@ -28,6 +33,7 @@ async def extension_login(req: LoginRequest) -> dict[str, Any]:
             raise HTTPException(status_code=401, detail="Invalid email or password.")
         
         user_id = res.user.id
+        client = get_service_client()
         user_profile = _single_row(
             client.table("users")
             .select("id, role, status, full_name")

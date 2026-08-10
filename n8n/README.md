@@ -490,6 +490,152 @@ Supabase webhooks fire on every `INSERT`. The workflow already has an **IF statu
 
 ---
 
+## Webhook Test Curl Commands
+
+Here are real, confirmed-working `curl` commands for each webhook to test them against production (or local if you replace the domain with `http://localhost:5678`).
+
+### Docs Pending
+```bash
+curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-listing-docs-pending \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "docs_pending",
+    "listing_id": "test-12345",
+    "brokermint_transaction_id": "99999",
+    "property_address": "123 Test St, Dallas, TX",
+    "agent_name": "Andrew Wetzel",
+    "recipients": ["andrew@theandrews.group"],
+    "listing_url": "https://localprohub.netlify.app/listing/test-12345"
+  }'
+```
+* **What to check:** Check the recipient's inbox (e.g., `andrew@theandrews.group`) for a real listing registration email.
+
+### Marketing Pending
+```bash
+curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-marketing-pending \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "marketing_pending",
+    "listing_id": "test-12345",
+    "property_address": "123 Test St, Dallas, TX",
+    "list_price": "450000",
+    "listing_type": "Single Family Residence",
+    "agent_name": "Adarsh Gella",
+    "agent_email": "g.adarsh043@gmail.com",
+    "agent_phone": "469-347-2862",
+    "listing_url": "https://localprohub.netlify.app/listing/test-12345"
+  }'
+```
+* **What to check:** Check the marketing team inbox (defined by `MARKETING_EMAIL` or `LOCALPRO_MARKETING_EMAIL`) for a new marketing task notification email.
+
+### Photography Booked
+```bash
+curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-photography-booked \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "photography_booked",
+    "booking_id": "test-booking-1",
+    "photographer_name": "Test Photographer",
+    "photographer_email": "g.adarsh043@gmail.com",
+    "photographer_phone": "469-000-0000",
+    "property_address": "123 Test St, Dallas, TX",
+    "shoot_date": "2026-08-10",
+    "shoot_time": "10:00 AM",
+    "access_notes": "Lockbox code 1234",
+    "listing_type": "Single Family Residence"
+  }'
+```
+* **What to check:** Check the photographer inbox (`g.adarsh043@gmail.com`) for a shoot booking email. If Twilio is active, check the phone number (`469-000-0000`) for a booking SMS.
+
+### Listing Go Live
+```bash
+curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-listing-live \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "listing_live",
+    "listing_id": "test-12345",
+    "brokermint_transaction_id": "99999",
+    "property_address": "123 Test St, Dallas, TX",
+    "list_price": "450000",
+    "bedrooms": "3",
+    "bathrooms": "2",
+    "sqft": "1850",
+    "property_description": "Beautiful updated home in a great neighborhood.",
+    "school_district": "Dallas ISD",
+    "agent_name": "Adarsh Gella",
+    "agent_email": "g.adarsh043@gmail.com",
+    "agent_phone": "469-347-2862",
+    "listing_url": "https://localprohub.netlify.app/listing/test-12345"
+  }'
+```
+* **What to check:** Check the admin inbox (`LOCALPRO_ADMIN_EMAIL`) and marketing inbox (`LOCALPRO_MARKETING_EMAIL`) for the live listing details and marketing brief emails.
+
+### Signup Pending
+```bash
+curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-signup-pending \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "INSERT",
+    "table": "users",
+    "schema": "public",
+    "record": {
+      "id": "test-user-1",
+      "email": "g.adarsh043@gmail.com",
+      "full_name": "Test Agent",
+      "phone": "469-000-0000",
+      "role": "agent",
+      "mls_id": "0606999",
+      "status": "pending"
+    }
+  }'
+```
+* **What to check:** Check the admin inbox (`LOCALPRO_ADMIN_EMAIL`) for a new user approval request email.
+
+### Run Milestones Now (manual trigger)
+```bash
+curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-run-milestones \
+  -H "Content-Type: application/json" \
+  -d '{"force": true}'
+```
+* **What to check:** Check the n8n Executions tab for a clean run. No email is expected unless a real milestone is due today for an active agent in the database.
+
+---
+
+## Resilience & Pruning Settings (Added after 2026-08-10 Outage)
+
+Following a real outage on 2026-08-10, resilience and auto-pruning configurations were added to n8n.
+
+### Outage Symptoms & Context
+* **Real Symptoms Observed:**
+  * n8n's web UI became unreachable, displaying `"Could not connect to server"`.
+  * Webhook calls failed and returned: `{"code":0,"message":"timeout exceeded when trying to connect"}`.
+  * The PostgreSQL database connection was failing.
+* **Root Cause (Theoretical):**
+  * The exact root cause is **not independently confirmed**.
+  * A theory involving Railway volume/container permission issues was proposed but has not been verified against Railway's own documentation or official support channels.
+
+### Configuration Changes
+The following environment variables were added to the n8n service on Railway (**Railway → n8n → Variables**) to prevent connection issues, configure connection pool limits, and enable execution data pruning:
+
+```env
+DB_POSTGRESDB_HOST=${{Postgres.RAILWAY_PRIVATE_DOMAIN}}
+DB_POSTGRESDB_PORT=${{Postgres.PGPORT}}
+DB_POSTGRESDB_USER=${{Postgres.PGUSER}}
+DB_POSTGRESDB_PASSWORD=${{Postgres.PGPASSWORD}}
+DB_POSTGRESDB_DATABASE=${{Postgres.PGDATABASE}}
+DB_POSTGRESDB_TIMEOUT=60000
+DB_POSTGRESDB_POOL_MAX_CONNECTIONS=30
+EXECUTIONS_DATA_PRUNE=true
+EXECUTIONS_DATA_MAX_AGE=168
+EXECUTIONS_DATA_PRUNE_TIMEOUT=3600
+```
+
+> [!WARNING]
+> During troubleshooting, `DEBUG_MODE=true` was also added to the Postgres service variables.
+> **Action Required:** This setting was added purely for diagnosing the outage. It does not provide real diagnostic value in normal operations, and leaving it on permanently will lead to log bloat and potential database performance degradation. It **should be removed** once the environment is confirmed stable.
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |

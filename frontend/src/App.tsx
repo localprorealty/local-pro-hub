@@ -34,6 +34,10 @@ import SignupPendingPage from '@/pages/auth/SignupPending'
 import ResetPasswordPage from '@/pages/auth/ResetPassword'
 import PhotographerCalendarPage from '@/pages/photographer/PhotographerCalendar'
 import ExtensionInstallPage from '@/pages/ExtensionInstall'
+import {
+  FEATURE_REVENUE_DASHBOARD,
+  FEATURE_MARKET_YOURSELF,
+} from '@/lib/featureFlags'
 
 type AuthState = {
   isLoading: boolean
@@ -293,17 +297,25 @@ function App() {
           <Route
             path="/admin/revenue"
             element={
-              <RevenueRoute state={authState}>
-                <RevenueOverviewPage />
-              </RevenueRoute>
+              FEATURE_REVENUE_DASHBOARD ? (
+                <RevenueRoute state={authState}>
+                  <RevenueOverviewPage />
+                </RevenueRoute>
+              ) : (
+                <Navigate to="/admin/pipeline" replace />
+              )
             }
           />
           <Route
             path="/admin/revenue-share"
             element={
-              <RevenueRoute state={authState}>
-                <RevenueSharePage />
-              </RevenueRoute>
+              FEATURE_REVENUE_DASHBOARD ? (
+                <RevenueRoute state={authState}>
+                  <RevenueSharePage />
+                </RevenueRoute>
+              ) : (
+                <Navigate to="/admin/pipeline" replace />
+              )
             }
           />
           <Route
@@ -320,9 +332,13 @@ function App() {
           <Route
             path="/market-yourself"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent']}>
-                <MarketYourselfPage />
-              </ProtectedRoute>
+              FEATURE_MARKET_YOURSELF ? (
+                <ProtectedRoute state={authState} allowedRoles={['agent']}>
+                  <MarketYourselfPage />
+                </ProtectedRoute>
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
             }
           />
           <Route
@@ -422,9 +438,13 @@ function App() {
           <Route
             path="/overview"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent']}>
-                <OverviewPage />
-              </ProtectedRoute>
+              FEATURE_REVENUE_DASHBOARD ? (
+                <ProtectedRoute state={authState} allowedRoles={['agent']}>
+                  <OverviewPage />
+                </ProtectedRoute>
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
             }
           />
           <Route path="/" element={<Navigate to={resolveHomeRoute(authState.profile)} replace />} />

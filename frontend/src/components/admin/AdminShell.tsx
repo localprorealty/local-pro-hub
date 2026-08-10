@@ -17,6 +17,7 @@ import { QuickLinks } from '@/components/layout/QuickLinks'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile } from '@/lib/users'
+import { FEATURE_REVENUE_DASHBOARD } from '@/lib/featureFlags'
 
 type AdminShellProps = {
   title: string
@@ -145,7 +146,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
                 icon={<RefreshCw className="size-4" />}
                 label="BrokerMint Sync"
               />
-              {canViewRevenue && (
+              {canViewRevenue && FEATURE_REVENUE_DASHBOARD && (
                 <>
                   <ShellNavLink
                     to="/admin/revenue"

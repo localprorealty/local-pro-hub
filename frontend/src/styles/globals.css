@@ -8,6 +8,7 @@
 :root {
   --color-black: #000000;
   --color-gold: #cfb87c;
+  --color-gold-hover: #dcc487;
   --color-gold-dim: rgba(207, 184, 124, 0.13);
   --color-gold-border: rgba(207, 184, 124, 0.33);
   --color-white: #ffffff;
@@ -30,6 +31,7 @@
   --popover: var(--color-surface-3);
   --popover-foreground: var(--color-text);
   --primary: var(--color-gold);
+  --primary-hover: var(--color-gold-hover);
   --primary-foreground: var(--color-black);
   --secondary: var(--color-surface-3);
   --secondary-foreground: var(--color-text);
@@ -66,6 +68,7 @@
   --popover: var(--color-surface-3);
   --popover-foreground: var(--color-text);
   --primary: var(--color-gold);
+  --primary-hover: var(--color-gold-hover);
   --primary-foreground: var(--color-black);
   --secondary: var(--color-surface-3);
   --secondary-foreground: var(--color-text);
@@ -95,6 +98,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);

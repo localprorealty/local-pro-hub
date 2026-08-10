@@ -7,6 +7,16 @@ import { ListingMissionLayout } from '@/components/listing/ListingMissionLayout'
 import { PipelineDotNav } from '@/components/listing/SubmissionPortalSidebar'
 import { Button } from '@/components/ui/button'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   generateListingDescription,
   getListing,
   markListingLive,
@@ -52,6 +62,7 @@ function GoLiveContent() {
   const [agentEmail, setAgentEmail] = useState<string | undefined>()
   const [hasGenerated, setHasGenerated] = useState(false)
   const [copiedListingId, setCopiedListingId] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
   const loadPage = useCallback(async () => {
     if (!id) return
@@ -321,7 +332,7 @@ function GoLiveContent() {
           <Button
             type="button"
             disabled={!canGoLive || isGoingLive}
-            onClick={() => void handleGoLive()}
+            onClick={() => setShowConfirmDialog(true)}
             className="h-14 w-full rounded-sm bg-[#CFB87C] text-base font-bold tracking-wide text-[#0a0a0a] uppercase hover:bg-[#dcc487] disabled:opacity-50"
           >
             {isGoingLive ? (
@@ -333,6 +344,29 @@ function GoLiveContent() {
               'Mark as live →'
             )}
           </Button>
+
+          <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm MLS Submission</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Have you completed MLS submission for this listing? Make sure you have actually submitted the listing details to Matrix/NTREIS before marking it as live in LocalPRO Hub.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setShowConfirmDialog(false)
+                    void handleGoLive()
+                  }}
+                  className="bg-[#CFB87C] text-[#0a0a0a] hover:bg-[#dcc487]"
+                >
+                  Yes, Mark as Live
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {actionError ? (
             <p className="text-center text-sm text-red-300" role="alert">

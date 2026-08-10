@@ -14,6 +14,10 @@ import { shellPanelClass } from '@/components/layout/GridBackground'
 import { QuickLinks } from '@/components/layout/QuickLinks'
 import { PIPELINE_STAGES, STAGE_LABEL } from '@/lib/listings'
 import type { UserRole } from '@/lib/auth'
+import {
+  FEATURE_REVENUE_DASHBOARD,
+  FEATURE_MARKET_YOURSELF,
+} from '@/lib/featureFlags'
 
 type AgentSidebarProps = {
   role: Exclude<UserRole, 'admin'>
@@ -80,11 +84,13 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
         <nav className="space-y-1">
           {role === 'agent' ? (
             <>
-              <SidebarNavLink
-                to="/overview"
-                icon={<LayoutDashboard className="size-4" />}
-                label="Overview"
-              />
+              {FEATURE_REVENUE_DASHBOARD && (
+                <SidebarNavLink
+                  to="/overview"
+                  icon={<LayoutDashboard className="size-4" />}
+                  label="Overview"
+                />
+              )}
               <SidebarNavLink
                 to="/dashboard"
                 end
@@ -107,7 +113,7 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
               label="New Listing"
             />
           ) : null}
-          {role === 'agent' ? (
+          {role === 'agent' && FEATURE_MARKET_YOURSELF ? (
             <SidebarNavLink
               to="/market-yourself"
               icon={<Video className="size-4" />}

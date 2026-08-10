@@ -14,6 +14,7 @@ import { AdminShell } from '@/components/admin/AdminShell'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
+import { FEATURE_SPONSOR_TREE } from '@/lib/featureFlags'
 
 type SuggestedPayment = {
   recipient_id: string
@@ -312,12 +313,13 @@ function RevenueShareContent() {
           {(
             [
               { key: 'ledger', label: 'Payout Suggested Ledger', icon: <DollarSign className="size-4 mr-2" /> },
-              { key: 'overrides', label: 'Agent Overrides', icon: <Edit className="size-4 mr-2" /> },
-              { key: 'resolution', label: 'Sponsor Resolution', icon: <UserCheck className="size-4 mr-2" /> },
+              FEATURE_SPONSOR_TREE ? { key: 'overrides', label: 'Agent Overrides', icon: <Edit className="size-4 mr-2" /> } : null,
+              FEATURE_SPONSOR_TREE ? { key: 'resolution', label: 'Sponsor Resolution', icon: <UserCheck className="size-4 mr-2" /> } : null,
               { key: 'settings', label: 'Global Settings', icon: <Settings className="size-4 mr-2" /> },
               { key: 'calc', label: 'Calculations Run', icon: <RefreshCw className="size-4 mr-2" /> },
-            ] as const
-          ).map(tab => (
+            ] as ({ key: ActiveTab; label: string; icon: JSX.Element } | null)[]
+          ).filter((t): t is { key: ActiveTab; label: string; icon: JSX.Element } => t !== null)
+          .map(tab => (
             <button
               key={tab.key}
               type="button"
@@ -465,7 +467,7 @@ function RevenueShareContent() {
               )}
 
               {/* OVERRIDES TAB */}
-              {activeTab === 'overrides' && (
+              {activeTab === 'overrides' && FEATURE_SPONSOR_TREE && (
                 <div className="space-y-6">
                   <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
                     <table className="w-full text-left text-xs">
@@ -615,7 +617,7 @@ function RevenueShareContent() {
               )}
 
               {/* RESOLUTION TAB */}
-              {activeTab === 'resolution' && (
+              {activeTab === 'resolution' && FEATURE_SPONSOR_TREE && (
                 <div className="space-y-6">
                   <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
                     <table className="w-full text-left text-xs">

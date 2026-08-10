@@ -81,9 +81,14 @@ async def require_photographer(
 
 
 def _profile_for_token_full(token: str) -> dict:
-    client = get_service_client()
+    # Use a temporary client for token validation to prevent mutating global service client headers
+    settings = get_settings()
+    url, key = settings.require_supabase()
+    from supabase import create_client
+    temp_client = create_client(url, key)
+
     try:
-        user_response = client.auth.get_user(token)
+        user_response = temp_client.auth.get_user(token)
     except Exception as exc:
         raise HTTPException(status_code=401, detail="Invalid session.") from exc
 
@@ -91,6 +96,7 @@ def _profile_for_token_full(token: str) -> dict:
     if not user:
         raise HTTPException(status_code=401, detail="Invalid session.")
 
+    client = get_service_client()
     result = (
         client.table("users")
         .select("id, role, status, email, can_view_revenue")

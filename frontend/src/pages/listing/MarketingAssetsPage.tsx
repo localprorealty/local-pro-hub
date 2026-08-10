@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Download, Loader2 } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -88,6 +88,10 @@ function MarketingAssetsContent() {
   const [refineError, setRefineError] = useState<string | null>(null)
   const [downloadError, setDownloadError] = useState<string | null>(null)
 
+  const [hasCheckedDraft, setHasCheckedDraft] = useState(false)
+  const [isDraftRestored, setIsDraftRestored] = useState(false)
+  const maxWaitRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const loadPage = useCallback(async () => {
     if (!id) return
     setIsLoading(true)
@@ -97,10 +101,25 @@ function MarketingAssetsContent() {
         data: { session },
       } = await getSupabaseClient().auth.getSession()
       const userId = session?.user?.id
-      const [listingRow, profile] = await Promise.all([
+      const token = session?.access_token
+      
+      const [listingRow, profile, draftRes] = await Promise.all([
         getListing(id),
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
+        token
+          ? fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/listings/${id}/marketing/draft`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            )
+              .then((r) => r.json())
+              .catch(() => null)
+          : Promise.resolve(null),
       ])
+
       if (!listingRow) throw new Error('Listing not found')
       if (listingRow.stage !== 'marketing') {
         navigate(`/listing/${id}`, { replace: true })
@@ -109,6 +128,23 @@ function MarketingAssetsContent() {
       setListing(listingRow)
       if (profile?.email) setAgentEmail(profile.email)
       setUserProfile(profile)
+
+      if (draftRes && draftRes.draft) {
+        const draft = draftRes.draft
+        if (draft.step) setStep(draft.step)
+        if (draft.activeTab) setActiveTab(draft.activeTab)
+        if (draft.activePageKey) setActivePageKey(draft.activePageKey)
+        if (draft.flyerDescription) setFlyerDescription(draft.flyerDescription)
+        if (draft.propertyDescription) setPropertyDescription(draft.propertyDescription)
+        if (draft.agentBio) setAgentBio(draft.agentBio)
+        if (draft.agentContact) setAgentContact(draft.agentContact)
+        if (draft.neighborhoodGuide) setNeighborhoodGuide(draft.neighborhoodGuide)
+        if (draft.refinementHistory) setRefinementHistory(draft.refinementHistory)
+        if (draft.undoStacks) setUndoStacks(draft.undoStacks)
+        if (draft.photos) setPhotos(draft.photos)
+        setIsDraftRestored(true)
+      }
+      setHasCheckedDraft(true)
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : 'Unable to load listing.')
     } finally {
@@ -117,27 +153,118 @@ function MarketingAssetsContent() {
   }, [id, navigate])
 
   useEffect(() => {
-    if (!listing) return
+    if (!listing || !hasCheckedDraft || isDraftRestored) return
     const context = buildListingContext(listing)
     setFlyerDescription(context.property_description)
     setPropertyDescription(context.property_description)
     setAgentBio(
       `${userProfile?.full_name ?? 'Your agent'} is an experienced North Texas real estate professional dedicated to guiding clients through every step of the transaction with clarity and care.`,
     )
-  }, [listing, userProfile?.full_name])
+  }, [listing, userProfile?.full_name, hasCheckedDraft, isDraftRestored])
 
   useEffect(() => {
-    if (!userProfile) return
+    if (!userProfile || !hasCheckedDraft || isDraftRestored) return
     setAgentContact({
       full_name: userProfile.full_name?.trim() || 'Your Agent',
       phone: userProfile.phone?.trim() || '',
       email: userProfile.email?.trim() || '',
     })
-  }, [userProfile])
+  }, [userProfile, hasCheckedDraft, isDraftRestored])
 
   useEffect(() => {
     void loadPage()
   }, [loadPage])
+
+  // Cleanup maxWait timer on unmount
+  useEffect(() => {
+    return () => {
+      if (maxWaitRef.current) {
+        clearTimeout(maxWaitRef.current)
+      }
+    }
+  }, [])
+
+  // Auto-save debounced effect
+  useEffect(() => {
+    if (!id || !hasCheckedDraft) return
+
+    const saveState = async () => {
+      try {
+        const { getSupabaseClient } = await import('@/lib/supabase')
+        const session = await getSupabaseClient().auth.getSession()
+        const token = session.data.session?.access_token
+        if (!token) return
+
+        const serializablePhotos = photos.map((p) => ({
+          id: p.id,
+          category: p.category,
+          photo_path: p.photo_path,
+        }))
+
+        const statePayload = {
+          step,
+          activeTab,
+          activePageKey,
+          flyerDescription,
+          propertyDescription,
+          agentBio,
+          agentContact,
+          neighborhoodGuide,
+          refinementHistory,
+          undoStacks,
+          photos: serializablePhotos,
+        }
+
+        await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/listings/${id}/marketing/draft`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ state: statePayload }),
+          }
+        )
+      } catch (err) {
+        console.error('Failed to auto-save marketing draft:', err)
+      }
+    }
+
+    const debounceTimeout = setTimeout(() => {
+      void saveState()
+      if (maxWaitRef.current) {
+        clearTimeout(maxWaitRef.current)
+        maxWaitRef.current = null
+      }
+    }, 2000)
+
+    if (!maxWaitRef.current) {
+      maxWaitRef.current = setTimeout(() => {
+        void saveState()
+        clearTimeout(debounceTimeout)
+        maxWaitRef.current = null
+      }, 10000)
+    }
+
+    return () => {
+      clearTimeout(debounceTimeout)
+    }
+  }, [
+    id,
+    hasCheckedDraft,
+    step,
+    photos,
+    activeTab,
+    activePageKey,
+    flyerDescription,
+    propertyDescription,
+    agentBio,
+    agentContact,
+    neighborhoodGuide,
+    refinementHistory,
+    undoStacks,
+  ])
 
   const agentProfile = useMemo(() => {
     const base = buildAgentProfile(userProfile, photos)
@@ -338,6 +465,7 @@ function MarketingAssetsContent() {
     >
       {step === 'upload' ? (
         <PhotoUploadStep
+          listingId={id}
           photos={photos}
           onPhotosChange={setPhotos}
           onContinue={() => setStep('payment')}

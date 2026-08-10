@@ -582,3 +582,61 @@ async def run_milestone_automation(
         ) from exc
 
     return {"ok": True, "force": force}
+
+
+@router.post("/marketing/cleanup-drafts")
+async def cleanup_expired_drafts(
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    # Support both admin user sessions and system service key authentication (for n8n crons)
+    settings = get_settings()
+    is_system = False
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ").strip()
+        if token == settings.supabase_service_key:
+            is_system = True
+            
+    if not is_system:
+        # Fallback to require_admin logic
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Missing authorization token.")
+        token = authorization.removeprefix("Bearer ").strip()
+        from deps.auth import _profile_for_token
+        row = _profile_for_token(token)
+        if row.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Admin access required.")
+
+    # Execute cleanup using the service-role client (bypasses RLS to see all drafts)
+    client = get_service_client()
+    
+    # 1. Fetch drafts older than 30 days
+    from datetime import datetime, timedelta, timezone
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    
+    try:
+        expired = client.table("marketing_drafts").select("listing_id").lt("updated_at", cutoff).execute()
+        if not expired or not expired.data:
+            return {"success": True, "deleted_count": 0}
+            
+        deleted_count = 0
+        for draft in expired.data:
+            listing_id = draft["listing_id"]
+            
+            # Delete DB record
+            client.table("marketing_drafts").delete().eq("listing_id", listing_id).execute()
+            
+            # Delete associated files in Supabase storage
+            try:
+                files_res = client.storage.from_("marketing-drafts").list(path=listing_id)
+                if files_res:
+                    file_names = [f"{listing_id}/{file['name']}" for file in files_res]
+                    if file_names:
+                        client.storage.from_("marketing-drafts").remove(file_names)
+            except Exception as se:
+                print(f"Failed to clear files for listing {listing_id} from storage: {se}")
+                
+            deleted_count += 1
+            
+        return {"success": True, "deleted_count": deleted_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cleanup failed: {e}")

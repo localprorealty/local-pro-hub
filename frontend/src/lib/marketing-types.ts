@@ -22,9 +22,12 @@ export type PhotoCategory =
 
 export type PhotoUpload = {
   id: string
-  file: File
+  file?: File
   preview: string
   category: PhotoCategory
+  photo_path?: string
+  isUploading?: boolean
+  error?: string
 }
 
 export type CommuteTime = {

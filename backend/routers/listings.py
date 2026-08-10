@@ -4,7 +4,7 @@ from typing import Any
 
 import groq
 import httpx
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile, File
 from pydantic import BaseModel, Field
 
 from config import get_settings
@@ -730,6 +730,17 @@ async def transition_listing(
         if target_stage == "marketing":
             await _trigger_marketing_notification(client, listing_id, agent_id, listing)
         
+    if target_stage in ["mls_submitted", "live", "closed"]:
+        try:
+            client.table("marketing_drafts").delete().eq("listing_id", listing_id).execute()
+            files_res = client.storage.from_("marketing-drafts").list(path=listing_id)
+            if files_res:
+                file_names = [f"{listing_id}/{file['name']}" for file in files_res]
+                if file_names:
+                    client.storage.from_("marketing-drafts").remove(file_names)
+        except Exception as cle:
+            print(f"Failed to clean up marketing draft/files for listing {listing_id}: {cle}")
+
     return {"success": True, "stage": target_stage}
 
 
@@ -769,4 +780,120 @@ async def add_marketing_asset(
     )
 
     return {"success": True, "marketing_statuses": marketing_statuses}
+
+
+class SaveDraftRequest(BaseModel):
+    state: dict[str, Any]
+
+
+@router.post("/{listing_id}/marketing/draft")
+async def save_marketing_draft(
+    listing_id: str,
+    req: SaveDraftRequest,
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+    
+    try:
+        existing = client.table("marketing_drafts").select("id").eq("listing_id", listing_id).maybe_single().execute()
+        if existing and existing.data:
+            client.table("marketing_drafts").update({
+                "state": req.state,
+                "updated_at": "now()"
+            }).eq("listing_id", listing_id).execute()
+        else:
+            client.table("marketing_drafts").insert({
+                "listing_id": listing_id,
+                "agent_id": agent_id,
+                "state": req.state
+            }).execute()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to save marketing draft: {e}"
+        )
+        
+    return {"success": True}
+
+
+@router.get("/{listing_id}/marketing/draft")
+async def get_marketing_draft(
+    listing_id: str,
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+    
+    try:
+        res = client.table("marketing_drafts").select("state, updated_at").eq("listing_id", listing_id).maybe_single().execute()
+        if not res or not res.data:
+            return {"draft": None}
+            
+        state = res.data.get("state") or {}
+        
+        # Regenerate signed URLs for photos
+        photos = state.get("photos") or []
+        for photo in photos:
+            photo_path = photo.get("photo_path")
+            if photo_path:
+                try:
+                    signed_res = client.storage.from_("marketing-drafts").create_signed_url(photo_path, 86400)
+                    signed_url = signed_res.get("signedURL") or signed_res.get("signedUrl")
+                    photo["preview"] = signed_url
+                except Exception as e:
+                    print(f"Error signing URL for {photo_path}: {e}")
+                    
+        return {"draft": state}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to load marketing draft: {e}"
+        )
+
+
+@router.post("/{listing_id}/marketing/upload-photo")
+async def upload_marketing_photo(
+    listing_id: str,
+    file: UploadFile = File(...),
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+    
+    import uuid
+    import os
+    ext = os.path.splitext(file.filename)[1] if file.filename else ".jpg"
+    if not ext:
+        ext = ".jpg"
+    photo_uuid = str(uuid.uuid4())
+    photo_path = f"{listing_id}/{photo_uuid}{ext}"
+    
+    contents = await file.read()
+    try:
+        client.storage.from_("marketing-drafts").upload(
+            photo_path,
+            contents,
+            {"content-type": file.content_type or "image/jpeg"}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload photo to storage: {e}"
+        )
+        
+    try:
+        signed_res = client.storage.from_("marketing-drafts").create_signed_url(photo_path, 86400)
+        signed_url = signed_res.get("signedURL") or signed_res.get("signedUrl")
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate signed URL: {e}"
+        )
+        
+    return {
+        "success": True,
+        "photo_path": photo_path,
+        "signed_url": signed_url,
+    }
 

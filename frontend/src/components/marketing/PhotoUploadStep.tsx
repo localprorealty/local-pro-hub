@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { fileToDataUrl } from '@/lib/marketing-data'
+
 import {
   MAX_PHOTOS,
   PHOTO_CATEGORY_OPTIONS,
@@ -19,52 +19,114 @@ import {
 } from '@/lib/marketing-types'
 
 type PhotoUploadStepProps = {
+  listingId?: string
   photos: PhotoUpload[]
-  onPhotosChange: (photos: PhotoUpload[]) => void
+  onPhotosChange: (photos: PhotoUpload[] | ((prev: PhotoUpload[]) => PhotoUpload[])) => void
   onContinue: () => void
 }
 
 export function PhotoUploadStep({
+  listingId,
   photos,
   onPhotosChange,
   onContinue,
 }: PhotoUploadStepProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const hasHero = photos.some((photo) => photo.category === 'hero')
+  const isUploadingAny = photos.some((photo) => photo.isUploading)
 
   const handleFiles = useCallback(
     async (files: FileList | null) => {
-      if (!files) return
+      if (!files || !listingId) return
       const remaining = MAX_PHOTOS - photos.length
       const selected = Array.from(files).slice(0, remaining)
 
-      const uploads: PhotoUpload[] = []
+      const newPhotos: PhotoUpload[] = []
       for (const file of selected) {
         if (!file.type.startsWith('image/')) continue
-        const preview = await fileToDataUrl(file)
-        uploads.push({
+        const localPreview = URL.createObjectURL(file)
+        newPhotos.push({
           id: crypto.randomUUID(),
           file,
-          preview,
+          preview: localPreview,
           category: 'other',
+          isUploading: true,
         })
       }
 
-      if (uploads.length > 0) {
-        onPhotosChange([...photos, ...uploads])
-      }
+      if (newPhotos.length === 0) return
+
+      onPhotosChange((prev) => [...prev, ...newPhotos])
+
+      const uploadPromises = newPhotos.map(async (photo) => {
+        const formData = new FormData()
+        if (photo.file) {
+          formData.append('file', photo.file)
+        }
+
+        try {
+          const { getSupabaseClient } = await import('@/lib/supabase')
+          const session = await getSupabaseClient().auth.getSession()
+          const token = session.data.session?.access_token
+
+          const response = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/listings/${listingId}/marketing/upload-photo`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: formData,
+            }
+          )
+
+          if (!response.ok) {
+            throw new Error(`Upload failed (${response.status})`)
+          }
+
+          const data = await response.json()
+
+          onPhotosChange((prevPhotos) =>
+            prevPhotos.map((p) =>
+              p.id === photo.id
+                ? {
+                    ...p,
+                    isUploading: false,
+                    photo_path: data.photo_path,
+                    preview: data.signed_url,
+                  }
+                : p
+            )
+          )
+        } catch (err) {
+          console.error(err)
+          onPhotosChange((prevPhotos) =>
+            prevPhotos.map((p) =>
+              p.id === photo.id
+                ? {
+                    ...p,
+                    isUploading: false,
+                    error: err instanceof Error ? err.message : 'Upload failed',
+                  }
+                : p
+            )
+          )
+        }
+      })
+
+      await Promise.all(uploadPromises)
     },
-    [onPhotosChange, photos],
+    [listingId, onPhotosChange, photos.length],
   )
 
   const updateCategory = (id: string, category: PhotoCategory) => {
-    onPhotosChange(
-      photos.map((photo) => (photo.id === id ? { ...photo, category } : photo)),
+    onPhotosChange((prev) =>
+      prev.map((photo) => (photo.id === id ? { ...photo, category } : photo)),
     )
   }
 
   const removePhoto = (id: string) => {
-    onPhotosChange(photos.filter((photo) => photo.id !== id))
+    onPhotosChange((prev) => prev.filter((photo) => photo.id !== id))
   }
 
   return (
@@ -123,6 +185,18 @@ export function PhotoUploadStep({
                   alt="Upload preview"
                   className="size-full object-cover"
                 />
+                {photo.isUploading ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 text-white">
+                    <Loader2 className="size-6 animate-spin text-[#CFB87C]" />
+                    <span className="mt-2 text-xs">Uploading...</span>
+                  </div>
+                ) : null}
+                {photo.error ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/85 p-2 text-center text-red-300">
+                    <span className="text-xs font-semibold">Error</span>
+                    <span className="mt-1 text-[10px] line-clamp-2">{photo.error}</span>
+                  </div>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => removePhoto(photo.id)}
@@ -137,6 +211,7 @@ export function PhotoUploadStep({
                 <Select
                   value={photo.category}
                   onValueChange={(value) => updateCategory(photo.id, value as PhotoCategory)}
+                  disabled={photo.isUploading}
                 >
                   <SelectTrigger className="mt-1 w-full border-[var(--color-border)] bg-[#0a0a0a] text-white">
                     <SelectValue />
@@ -158,7 +233,7 @@ export function PhotoUploadStep({
       <div className="flex justify-end">
         <Button
           type="button"
-          disabled={!hasHero}
+          disabled={!hasHero || isUploadingAny}
           onClick={onContinue}
           className="h-11 rounded-sm bg-[#CFB87C] px-6 font-semibold text-[#0a0a0a] hover:bg-[#dcc487] disabled:opacity-50"
         >

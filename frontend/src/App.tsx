@@ -438,13 +438,9 @@ function App() {
           <Route
             path="/overview"
             element={
-              FEATURE_REVENUE_DASHBOARD ? (
-                <ProtectedRoute state={authState} allowedRoles={['agent']}>
-                  <OverviewPage />
-                </ProtectedRoute>
-              ) : (
-                <Navigate to="/dashboard" replace />
-              )
+              <ProtectedRoute state={authState} allowedRoles={['agent']}>
+                <OverviewPage />
+              </ProtectedRoute>
             }
           />
           <Route path="/" element={<Navigate to={resolveHomeRoute(authState.profile)} replace />} />

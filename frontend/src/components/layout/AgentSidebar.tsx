@@ -15,7 +15,6 @@ import { QuickLinks } from '@/components/layout/QuickLinks'
 import { PIPELINE_STAGES, STAGE_LABEL } from '@/lib/listings'
 import type { UserRole } from '@/lib/auth'
 import {
-  FEATURE_REVENUE_DASHBOARD,
   FEATURE_MARKET_YOURSELF,
 } from '@/lib/featureFlags'
 
@@ -52,6 +51,29 @@ function SidebarNavLink({
   )
 }
 
+function DisabledNavItem({
+  icon,
+  label,
+}: {
+  icon: ReactNode
+  label: string
+}) {
+  return (
+    <div
+      className="flex w-full cursor-not-allowed items-center justify-between rounded-sm px-3 py-2.5 text-left text-xs tracking-wide uppercase text-[var(--color-text-secondary)]/40"
+      aria-disabled
+    >
+      <div className="flex items-center gap-3">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <span className="text-[9px] tracking-widest text-[var(--color-gold)]/40 normal-case pr-1">
+        Coming Soon
+      </span>
+    </div>
+  )
+}
+
 export function AgentSidebar({ role }: AgentSidebarProps) {
   const roleLabel =
     role === 'marketing'
@@ -84,13 +106,11 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
         <nav className="space-y-1">
           {role === 'agent' ? (
             <>
-              {FEATURE_REVENUE_DASHBOARD && (
-                <SidebarNavLink
-                  to="/overview"
-                  icon={<LayoutDashboard className="size-4" />}
-                  label="Overview"
-                />
-              )}
+              <SidebarNavLink
+                to="/overview"
+                icon={<LayoutDashboard className="size-4" />}
+                label="Overview"
+              />
               <SidebarNavLink
                 to="/dashboard"
                 end
@@ -113,13 +133,20 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
               label="New Listing"
             />
           ) : null}
-          {role === 'agent' && FEATURE_MARKET_YOURSELF ? (
-            <SidebarNavLink
-              to="/market-yourself"
-              icon={<Video className="size-4" />}
-              label="Market Yourself"
-            />
-          ) : null}
+          {role === 'agent' && (
+            FEATURE_MARKET_YOURSELF ? (
+              <SidebarNavLink
+                to="/market-yourself"
+                icon={<Video className="size-4" />}
+                label="Market Yourself"
+              />
+            ) : (
+              <DisabledNavItem
+                icon={<Video className="size-4" />}
+                label="Market Yourself"
+              />
+            )
+          )}
           <SidebarNavLink
             to="/profile"
             icon={<User className="size-4" />}

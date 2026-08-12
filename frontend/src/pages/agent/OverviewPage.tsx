@@ -7,6 +7,7 @@ import { MissionShell } from '@/components/layout/MissionShell'
 import { getMyHistory, type TransactionHistory } from '@/lib/brokermint'
 import CapProgressCard from '@/components/overview/CapProgressCard'
 import { api } from '@/lib/api'
+import { FEATURE_REVENUE_DASHBOARD } from '@/lib/featureFlags'
 
 type ActiveTab = 'history' | 'earnings' | 'revenue_share'
 type StatusFilter = 'all' | 'closed' | 'active' | 'pending' | 'cancelled'
@@ -176,40 +177,44 @@ function OverviewContent() {
           />
         )}
       </button>
-      <button
-        type="button"
-        onClick={() => setActiveTab('earnings')}
-        className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
-          activeTab === 'earnings'
-            ? 'text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
-        }`}
-      >
-        My Earnings
-        {activeTab === 'earnings' && (
-          <motion.div
-            layoutId="activeTabUnderline"
-            className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
-          />
-        )}
-      </button>
-      <button
-        type="button"
-        onClick={() => setActiveTab('revenue_share')}
-        className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
-          activeTab === 'revenue_share'
-            ? 'text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
-        }`}
-      >
-        Revenue Share
-        {activeTab === 'revenue_share' && (
-          <motion.div
-            layoutId="activeTabUnderline"
-            className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
-          />
-        )}
-      </button>
+      {FEATURE_REVENUE_DASHBOARD && (
+        <>
+          <button
+            type="button"
+            onClick={() => setActiveTab('earnings')}
+            className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
+              activeTab === 'earnings'
+                ? 'text-[var(--color-gold)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+            }`}
+          >
+            My Earnings
+            {activeTab === 'earnings' && (
+              <motion.div
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
+              />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('revenue_share')}
+            className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
+              activeTab === 'revenue_share'
+                ? 'text-[var(--color-gold)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+            }`}
+          >
+            Revenue Share
+            {activeTab === 'revenue_share' && (
+              <motion.div
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
+              />
+            )}
+          </button>
+        </>
+      )}
     </div>
   )
 
@@ -220,7 +225,7 @@ function OverviewContent() {
       subtitle="Track your production history and revenue"
     >
       <div className="max-w-5xl space-y-8">
-        <CapProgressCard />
+        {FEATURE_REVENUE_DASHBOARD && <CapProgressCard />}
 
         {tabHeaderSlot}
 
@@ -435,7 +440,7 @@ function OverviewContent() {
               // PROPERTY HISTORY VIEW
               <>
                 {/* Stats cards */}
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className={`grid gap-4 grid-cols-1 ${FEATURE_REVENUE_DASHBOARD ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Total Closed</p>
@@ -454,14 +459,16 @@ function OverviewContent() {
                     <Calendar className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />
                   </div>
 
-                  <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Total Earned</p>
-                      <h3 className="text-3xl font-bold text-[var(--color-gold)] mt-2">{formatCurrency(stats.total_earned)}</h3>
+                  {FEATURE_REVENUE_DASHBOARD && (
+                    <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Total Earned</p>
+                        <h3 className="text-3xl font-bold text-[var(--color-gold)] mt-2">{formatCurrency(stats.total_earned)}</h3>
+                      </div>
+                      <p className="text-[11px] text-[var(--color-text-secondary)] mt-2">agent split take-home</p>
+                      <DollarSign className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />
                     </div>
-                    <p className="text-[11px] text-[var(--color-text-secondary)] mt-2">agent split take-home</p>
-                    <DollarSign className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />
-                  </div>
+                  )}
                 </div>
 
                 {/* Filter pills */}
@@ -575,7 +582,7 @@ function OverviewContent() {
                               </span>
                             </span>
                           )}
-                          {tx.price && (
+                           {FEATURE_REVENUE_DASHBOARD && tx.price && (
                             <span>
                               Volume: <span className="text-white font-medium">{formatCurrency(tx.price)}</span>
                             </span>
@@ -593,25 +600,27 @@ function OverviewContent() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-6 border-t md:border-t-0 border-[#2a2a2a] pt-3 md:pt-0">
-                        {activeTab === 'history' ? (
-                          <>
+                      {FEATURE_REVENUE_DASHBOARD && (
+                        <div className="flex items-center gap-6 border-t md:border-t-0 border-[#2a2a2a] pt-3 md:pt-0">
+                          {activeTab === 'history' ? (
+                            <>
+                              <div className="text-left md:text-right">
+                                <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Gross</p>
+                                <p className="text-sm font-semibold text-white">{formatCurrency(tx.adjusted_basis)}</p>
+                              </div>
+                              <div className="text-left md:text-right">
+                                <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Net take-home</p>
+                                <p className="text-base font-bold text-[var(--color-gold)]">{formatCurrency(tx.net_commission)}</p>
+                              </div>
+                            </>
+                          ) : (
                             <div className="text-left md:text-right">
-                              <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Gross</p>
-                              <p className="text-sm font-semibold text-white">{formatCurrency(tx.adjusted_basis)}</p>
-                            </div>
-                            <div className="text-left md:text-right">
-                              <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Net take-home</p>
+                              <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Net Earnings</p>
                               <p className="text-base font-bold text-[var(--color-gold)]">{formatCurrency(tx.net_commission)}</p>
                             </div>
-                          </>
-                        ) : (
-                          <div className="text-left md:text-right">
-                            <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Net Earnings</p>
-                            <p className="text-base font-bold text-[var(--color-gold)]">{formatCurrency(tx.net_commission)}</p>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

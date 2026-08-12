@@ -56,13 +56,18 @@ function ShellNavLink({
 
 function DisabledNavItem({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <span
-      className="flex w-full cursor-not-allowed items-center gap-3 px-4 py-3 text-left text-xs tracking-wide text-[var(--color-text-secondary)]/50 uppercase"
+    <div
+      className="flex w-full cursor-not-allowed items-center justify-between px-4 py-3 text-left text-xs tracking-wide text-[var(--color-text-secondary)]/40 uppercase"
       aria-disabled
     >
-      {icon}
-      {label}
-    </span>
+      <div className="flex items-center gap-3">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <span className="text-[9px] tracking-widest text-[var(--color-gold)]/40 normal-case pr-1">
+        Coming Soon
+      </span>
+    </div>
   )
 }
 
@@ -146,19 +151,32 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
                 icon={<RefreshCw className="size-4" />}
                 label="BrokerMint Sync"
               />
-              {canViewRevenue && FEATURE_REVENUE_DASHBOARD && (
-                <>
-                  <ShellNavLink
-                    to="/admin/revenue"
-                    icon={<CircleDollarSign className="size-4" />}
-                    label="Agent Commissions"
-                  />
-                  <ShellNavLink
-                    to="/admin/revenue-share"
-                    icon={<Users className="size-4" />}
-                    label="Revenue Share"
-                  />
-                </>
+              {canViewRevenue && (
+                FEATURE_REVENUE_DASHBOARD ? (
+                  <>
+                    <ShellNavLink
+                      to="/admin/revenue"
+                      icon={<CircleDollarSign className="size-4" />}
+                      label="Agent Commissions"
+                    />
+                    <ShellNavLink
+                      to="/admin/revenue-share"
+                      icon={<Users className="size-4" />}
+                      label="Revenue Share"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <DisabledNavItem
+                      icon={<CircleDollarSign className="size-4" />}
+                      label="Agent Commissions"
+                    />
+                    <DisabledNavItem
+                      icon={<Users className="size-4" />}
+                      label="Revenue Share"
+                    />
+                  </>
+                )
               )}
               <DisabledNavItem icon={<Settings2 className="size-4" />} label="Resources" />
             </nav>

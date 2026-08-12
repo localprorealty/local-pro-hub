@@ -46,7 +46,7 @@ def main():
             print(f"Created new Auth user with ID: {user_id}")
     except Exception as e:
         err_msg = str(e).lower()
-        if "already exists" in err_msg or "already registered" in err_msg or "conflict" in err_msg:
+        if "already" in err_msg or "registered" in err_msg or "exists" in err_msg or "conflict" in err_msg:
             # Look up from auth list or users table
             print("User already exists in Auth, looking up ID...")
             exist_res = supabase.table("users").select("id").eq("email", email).execute()

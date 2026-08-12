@@ -2,6 +2,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from deps.auth import require_agent, get_service_client
+from config import get_settings
 
 router = APIRouter(prefix="/extension", tags=["extension"])
 

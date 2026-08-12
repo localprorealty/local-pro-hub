@@ -34,6 +34,14 @@ function MlsSubmissionContent() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [agentEmail, setAgentEmail] = useState<string | undefined>()
+  const [copiedListingId, setCopiedListingId] = useState(false)
+
+  const handleCopyListingId = async () => {
+    if (!id) return
+    await navigator.clipboard.writeText(id)
+    setCopiedListingId(true)
+    window.setTimeout(() => setCopiedListingId(false), 2000)
+  }
 
   const loadPage = useCallback(async () => {
     if (!id) return
@@ -172,6 +180,25 @@ function MlsSubmissionContent() {
               Open NTREIS Matrix
               <ExternalLink className="ml-2 size-3.5" />
             </Button>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-5 space-y-3">
+          <h5 className="text-xs tracking-wider text-white uppercase font-semibold">LocalPRO Listing Credentials</h5>
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            Copy your LocalPRO Listing ID to load it inside the Chrome Extension helper.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => void handleCopyListingId()}
+              className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[#111111] border border-[#2a2a2a] text-xs font-semibold text-[#CFB87C] hover:bg-[#2a2a2a] transition-colors"
+            >
+              {copiedListingId ? 'Copied!' : 'Copy Listing ID'}
+            </button>
+            <span className="text-xs text-[var(--color-text-secondary)]">
+              (ID: <strong className="text-white font-mono">{id}</strong>)
+            </span>
           </div>
         </div>
 

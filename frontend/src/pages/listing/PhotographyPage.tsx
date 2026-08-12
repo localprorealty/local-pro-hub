@@ -22,7 +22,7 @@ import {
   type Photographer,
   type PhotographerTier,
 } from '@/lib/bookings'
-import { getListing, type Listing } from '@/lib/listings'
+import { getListing, updateListingStage, type Listing } from '@/lib/listings'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile } from '@/lib/users'
 
@@ -49,6 +49,7 @@ function PhotographyContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false)
   const [isBooking, setIsBooking] = useState(false)
+  const [isSkipping, setIsSkipping] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [bookingError, setBookingError] = useState<string | null>(null)
   const [agentEmail, setAgentEmail] = useState<string | undefined>()
@@ -172,6 +173,28 @@ function PhotographyContent() {
     }
   }
 
+  const handleSkip = async () => {
+    if (!id) return
+    setIsSkipping(true)
+    setBookingError(null)
+    try {
+      const ok = await updateListingStage(id, 'shoot_booked')
+      if (ok) {
+        navigate(`/listing/${id}`, {
+          state: {
+            bookingSuccess: 'Photography booking stage skipped.',
+          },
+        })
+      } else {
+        setBookingError('Failed to skip photography booking.')
+      }
+    } catch (error) {
+      setBookingError(error instanceof Error ? error.message : 'Failed to skip.')
+    } finally {
+      setIsSkipping(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center text-[var(--color-text-secondary)]">
@@ -213,6 +236,11 @@ function PhotographyContent() {
               Photographer
             </p>
             <div className="space-y-3">
+              {bookingError ? (
+                <p className="rounded-sm border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-red-300" role="alert">
+                  {bookingError}
+                </p>
+              ) : null}
               {photographers.length === 0 ? (
                 <p className="text-sm text-[var(--color-text-secondary)]">
                   No active photographers available.
@@ -255,6 +283,26 @@ function PhotographyContent() {
                   )
                 })
               )}
+
+              <button
+                type="button"
+                disabled={isSkipping}
+                onClick={() => void handleSkip()}
+                className="w-full rounded-sm border border-dashed border-[var(--color-border)] hover:border-red-500/40 bg-red-950/5 hover:bg-red-950/10 p-4 text-left transition-colors"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-semibold text-white">Skip Photography</p>
+                  <span className="rounded-sm bg-red-900/25 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
+                    Skip Flow
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                  Advance this listing to the next stage without booking photography.
+                </p>
+                <p className="mt-3 text-xs font-bold tracking-widest text-red-300 uppercase">
+                  {isSkipping ? 'Skipping...' : 'Skip Photography →'}
+                </p>
+              </button>
             </div>
             {photographers.some((p) => p.photographer_tier === preferredTier) ? (
               <p className="mt-2 text-xs text-[var(--color-text-secondary)]">

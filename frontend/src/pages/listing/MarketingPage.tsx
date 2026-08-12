@@ -8,6 +8,7 @@ import { PipelineDotNav } from '@/components/listing/SubmissionPortalSidebar'
 import { Button } from '@/components/ui/button'
 import {
   MARKETING_ASSETS,
+  PROCESSING_FEE_CENTS,
   STATUS_LABEL,
   statusBadgeClass,
   type MarketingAssetStatus,
@@ -76,6 +77,13 @@ function MarketingContent() {
     () => MARKETING_ASSETS.filter((asset) => selected.has(asset.id)),
     [selected],
   )
+
+  const subtotalCents = useMemo(
+    () => selectedAssets.reduce((sum, asset) => sum + asset.priceCents, 0),
+    [selectedAssets],
+  )
+
+  const totalCents = subtotalCents > 0 ? subtotalCents + PROCESSING_FEE_CENTS : 0
 
 
 
@@ -218,8 +226,7 @@ function MarketingContent() {
                     {asset.name}
                   </p>
                   <span className="rounded-sm bg-[#2a2a2a] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#CFB87C] uppercase">
-                    <span className="line-through opacity-50 mr-1.5">{asset.priceLabel}</span>
-                    <span>FREE</span>
+                    {asset.priceLabel}
                   </span>
                 </div>
 
@@ -270,19 +277,38 @@ function MarketingContent() {
                 <li key={asset.id} className="flex items-center justify-between text-sm text-white">
                   <span>{asset.name}</span>
                   <span className="text-[var(--color-text-secondary)]">
-                    <span className="line-through mr-1.5">${(asset.priceCents / 100).toFixed(2)}</span>
-                    <span className="text-emerald-400 font-medium">Free</span>
+                    {`$${(asset.priceCents / 100).toFixed(2)}`}
                   </span>
                 </li>
               ))
             )}
           </ul>
 
+          {subtotalCents > 0 ? (
+            <div className="mt-4 flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
+              <span>Processing fee</span>
+              <span>{`$${(PROCESSING_FEE_CENTS / 100).toFixed(2)}`}</span>
+            </div>
+          ) : null}
+
+          {subtotalCents > 0 ? (
+            <div className="mt-4 flex items-end justify-between border-t border-[var(--color-border)]/40 pt-4 mb-4">
+              <div>
+                <p className="text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
+                  Total due
+                </p>
+                <p className="mt-1 font-[family-name:var(--font-display)] text-3xl text-white">
+                  {`$${(totalCents / 100).toFixed(2)}`}
+                </p>
+              </div>
+            </div>
+          ) : null}
+
           <Button
             type="button"
             disabled={selectedAssets.length === 0 || isNotifying}
             onClick={() => void handleNotify()}
-            className="mt-6 h-12 w-full rounded-sm bg-[#CFB87C] text-sm font-bold tracking-wide text-[#0a0a0a] uppercase hover:bg-[#dcc487] disabled:opacity-50"
+            className="h-12 w-full rounded-sm bg-[#CFB87C] text-sm font-bold tracking-wide text-[#0a0a0a] uppercase hover:bg-[#dcc487] disabled:opacity-50"
           >
             {isNotifying ? (
               <>

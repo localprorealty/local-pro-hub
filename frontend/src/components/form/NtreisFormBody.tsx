@@ -69,6 +69,9 @@ export function NtreisFormBody({
     if (agentMlsId && !base.agent_id) {
       base.agent_id = agentMlsId
     }
+    if (!base.supervisor_id) {
+      base.supervisor_id = 'Tricia Andrews (0543406)'
+    }
     return base
   })
   const [activeSectionId, setActiveSectionId] = useState(1)
@@ -164,6 +167,12 @@ export function NtreisFormBody({
       handleFieldChange('agent_id', agentMlsId)
     }
   }, [agentMlsId]) // eslint-disable-line react-hooks/exhaustive-deps -- seed once from profile
+
+  useEffect(() => {
+    if (!formData.supervisor_id) {
+      handleFieldChange('supervisor_id', 'Tricia Andrews (0543406)')
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- seed once on mount
 
   useEffect(() => {
     return () => {

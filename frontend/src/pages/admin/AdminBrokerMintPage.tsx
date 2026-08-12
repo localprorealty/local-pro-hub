@@ -10,6 +10,8 @@ import {
   ChevronDown,
   ChevronUp,
   StopCircle,
+  HelpCircle,
+  X,
 } from 'lucide-react'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -98,6 +100,7 @@ function AdminBrokerMintContent() {
   })
   const [isSavingMappings, setIsSavingMappings] = useState(false)
   const [mappingsMessage, setMappingsMessage] = useState<string | null>(null)
+  const [showMappingInfo, setShowMappingInfo] = useState(false)
 
   const loadStatus = async (showLoader = true) => {
     if (showLoader) setIsLoading(true)
@@ -392,7 +395,42 @@ function AdminBrokerMintContent() {
                 )}
                 {/* Checklist Mappings Settings */}
                 <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm space-y-4">
-                  <h3 className="font-semibold text-lg text-white">BrokerMint Checklist Mappings</h3>
+                  <div className="flex items-center gap-2 relative">
+                    <h3 className="font-semibold text-lg text-white">BrokerMint Checklist Mappings</h3>
+                    <button
+                      type="button"
+                      onClick={() => setShowMappingInfo(!showMappingInfo)}
+                      className="text-[var(--color-text-secondary)] hover:text-white transition-colors"
+                      title="What is this?"
+                    >
+                      <HelpCircle className="size-4" />
+                    </button>
+                    {showMappingInfo && (
+                      <div className="absolute left-0 top-8 z-20 w-80 rounded border border-[var(--color-border)] bg-[var(--color-surface-3)] p-4 shadow-xl text-xs space-y-3 leading-relaxed text-[var(--color-text-secondary)] animate-in fade-in slide-in-from-top-1 duration-150">
+                        <div className="flex items-center justify-between border-b border-[var(--color-border)]/60 pb-2 mb-1">
+                          <span className="font-semibold text-white">Checklist Mapping Guide</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowMappingInfo(false)}
+                            className="text-gray-400 hover:text-white"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        </div>
+                        <p>
+                          BrokerMint uses <strong>Checklist Templates</strong> to track tasks and document requirements for deals.
+                        </p>
+                        <p>
+                          By mapping LocalPRO Listing Types (<code>listing</code>, <code>buyer</code>, or <code>lease</code>) to specific BrokerMint template IDs, the system auto-applies the checklist when syncing.
+                        </p>
+                        <div className="bg-black/35 p-2 rounded font-mono text-[10px] space-y-1 border border-[#222]">
+                          <div>• listing ID: 3301356</div>
+                          <div>• buyer ID: 3301357</div>
+                          <div>• lease ID: 3317147</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <p className="text-xs text-[var(--color-text-secondary)]">
                     Map each LocalPRO Listing Type to its corresponding BrokerMint Checklist Template ID.
                   </p>

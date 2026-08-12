@@ -782,6 +782,31 @@ async def add_marketing_asset(
     return {"success": True, "marketing_statuses": marketing_statuses}
 
 
+class RemoveMarketingAssetRequest(BaseModel):
+    asset_id: str
+
+
+@router.post("/{listing_id}/marketing/remove-asset")
+async def remove_marketing_asset(
+    listing_id: str,
+    req: RemoveMarketingAssetRequest,
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    listing = _require_agent_listing(client, listing_id, agent_id)
+
+    form_data = listing.get("form_data") or {}
+    marketing_statuses = form_data.get("marketing_statuses") or {}
+    if req.asset_id in marketing_statuses:
+        del marketing_statuses[req.asset_id]
+
+    # Save back to Supabase
+    form_data["marketing_statuses"] = marketing_statuses
+    client.table("listings").update({"form_data": form_data}).eq("id", listing_id).execute()
+
+    return {"success": True, "marketing_statuses": marketing_statuses}
+
+
 class SaveDraftRequest(BaseModel):
     state: dict[str, Any]
 

@@ -8,18 +8,13 @@ import { PipelineDotNav } from '@/components/listing/SubmissionPortalSidebar'
 import { Button } from '@/components/ui/button'
 import {
   MARKETING_ASSETS,
-  PROCESSING_FEE_CENTS,
   STATUS_LABEL,
   statusBadgeClass,
   type MarketingAssetStatus,
 } from '@/lib/marketing-assets'
-import { getListing, getMarketingAssetsPath, getMlsPath, addMarketingAsset, type Listing } from '@/lib/listings'
+import { getListing, getMarketingAssetsPath, getMlsPath, addMarketingAsset, removeMarketingAsset, type Listing } from '@/lib/listings'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile } from '@/lib/users'
-
-function formatCents(cents: number): string {
-  return `$${(cents / 100).toFixed(cents % 100 === 0 ? 0 : 2)}`
-}
 
 function MarketingContent() {
   const { id } = useParams<{ id: string }>()
@@ -82,12 +77,9 @@ function MarketingContent() {
     [selected],
   )
 
-  const subtotalCents = useMemo(
-    () => selectedAssets.reduce((sum, asset) => sum + asset.priceCents, 0),
-    [selectedAssets],
-  )
 
-  const totalCents = subtotalCents > 0 ? subtotalCents + PROCESSING_FEE_CENTS : 0
+
+
 
   const handleAddAsset = async (assetId: string) => {
     if (!id) return
@@ -117,6 +109,43 @@ function MarketingContent() {
         next.delete(assetId)
         return next
       })
+    }
+  }
+
+  const handleRemoveAsset = async (assetId: string) => {
+    if (!id) return
+
+    // Preemptively update local state
+    setStatuses((prev) => {
+      const next = { ...prev }
+      delete next[assetId]
+      return next
+    })
+    setSelected((prev) => {
+      const next = new Set(prev)
+      next.delete(assetId)
+      return next
+    })
+
+    const updatedStatuses = await removeMarketingAsset(id, assetId)
+    if (updatedStatuses) {
+      setStatuses(updatedStatuses as Record<string, MarketingAssetStatus>)
+    } else {
+      // Rollback on failure
+      setStatuses((prev) => ({ ...prev, [assetId]: 'in_progress' }))
+      setSelected((prev) => {
+        const next = new Set(prev)
+        next.add(assetId)
+        return next
+      })
+    }
+  }
+
+  const handleToggleAsset = async (assetId: string) => {
+    if (selected.has(assetId)) {
+      await handleRemoveAsset(assetId)
+    } else {
+      await handleAddAsset(assetId)
     }
   }
 
@@ -189,7 +218,8 @@ function MarketingContent() {
                     {asset.name}
                   </p>
                   <span className="rounded-sm bg-[#2a2a2a] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#CFB87C] uppercase">
-                    {asset.priceLabel}
+                    <span className="line-through opacity-50 mr-1.5">{asset.priceLabel}</span>
+                    <span>FREE</span>
                   </span>
                 </div>
 
@@ -211,10 +241,11 @@ function MarketingContent() {
                   </span>
                   <button
                     type="button"
-                    disabled={isSelected}
-                    onClick={() => void handleAddAsset(asset.id)}
-                    className={`text-[10px] tracking-widest uppercase ${
-                      isSelected ? 'text-[#CFB87C] opacity-60 cursor-default' : 'text-[var(--color-text-secondary)] hover:text-white'
+                    onClick={() => void handleToggleAsset(asset.id)}
+                    className={`text-[10px] tracking-widest uppercase font-semibold transition-colors duration-150 ${
+                      isSelected 
+                        ? 'text-[var(--color-gold)] hover:text-red-400' 
+                        : 'text-[var(--color-text-secondary)] hover:text-white'
                     }`}
                   >
                     {isSelected ? 'Selected' : 'Add'}
@@ -239,19 +270,13 @@ function MarketingContent() {
                 <li key={asset.id} className="flex items-center justify-between text-sm text-white">
                   <span>{asset.name}</span>
                   <span className="text-[var(--color-text-secondary)]">
-                    {asset.priceCents > 0 ? formatCents(asset.priceCents) : 'Free'}
+                    <span className="line-through mr-1.5">${(asset.priceCents / 100).toFixed(2)}</span>
+                    <span className="text-emerald-400 font-medium">Free</span>
                   </span>
                 </li>
               ))
             )}
           </ul>
-
-          {subtotalCents > 0 ? (
-            <div className="mt-4 flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
-              <span>Processing fee</span>
-              <span>{formatCents(PROCESSING_FEE_CENTS)}</span>
-            </div>
-          ) : null}
 
           <Button
             type="button"
@@ -268,23 +293,6 @@ function MarketingContent() {
               'Notify marketing team'
             )}
           </Button>
-
-          <div className="mt-6 flex items-end justify-between">
-            <div>
-              <p className="text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
-                Total due
-              </p>
-              <p className="mt-1 font-[family-name:var(--font-display)] text-3xl text-white">
-                {formatCents(totalCents)}
-              </p>
-            </div>
-            {subtotalCents > 0 ? (
-              <label className="flex items-center gap-2 text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
-                <input type="checkbox" defaultChecked className="accent-[#CFB87C]" />
-                Secure payment
-              </label>
-            ) : null}
-          </div>
 
           {notifyMessage ? (
             <p className="mt-4 text-sm text-emerald-400" role="status">

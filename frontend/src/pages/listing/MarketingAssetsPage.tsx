@@ -91,6 +91,9 @@ function MarketingAssetsContent() {
 
   const [hasCheckedDraft, setHasCheckedDraft] = useState(false)
   const [isDraftRestored, setIsDraftRestored] = useState(false)
+  const [showDraftSelector, setShowDraftSelector] = useState(false)
+  const [pendingDraft, setPendingDraft] = useState<any>(null)
+  const [isDirty, setIsDirty] = useState(false)
   const maxWaitRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const loadPage = useCallback(async () => {
@@ -119,27 +122,43 @@ function MarketingAssetsContent() {
       setUserProfile(profile)
 
       if (draftRes && draftRes.draft) {
-        const draft = draftRes.draft
-        if (draft.step) setStep(draft.step)
-        if (draft.activeTab) setActiveTab(draft.activeTab)
-        if (draft.activePageKey) setActivePageKey(draft.activePageKey)
-        if (draft.flyerDescription) setFlyerDescription(draft.flyerDescription)
-        if (draft.propertyDescription) setPropertyDescription(draft.propertyDescription)
-        if (draft.agentBio) setAgentBio(draft.agentBio)
-        if (draft.agentContact) setAgentContact(draft.agentContact)
-        if (draft.neighborhoodGuide) setNeighborhoodGuide(draft.neighborhoodGuide)
-        if (draft.refinementHistory) setRefinementHistory(draft.refinementHistory)
-        if (draft.undoStacks) setUndoStacks(draft.undoStacks)
-        if (draft.photos) setPhotos(draft.photos)
-        setIsDraftRestored(true)
+        setPendingDraft(draftRes.draft)
+        setShowDraftSelector(true)
+      } else {
+        setHasCheckedDraft(true)
       }
-      setHasCheckedDraft(true)
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : 'Unable to load listing.')
     } finally {
       setIsLoading(false)
     }
   }, [id, navigate])
+
+  const handleContinueDraft = () => {
+    if (pendingDraft) {
+      const draft = pendingDraft
+      if (draft.step) setStep(draft.step)
+      if (draft.activeTab) setActiveTab(draft.activeTab)
+      if (draft.activePageKey) setActivePageKey(draft.activePageKey)
+      if (draft.flyerDescription) setFlyerDescription(draft.flyerDescription)
+      if (draft.propertyDescription) setPropertyDescription(draft.propertyDescription)
+      if (draft.agentBio) setAgentBio(draft.agentBio)
+      if (draft.agentContact) setAgentContact(draft.agentContact)
+      if (draft.neighborhoodGuide) setNeighborhoodGuide(draft.neighborhoodGuide)
+      if (draft.refinementHistory) setRefinementHistory(draft.refinementHistory)
+      if (draft.undoStacks) setUndoStacks(draft.undoStacks)
+      if (draft.photos) setPhotos(draft.photos)
+      setIsDraftRestored(true)
+    }
+    setHasCheckedDraft(true)
+    setShowDraftSelector(false)
+  }
+
+  const handleStartNew = () => {
+    setHasCheckedDraft(true)
+    setIsDraftRestored(false)
+    setShowDraftSelector(false)
+  }
 
   useEffect(() => {
     if (!listing || !hasCheckedDraft || isDraftRestored) return
@@ -175,7 +194,7 @@ function MarketingAssetsContent() {
 
   // Auto-save debounced effect
   useEffect(() => {
-    if (!id || !hasCheckedDraft) return
+    if (!id || !hasCheckedDraft || !isDirty) return
 
     const saveState = async () => {
       try {
@@ -203,6 +222,7 @@ function MarketingAssetsContent() {
           method: 'POST',
           body: { state: statePayload },
         })
+        setIsDirty(false)
       } catch (err) {
         console.error('Failed to auto-save marketing draft:', err)
       }
@@ -230,6 +250,7 @@ function MarketingAssetsContent() {
   }, [
     id,
     hasCheckedDraft,
+    isDirty,
     step,
     photos,
     activeTab,
@@ -294,6 +315,7 @@ function MarketingAssetsContent() {
 
   const handlePaid = () => {
     setStep('generate')
+    setIsDirty(true)
     void bootstrapAssets()
   }
 
@@ -305,7 +327,10 @@ function MarketingAssetsContent() {
           label: 'Property description',
           pageType: 'flyer',
           getContent: () => flyerDescription,
-          applyContent: setFlyerDescription,
+          applyContent: (content) => {
+            setFlyerDescription(content)
+            setIsDirty(true)
+          },
         },
         {
           key: 'flyer_footer',
@@ -315,6 +340,7 @@ function MarketingAssetsContent() {
           applyContent: (content) => {
             const parsed = parseFooterContact(content)
             setAgentContact((prev) => ({ ...prev, ...parsed }))
+            setIsDirty(true)
           },
         },
       ]
@@ -322,11 +348,20 @@ function MarketingAssetsContent() {
     if (activeTab === 'book' && neighborhoodGuide) {
       return buildBookRefinementPages({
         neighborhoodGuide,
-        setNeighborhoodGuide,
+        setNeighborhoodGuide: (val) => {
+          setNeighborhoodGuide(val)
+          setIsDirty(true)
+        },
         propertyDescription,
-        setPropertyDescription,
+        setPropertyDescription: (val) => {
+          setPropertyDescription(val)
+          setIsDirty(true)
+        },
         agentBio,
-        setAgentBio,
+        setAgentBio: (val) => {
+          setAgentBio(val)
+          setIsDirty(true)
+        },
       })
     }
     return []
@@ -364,6 +399,7 @@ function MarketingAssetsContent() {
         ...prev,
         [page.key]: [instruction, ...(prev[page.key] ?? [])].slice(0, 3),
       }))
+      setIsDirty(true)
     } catch (error) {
       setRefineError(
         error instanceof Error ? error.message : 'Could not refine this section.',
@@ -378,7 +414,10 @@ function MarketingAssetsContent() {
     if (!stack?.length) return
     const previous = stack[stack.length - 1]
     const page = refinementPages.find((item) => item.key === pageKey)
-    if (page) page.applyContent(previous)
+    if (page) {
+      page.applyContent(previous)
+      setIsDirty(true)
+    }
     setUndoStacks((prev) => ({
       ...prev,
       [pageKey]: prev[pageKey]?.slice(0, -1) ?? [],
@@ -433,6 +472,43 @@ function MarketingAssetsContent() {
     )
   }
 
+  if (showDraftSelector) {
+    return (
+      <ListingMissionLayout
+        listingId={id}
+        title="Marketing Asset Generator"
+        subtitle={listingContext.address_full}
+        email={agentEmail}
+      >
+        <div className="mx-auto max-w-md rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-8 space-y-6 text-center">
+          <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+            Saved Draft Found
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            We found a previously saved marketing asset draft for this listing. Would you like to continue from where you left off or start fresh?
+          </p>
+          <div className="space-y-3 pt-2">
+            <Button
+              type="button"
+              onClick={handleContinueDraft}
+              className="h-11 w-full rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+            >
+              Continue Previous Draft
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleStartNew}
+              className="h-11 w-full rounded-sm border-[var(--color-border)] bg-transparent font-semibold text-white hover:bg-[#2a2a2a]"
+            >
+              Start New (Discard Draft)
+            </Button>
+          </div>
+        </div>
+      </ListingMissionLayout>
+    )
+  }
+
   return (
     <ListingMissionLayout
       listingId={id}
@@ -444,8 +520,14 @@ function MarketingAssetsContent() {
         <PhotoUploadStep
           listingId={id}
           photos={photos}
-          onPhotosChange={setPhotos}
-          onContinue={() => setStep('payment')}
+          onPhotosChange={(newPhotos) => {
+            setPhotos(newPhotos)
+            setIsDirty(true)
+          }}
+          onContinue={() => {
+            setStep('payment')
+            setIsDirty(true)
+          }}
         />
       ) : null}
 

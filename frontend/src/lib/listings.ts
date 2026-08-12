@@ -477,3 +477,24 @@ export async function addMarketingAsset(
     return null
   }
 }
+
+export async function removeMarketingAsset(
+  listingId: string,
+  assetId: string,
+): Promise<Record<string, string> | null> {
+  try {
+    const result = await api<{ success: boolean; marketing_statuses: Record<string, string> }>(
+      `/listings/${listingId}/marketing/remove-asset`,
+      {
+        method: 'POST',
+        body: {
+          asset_id: assetId,
+        },
+      },
+    )
+    return result.marketing_statuses
+  } catch (error) {
+    console.error('Failed to remove marketing asset:', error)
+    return null
+  }
+}

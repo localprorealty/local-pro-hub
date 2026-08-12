@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
@@ -15,9 +14,6 @@ import {
 import { shellPanelClass } from '@/components/layout/GridBackground'
 import { QuickLinks } from '@/components/layout/QuickLinks'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
-import { getSupabaseClient } from '@/lib/supabase'
-import { fetchUserProfile } from '@/lib/users'
-import { FEATURE_REVENUE_DASHBOARD } from '@/lib/featureFlags'
 
 type AdminShellProps = {
   title: string
@@ -54,45 +50,9 @@ function ShellNavLink({
   )
 }
 
-function DisabledNavItem({ icon, label }: { icon: ReactNode; label: string }) {
-  return (
-    <div
-      className="flex w-full cursor-not-allowed items-center justify-between px-4 py-3 text-left text-xs tracking-wide text-[var(--color-text-secondary)]/40 uppercase"
-      aria-disabled
-    >
-      <div className="flex items-center gap-3">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <span className="text-[9px] tracking-widest text-[var(--color-gold)]/40 normal-case pr-1">
-        Coming Soon
-      </span>
-    </div>
-  )
-}
 
 export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellProps) {
-  const [canViewRevenue, setCanViewRevenue] = useState(false)
 
-  useEffect(() => {
-    let active = true
-    const checkPermission = async () => {
-      const { data: { session } } = await getSupabaseClient().auth.getSession()
-      if (!active || !session?.user?.id) return
-      try {
-        const profile = await fetchUserProfile(session.user.id)
-        if (active && profile) {
-          setCanViewRevenue(!!profile.can_view_revenue)
-        }
-      } catch (err) {
-        console.error("Error loading user profile:", err)
-      }
-    }
-    void checkPermission()
-    return () => {
-      active = false
-    }
-  }, [])
 
   return (
     <main className="relative min-h-svh text-[var(--color-white)]">
@@ -140,7 +100,11 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
                 icon={<CircleDollarSign className="size-4" />}
                 label="Marketing Team"
               />
-              <DisabledNavItem icon={<FileText className="size-4" />} label="Templates" />
+              <ShellNavLink
+                to="/admin/templates"
+                icon={<FileText className="size-4" />}
+                label="Templates"
+              />
               <ShellNavLink
                 to="/admin/automations"
                 icon={<Wrench className="size-4" />}
@@ -151,34 +115,21 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
                 icon={<RefreshCw className="size-4" />}
                 label="BrokerMint Sync"
               />
-              {canViewRevenue && (
-                FEATURE_REVENUE_DASHBOARD ? (
-                  <>
-                    <ShellNavLink
-                      to="/admin/revenue"
-                      icon={<CircleDollarSign className="size-4" />}
-                      label="Agent Commissions"
-                    />
-                    <ShellNavLink
-                      to="/admin/revenue-share"
-                      icon={<Users className="size-4" />}
-                      label="Revenue Share"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <DisabledNavItem
-                      icon={<CircleDollarSign className="size-4" />}
-                      label="Agent Commissions"
-                    />
-                    <DisabledNavItem
-                      icon={<Users className="size-4" />}
-                      label="Revenue Share"
-                    />
-                  </>
-                )
-              )}
-              <DisabledNavItem icon={<Settings2 className="size-4" />} label="Resources" />
+              <ShellNavLink
+                to="/admin/revenue"
+                icon={<CircleDollarSign className="size-4" />}
+                label="Agent Commissions"
+              />
+              <ShellNavLink
+                to="/admin/revenue-share"
+                icon={<Users className="size-4" />}
+                label="Revenue Share"
+              />
+              <ShellNavLink
+                to="/admin/resources"
+                icon={<Settings2 className="size-4" />}
+                label="Resources"
+              />
             </nav>
           </div>
 

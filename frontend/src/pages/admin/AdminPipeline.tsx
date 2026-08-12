@@ -47,12 +47,12 @@ function AdminPipelineContent() {
       try {
         const { data, error: queryError } = await getSupabaseClient()
           .from('listings')
-          .select(LISTING_COLUMNS)
+          .select(`${LISTING_COLUMNS}, agent:users(full_name)`)
           .order('updated_at', { ascending: false })
 
         if (queryError) throw queryError
         if (!isMounted) return
-        setListings((data ?? []) as ListingRow[])
+        setListings((data ?? []) as unknown as ListingRow[])
       } catch (loadError) {
         if (!isMounted) return
         setError(
@@ -194,6 +194,7 @@ function AdminPipelineContent() {
                 index={index}
                 listingPath={getListingContinuePath(listing)}
                 ctaLabel={getListingCtaLabel(listing.stage)}
+                showViewForm={true}
               />
             ))}
           </div>

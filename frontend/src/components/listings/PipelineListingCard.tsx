@@ -19,6 +19,7 @@ type PipelineListingCardProps = {
   listingPath: string
   ctaLabel?: string
   agentId?: string | null
+  showViewForm?: boolean
   onDraftDeleted?: () => void
 }
 
@@ -28,6 +29,7 @@ export function PipelineListingCard({
   listingPath,
   ctaLabel = 'Continue',
   agentId,
+  showViewForm = false,
   onDraftDeleted,
 }: PipelineListingCardProps) {
   const showDelete =
@@ -53,6 +55,16 @@ export function PipelineListingCard({
         <h3 className="text-lg font-semibold leading-tight text-[var(--color-white)]">
           {listing.address_full ?? 'Unnamed listing'}
         </h3>
+        {(() => {
+          const agentObj = Array.isArray(listing.agent) ? listing.agent[0] : listing.agent
+          const agentName = agentObj?.full_name
+          if (!agentName) return null
+          return (
+            <p className="text-xs text-[var(--color-gold)] font-medium mt-1">
+              Agent: {agentName}
+            </p>
+          )
+        })()}
         <div className="mt-1 flex flex-wrap items-center gap-4 text-[11px] tracking-widest text-[var(--color-text-secondary)] uppercase">
           <span>{specs.beds} BD</span>
           <span>{specs.baths} BA</span>
@@ -117,9 +129,17 @@ export function PipelineListingCard({
               onDeleted={onDraftDeleted}
             />
           ) : null}
+          {showViewForm && (
+            <Link
+              to={`/listing/${listing.id}/form`}
+              className="inline-flex items-center justify-center whitespace-nowrap shrink-0 gap-1.5 text-xs font-bold tracking-wider text-[var(--color-text-secondary)] hover:text-white uppercase border border-[var(--color-border)] px-3.5 py-1.5 rounded-sm hover:border-[var(--color-gold)] transition-colors"
+            >
+              View Form
+            </Link>
+          )}
           <Link
             to={listingPath}
-            className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-[var(--color-gold)] uppercase transition-all group-hover:gap-3"
+            className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-[var(--color-gold)] uppercase transition-all group-hover:gap-3 whitespace-nowrap shrink-0"
           >
             {ctaLabel}
             <ArrowRight className="size-4" aria-hidden />

@@ -73,7 +73,16 @@ async def update_checklist_mappings(mappings: List[ChecklistMappingRow], _admin_
 
 @router.get("/sync-status")
 async def sync_status(_admin_id: str = Depends(require_admin)):
-    """Returns most recent sync log entry."""
+    """Returns the active running sync log entry, or the most recent sync log entry."""
+    running = supabase.table("bm_sync_log") \
+        .select("*") \
+        .eq("status", "running") \
+        .order("started_at", desc=True) \
+        .limit(1) \
+        .execute()
+    if running.data:
+        return running.data[0]
+
     result = supabase.table("bm_sync_log") \
         .select("*") \
         .order("started_at", desc=True) \

@@ -133,6 +133,13 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
               label="New Listing"
             />
           ) : null}
+          {role === 'agent' ? (
+            <SidebarNavLink
+              to="/templates"
+              icon={<FileText className="size-4" />}
+              label="Templates"
+            />
+          ) : null}
           {role === 'agent' && (
             FEATURE_MARKET_YOURSELF ? (
               <SidebarNavLink

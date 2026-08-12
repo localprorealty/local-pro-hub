@@ -134,11 +134,15 @@ function ListingFormContent() {
         }
         setAgentId(userId)
 
-        const row = await getListing(id)
+        const [row, profile] = await Promise.all([
+          getListing(id),
+          fetchUserProfile(userId),
+        ])
         if (!isMounted) return
 
-        if (!row || row.agent_id !== userId) {
-          navigate('/dashboard', { replace: true })
+        const isAdmin = profile?.role === 'admin'
+        if (!row || (!isAdmin && row.agent_id !== userId)) {
+          navigate(isAdmin ? '/admin/pipeline' : '/dashboard', { replace: true })
           return
         }
 
@@ -184,7 +188,6 @@ function ListingFormContent() {
           setSavedAt(new Date(row.updated_at))
           setSaveStatus('saved')
         }
-        const profile = await fetchUserProfile(userId)
         if (isMounted && profile?.mls_id) {
           setAgentMlsId(profile.mls_id)
         }

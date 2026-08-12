@@ -126,7 +126,11 @@ def _require_agent_listing(
         )
         .eq("id", listing_id),
     )
-    if not listing or listing.get("agent_id") != agent_id:
+    user_row = _single_row(
+        client.table("users").select("role").eq("id", agent_id)
+    )
+    is_admin = user_row and user_row.get("role") == "admin"
+    if not listing or (not is_admin and listing.get("agent_id") != agent_id):
         raise HTTPException(status_code=403, detail="Not your listing")
     if expected_stage and listing.get("stage") != expected_stage:
         raise HTTPException(

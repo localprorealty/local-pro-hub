@@ -45,7 +45,10 @@ export type Listing = {
 }
 
 /** @deprecated Prefer `Listing` — kept for pipeline/dashboard compatibility */
-export type ListingRow = Listing & { agent_id?: string }
+export type ListingRow = Listing & {
+  agent_id?: string
+  agent?: { full_name: string } | null
+}
 
 export const LISTING_COLUMNS =
   'id, listing_type, stage, address_full, mls_number, list_price, go_live_date, description_generated, form_data, created_at, updated_at, agent_id, brokermint_transaction_id'

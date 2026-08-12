@@ -8,7 +8,6 @@ import { PipelineDotNav } from '@/components/listing/SubmissionPortalSidebar'
 import { Button } from '@/components/ui/button'
 import {
   MARKETING_ASSETS,
-  PROCESSING_FEE_CENTS,
   STATUS_LABEL,
   statusBadgeClass,
   type MarketingAssetStatus,
@@ -83,7 +82,7 @@ function MarketingContent() {
     [selectedAssets],
   )
 
-  const totalCents = subtotalCents > 0 ? subtotalCents + PROCESSING_FEE_CENTS : 0
+  const totalCents = subtotalCents
 
 
 
@@ -284,12 +283,6 @@ function MarketingContent() {
             )}
           </ul>
 
-          {subtotalCents > 0 ? (
-            <div className="mt-4 flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
-              <span>Processing fee</span>
-              <span>{`$${(PROCESSING_FEE_CENTS / 100).toFixed(2)}`}</span>
-            </div>
-          ) : null}
 
           {subtotalCents > 0 ? (
             <div className="mt-4 flex items-end justify-between border-t border-[var(--color-border)]/40 pt-4 mb-4">

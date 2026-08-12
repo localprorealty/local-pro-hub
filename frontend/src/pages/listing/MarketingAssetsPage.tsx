@@ -46,6 +46,7 @@ import type {
 import { getListing, type Listing } from '@/lib/listings'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile, type UserProfileRow } from '@/lib/users'
+import { api } from '@/lib/api'
 
 const TABS: { id: MarketingAssetTab; label: string }[] = [
   { id: 'just_sold', label: 'Just Sold' },
@@ -101,23 +102,11 @@ function MarketingAssetsContent() {
         data: { session },
       } = await getSupabaseClient().auth.getSession()
       const userId = session?.user?.id
-      const token = session?.access_token
       
       const [listingRow, profile, draftRes] = await Promise.all([
         getListing(id),
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
-        token
-          ? fetch(
-              `${import.meta.env.VITE_API_BASE_URL}/listings/${id}/marketing/draft`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            )
-              .then((r) => r.json())
-              .catch(() => null)
-          : Promise.resolve(null),
+        api<{ draft: any }>(`/listings/${id}/marketing/draft`).catch(() => null),
       ])
 
       if (!listingRow) throw new Error('Listing not found')
@@ -190,11 +179,6 @@ function MarketingAssetsContent() {
 
     const saveState = async () => {
       try {
-        const { getSupabaseClient } = await import('@/lib/supabase')
-        const session = await getSupabaseClient().auth.getSession()
-        const token = session.data.session?.access_token
-        if (!token) return
-
         const serializablePhotos = photos.map((p) => ({
           id: p.id,
           category: p.category,
@@ -215,17 +199,10 @@ function MarketingAssetsContent() {
           photos: serializablePhotos,
         }
 
-        await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/listings/${id}/marketing/draft`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ state: statePayload }),
-          }
-        )
+        await api(`/listings/${id}/marketing/draft`, {
+          method: 'POST',
+          body: { state: statePayload },
+        })
       } catch (err) {
         console.error('Failed to auto-save marketing draft:', err)
       }

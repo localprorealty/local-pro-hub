@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import { API_BASE_URL } from '@/lib/api'
 import {
   MAX_PHOTOS,
   PHOTO_CATEGORY_OPTIONS,
@@ -70,7 +71,7 @@ export function PhotoUploadStep({
           const token = session.data.session?.access_token
 
           const response = await fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/listings/${listingId}/marketing/upload-photo`,
+            `${API_BASE_URL}/listings/${listingId}/marketing/upload-photo`,
             {
               method: 'POST',
               headers: {

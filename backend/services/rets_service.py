@@ -323,10 +323,27 @@ class RETSService:
         city: str = "",
     ) -> list[dict[str, str]]:
         name = street_name.strip()
+        # Clean trailing suffix: e.g. "Pecan Drive" -> "Pecan", "Pecan Dr" -> "Pecan"
+        suffix_words = {
+            "drive", "dr", "street", "st", "avenue", "ave", "road", "rd", 
+            "court", "ct", "trail", "trl", "lane", "ln", "way", "loop", 
+            "boulevard", "blvd", "circle", "cir", "parkway", "pkwy", 
+            "place", "pl", "terrace", "ter"
+        }
+        words = name.split()
+        if len(words) > 1 and words[-1].lower().rstrip(".") in suffix_words:
+            name_without_suffix = " ".join(words[:-1])
+        else:
+            name_without_suffix = name
+
         queries = [
             f"(StreetNumber={street_number}),(StreetName={name})",
             f"(StreetNumber={street_number}),(StreetName=*{name}*)",
         ]
+        
+        if name_without_suffix != name:
+            queries.append(f"(StreetNumber={street_number}),(StreetName={name_without_suffix})")
+            queries.append(f"(StreetNumber={street_number}),(StreetName=*{name_without_suffix}*)")
         seen: set[str] = set()
         results: list[dict[str, str]] = []
 

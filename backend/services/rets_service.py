@@ -338,8 +338,9 @@ class RETSService:
                 if key:
                     seen.add(key)
                 if city:
+                    clean_city = city.split(",")[0].strip().lower()
                     row_city = row.get("City", "").strip().lower()
-                    if row_city and row_city != city.strip().lower():
+                    if row_city and row_city != clean_city:
                         continue
                 results.append(row)
             if results:

@@ -40,8 +40,8 @@ export function parsePropertySearchQuery(query: string): RetsSearchRequest {
   const streetMatch = addressPart.match(/^(\d+)\s+(.+)$/)
   let city = ''
   if (locationPart) {
-    const cityState = locationPart.match(/^([^,]+?)(?:\s*,?\s*TX)?$/i)
-    city = (cityState?.[1] ?? locationPart).trim()
+    const locParts = locationPart.split(',').map((p) => p.trim())
+    city = locParts[0] || ''
   }
 
   return {

@@ -31,6 +31,7 @@ class Settings(BaseSettings):
 
     # GROQ
     groq_api_key: str = ""
+    groq_model: str = "llama-3.1-8b-instant"
 
     # HeyGen (Market Yourself avatar + video)
     heygen_api_key: str = ""
@@ -65,7 +66,7 @@ class Settings(BaseSettings):
     lofty_webhook_url: str = ""
 
     # App
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
     frontend_url: str = ""
     api_host: str = "0.0.0.0"
     api_port: int = 8000

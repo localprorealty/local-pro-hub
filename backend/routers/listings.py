@@ -168,7 +168,7 @@ async def generate_description(
 
     try:
         response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=settings.groq_model,
             messages=[
                 {
                     "role": "user",
@@ -344,7 +344,7 @@ Return only the revised content, no explanation."""
 
     try:
         response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=settings.groq_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=500,
@@ -392,7 +392,7 @@ async def generate_neighborhood_guide(
 
     try:
         response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=settings.groq_model,
             messages=[
                 {
                     "role": "user",

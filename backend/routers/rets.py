@@ -191,6 +191,167 @@ async def discover_rets_fields(
         raise HTTPException(status_code=502, detail=f"RETS discover failed: {exc}") from exc
 
 
+import re
+
+
+def _extract_realist_pdf_text_deterministic(text: str) -> dict[str, Any]:
+    """Fallback deterministic parser for CoreLogic / Realist property tax PDF reports."""
+    data: dict[str, Any] = {}
+
+    # 1. Address line (e.g., "1229 Sam Dennis Dr, Lewisville, TX 75077-2551, Denton County")
+    addr_match = re.search(
+        r"(\d+)\s+([A-Za-z0-9\s]+?)\s+(Dr|St|Ave|Blvd|Rd|Ln|Ct|Pl|Way|Cir|Trl|Pkwy|Loop|Cv|Hwy)\b[,\s]+([A-Za-z\s]+?)[,\s]+([A-Z]{2})\s+(\d{5})(?:-\d{4})?(?:[,\s]+([A-Za-z\s]+?)(?:\s+County)?)?(?:\n|\r|$)",
+        text,
+        re.IGNORECASE,
+    )
+    if addr_match:
+        data["street_number"] = addr_match.group(1).strip()
+        data["street_name"] = addr_match.group(2).strip()
+        data["street_type"] = addr_match.group(3).strip().capitalize()
+        data["city"] = addr_match.group(4).strip()
+        data["state"] = addr_match.group(5).strip().upper()
+        data["zip_code"] = addr_match.group(6).strip()
+        if addr_match.group(7):
+            data["county"] = addr_match.group(7).replace("County", "").strip()
+
+    if not data.get("county"):
+        m = re.search(r"([A-Za-z]+)\s+County", text, re.IGNORECASE)
+        if m:
+            data["county"] = m.group(1).strip()
+
+    # 2. Owner Name
+    m = re.search(r"Owner Name\s+([A-Za-z\s,]+?)(?:\s+Tax Billing|\s+Owner Name 2|\n|\r)", text, re.IGNORECASE)
+    if m:
+        raw_owner = m.group(1).strip()
+        # Clean up owner name if needed
+        data["seller_name"] = raw_owner
+
+    # 3. Subdivision
+    m = re.search(r"Subdivision\s+([^\n\r]+?)(?:\s+Census Tract|\n|\r)", text, re.IGNORECASE)
+    if m:
+        data["subdivision"] = m.group(1).strip()
+
+    # 4. School District
+    m = re.search(r"School District\s+([^\n\r]+?)(?:\s+Census Tract|\s+School District Code|\n|\r)", text, re.IGNORECASE)
+    if m:
+        data["school_district"] = m.group(1).strip()
+
+    # 5. Tax ID / APN / Parcel ID
+    m = re.search(r"(?:Tax ID|APN:|Parcel ID)\s*[:\s]*([A-Za-z0-9-]+)", text, re.IGNORECASE)
+    if m:
+        data["parcel_id"] = m.group(1).strip()
+
+    # 6. Lot & Block
+    m = re.search(r"\bLot(?:\s*#|:|\s+)(?!(?:Sq|Size|Acres|Area)\b)(\w+)", text, re.IGNORECASE)
+    if not m:
+        m = re.search(r"LOT\s+(\d+)", text)
+    if m:
+        data["lot"] = m.group(1).strip()
+    m = re.search(r"\bBlock(?:\s*#|:|\s+)([A-Za-z0-9]+)", text, re.IGNORECASE)
+    if not m:
+        m = re.search(r"BLK\s+([A-Za-z0-9]+)", text)
+    if m:
+        data["tax_block"] = m.group(1).strip()
+
+    # 7. Beds, Baths, SqFt, Year Built
+    m = re.search(r"(?:MLS Beds|Bedrooms)\s*[:\n\r\s]*(\d+)", text, re.IGNORECASE)
+    if m:
+        data["bedrooms_total"] = int(m.group(1))
+
+    m = re.search(r"(?:MLS Full Baths|Full Baths)\s*[:\n\r\s]*(\d+)", text, re.IGNORECASE)
+    if m:
+        data["bathrooms_full"] = int(m.group(1))
+
+    m = re.search(r"(?:Half Baths)\s*[:\n\r\s]*(\d+|N/A)", text, re.IGNORECASE)
+    if m:
+        val = m.group(1).strip()
+        data["bathrooms_half"] = int(val) if val.isdigit() else 0
+    else:
+        data["bathrooms_half"] = 0
+
+    m = re.search(r"(?:MLS Sq Ft|Building Sq Ft)\s*[:\n\r\s]*([\d,]+)", text, re.IGNORECASE)
+    if m:
+        data["living_area_sqft"] = int(m.group(1).replace(",", ""))
+
+    m = re.search(r"(?:MLS Yr Built|Year Built)\s*[:\n\r\s]*(\d{4})", text, re.IGNORECASE)
+    if m:
+        data["year_built"] = int(m.group(1))
+
+    # 8. Stories / Levels
+    m = re.search(r"\bStories\s*[:\n\r\s]*(\d+)", text, re.IGNORECASE)
+    if m:
+        s_num = int(m.group(1))
+        levels_map = {1: "One", 2: "Two", 3: "Three"}
+        data["levels"] = levels_map.get(s_num, str(s_num))
+    else:
+        data["levels"] = "One"
+
+    # 9. Garage
+    m = re.search(r"Garage Capacity\s*[:\n\r\s]*(?:MLS:\s*)?(\d+)", text, re.IGNORECASE)
+    if m:
+        data["garage_spaces"] = int(m.group(1))
+    else:
+        data["garage_spaces"] = 2
+
+    # 10. Property & Housing Type
+    data["property_sub_type"] = "Single Family Residence"
+    data["housing_type"] = "Single Detached"
+
+    # 11. Foundation
+    m = re.search(r"Foundation\s*[:\n\r\s]*([A-Za-z\s]+?)(?:\s+Construction|\n|\r)", text, re.IGNORECASE)
+    if m:
+        found_val = m.group(1).strip()
+        data["foundation"] = [found_val] if found_val else ["Slab"]
+    else:
+        data["foundation"] = ["Slab"]
+
+    # 12. Roof
+    m = re.search(r"Roof Material\s*[:\n\r\s]*([A-Za-z\s]+?)(?:\s+Roof Shape|\n|\r)", text, re.IGNORECASE)
+    if m:
+        r_val = m.group(1).strip()
+        if "Composition" in r_val or "Shingle" in r_val:
+            data["roof"] = ["Composition"]
+        elif r_val:
+            data["roof"] = [r_val]
+        else:
+            data["roof"] = ["Composition"]
+    else:
+        data["roof"] = ["Composition"]
+
+    # 13. Fireplaces
+    m = re.search(r"Fireplaces\s*[:\n\r\s]*(\d+)", text, re.IGNORECASE)
+    if m:
+        data["fireplace_count"] = int(m.group(1))
+
+    # 14. Flooring
+    m = re.search(r"Floor Cover\s*[:\n\r\s]*([A-Za-z\s]+?)(?:\s+Pool|\n|\r)", text, re.IGNORECASE)
+    if m:
+        fl_val = m.group(1).strip()
+        if fl_val:
+            data["flooring"] = [fl_val]
+
+    # 15. Cooling & Heating
+    m = re.search(r"Cooling Type\s*[:\n\r\s]*([A-Za-z\s]+?)(?:\s+Heat Type|\n|\r)", text, re.IGNORECASE)
+    if m:
+        c_val = m.group(1).strip()
+        if "Central" in c_val:
+            data["cooling"] = ["Central Air"]
+        elif c_val:
+            data["cooling"] = [c_val]
+
+    m = re.search(r"Heat Type\s*[:\n\r\s]*([A-Za-z\s]+?)(?:\s+Heat Fuel|\n|\r)", text, re.IGNORECASE)
+    if m:
+        h_val = m.group(1).strip()
+        if "Central" in h_val:
+            data["heating"] = ["Central"]
+        elif h_val:
+            data["heating"] = [h_val]
+
+    data["living_areas_total"] = 1
+    data["dining_areas_total"] = 1
+    return data
+
+
 @router.post("/upload-pdf", response_model=PropertySearchResponse)
 async def upload_pdf(
     file: UploadFile = File(...),
@@ -217,11 +378,15 @@ async def upload_pdf(
         if not text.strip():
             raise HTTPException(status_code=400, detail="The uploaded PDF file contains no readable text.")
             
+        parsed_data = {}
+        llm_success = False
+
+        # Attempt Groq LLM parsing first if key is present
         settings = get_settings()
-        groq_key = settings.require_groq()
-        groq_client = groq.Groq(api_key=groq_key)
-        
-        prompt = f"""
+        if settings.groq_api_key:
+            try:
+                groq_client = groq.Groq(api_key=settings.groq_api_key)
+                prompt = f"""
 You are an expert real estate data parser. Parse the following extracted text from a Realist Property Details PDF report and return a JSON object with the following keys. If a value is missing, N/A, or empty, set it to null.
 
 Required Keys:
@@ -265,23 +430,28 @@ Extracted Report Text:
 
 Return ONLY the raw JSON object inside a code block.
 """
+                response = groq_client.chat.completions.create(
+                    model=settings.groq_model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.0
+                )
+                
+                raw_output = response.choices[0].message.content or ""
+                if "```json" in raw_output:
+                    json_str = raw_output.split("```json")[1].split("```")[0].strip()
+                elif "```" in raw_output:
+                    json_str = raw_output.split("```")[1].split("```")[0].strip()
+                else:
+                    json_str = raw_output.strip()
+                    
+                parsed_data = json.loads(json_str)
+                llm_success = True
+            except Exception as llm_err:
+                print(f"[WARN] Groq LLM parsing failed ({llm_err}). Falling back to deterministic parser.")
 
-        response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0
-        )
-        
-        raw_output = response.choices[0].message.content or ""
-        # Extract JSON from code block if present
-        if "```json" in raw_output:
-            json_str = raw_output.split("```json")[1].split("```")[0].strip()
-        elif "```" in raw_output:
-            json_str = raw_output.split("```")[1].split("```")[0].strip()
-        else:
-            json_str = raw_output.strip()
-            
-        parsed_data = json.loads(json_str)
+        # Fallback to deterministic regex parser if LLM failed or wasn't configured
+        if not llm_success or not parsed_data:
+            parsed_data = _extract_realist_pdf_text_deterministic(text)
         
         # Build standard address structure
         address = {

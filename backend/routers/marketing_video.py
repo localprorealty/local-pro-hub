@@ -986,7 +986,7 @@ Requirements:
 
     try:
         response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=settings.groq_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.95,
             max_tokens=200,
@@ -1017,7 +1017,7 @@ async def generate_script(
 
     try:
         response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=settings.groq_model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}

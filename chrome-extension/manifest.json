@@ -1,15 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "LocalPRO Hub Helper",
+  "name": "LocalPRO Hub Matrix Assistant",
   "version": "1.0.0",
   "description": "Chrome extension to assist agents in completing Matrix listing inputs using LocalPRO Hub.",
   "permissions": ["storage", "scripting"],
   "host_permissions": [
-    "http://localhost:8000/",
     "https://ntrdd.mlsmatrix.com/",
     "https://*.railway.app/",
     "https://*.up.railway.app/"
   ],
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
   "action": {
     "default_popup": "popup.html"
   },

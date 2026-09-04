@@ -36,6 +36,7 @@ import SignupPendingPage from '@/pages/auth/SignupPending'
 import ResetPasswordPage from '@/pages/auth/ResetPassword'
 import PhotographerCalendarPage from '@/pages/photographer/PhotographerCalendar'
 import ExtensionInstallPage from '@/pages/ExtensionInstall'
+import PrivacyPolicyPage from '@/pages/PrivacyPolicy'
 import {
   FEATURE_REVENUE_DASHBOARD,
   FEATURE_MARKET_YOURSELF,
@@ -222,6 +223,10 @@ function App() {
           <Route
             path="/extension"
             element={<ExtensionInstallPage state={authState} />}
+          />
+          <Route
+            path="/privacy-policy"
+            element={<PrivacyPolicyPage />}
           />
           <Route
             path="/signup"

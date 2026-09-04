@@ -260,8 +260,13 @@ export default function ExtensionInstallPage({ state }: ExtensionInstallPageProp
         </ErrorBoundary>
       </div>
 
-      <footer className="mt-16 text-center text-[10px] text-[var(--color-text-secondary)] border-t border-[var(--color-border)] pt-6">
-        &copy; {new Date().getFullYear()} Local Pro Realty LLC. All rights reserved.
+      <footer className="mt-16 text-center text-xs text-[var(--color-text-secondary)] border-t border-[var(--color-border)] pt-6 space-y-2">
+        <div>
+          <a href="/privacy-policy" className="text-[var(--color-gold)] hover:underline">
+            Privacy Policy
+          </a>
+        </div>
+        <div>&copy; {new Date().getFullYear()} Local Pro Realty LLC. All rights reserved.</div>
       </footer>
     </main>
   )

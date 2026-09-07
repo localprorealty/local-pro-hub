@@ -989,7 +989,7 @@ Requirements:
             model=settings.groq_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.95,
-            max_tokens=200,
+            max_tokens=800,
         )
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Teleprompter generation failed: {exc}") from exc
@@ -1023,7 +1023,7 @@ async def generate_script(
                 {"role": "user", "content": user_prompt}
             ],
             temperature=0.8,
-            max_tokens=1000,
+            max_tokens=4000,
             response_format={"type": "json_object"},
         )
     except Exception as exc:

@@ -31,7 +31,7 @@ class Settings(BaseSettings):
 
     # GROQ
     groq_api_key: str = ""
-    groq_model: str = "llama-3.1-8b-instant"
+    groq_model: str = "openai/gpt-oss-120b"
 
     # HeyGen (Market Yourself avatar + video)
     heygen_api_key: str = ""

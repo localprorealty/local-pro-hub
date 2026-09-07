@@ -7,6 +7,7 @@ import { PropertySearchStep } from '@/components/listing/PropertySearchStep'
 import { NtreisFormBody } from '@/components/form/NtreisFormBody'
 import {
   formatPropertyAddress,
+  generateListingDescription,
   getListing,
   propertyAddressFromFormData,
   TYPE_LABEL,
@@ -127,6 +128,23 @@ function ListingFormContent() {
       setPreFilledKeys(new Set(updatedFilledKeys))
       setShowFormSections(true)
       setIsSubmitting(false)
+
+      // If property details were imported (e.g. from PDF import or RETS search), trigger initial description generation
+      if (listingIdRef.current && (filledKeys.length > 0 || Object.keys(nextRets).length > 0)) {
+        const lid = listingIdRef.current
+        void generateListingDescription(lid)
+          .then((res) => {
+            if (res?.description) {
+              setRetsFormPatch((prev) => ({
+                ...prev,
+                property_description: res.description,
+              }))
+            }
+          })
+          .catch((err) => {
+            console.warn('Initial description generation skipped or failed:', err)
+          })
+      }
     },
     [persistFormData],
   )

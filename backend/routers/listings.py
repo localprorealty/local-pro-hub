@@ -140,6 +140,16 @@ def _require_agent_listing(
     return listing
 
 
+ALLOWED_DESCRIPTION_STAGES = {
+    "draft",
+    "docs_pending",
+    "docs_signed",
+    "shoot_booked",
+    "marketing",
+    "mls_submitted",
+}
+
+
 @router.post("/{listing_id}/generate-description")
 async def generate_description(
     listing_id: str,
@@ -150,12 +160,29 @@ async def generate_description(
         client,
         listing_id,
         agent_id,
-        expected_stage="mls_submitted",
     )
+
+    stage = listing.get("stage")
+    if stage not in ALLOWED_DESCRIPTION_STAGES:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Cannot generate description for listing in '{stage}' stage",
+        )
 
     form_data = listing.get("form_data") or {}
     if not isinstance(form_data, dict):
         form_data = {}
+
+    has_address = bool(listing.get("address_full") or _pick(form_data, "address_full", "street_name"))
+    has_details = any(
+        bool(form_data.get(k))
+        for k in ["bedrooms_total", "bedrooms", "living_area_sqft", "property_sub_type", "city", "subdivision"]
+    )
+    if not has_address and not has_details:
+        raise HTTPException(
+            status_code=400,
+            detail="Listing has insufficient property details to generate a description. Please add an address or property details first.",
+        )
 
     context = _build_description_context(
         form_data,
@@ -176,7 +203,7 @@ async def generate_description(
                 },
             ],
             temperature=0.7,
-            max_tokens=400,
+            max_tokens=1200,
         )
     except Exception as exc:
         raise HTTPException(
@@ -187,6 +214,13 @@ async def generate_description(
     description = (response.choices[0].message.content or "").strip()
     if len(description) > 1000:
         description = description[:1000].rstrip()
+
+    # Persist to listings.description_generated and keep form_data.property_description in sync
+    updated_form_data = {**form_data, "property_description": description}
+    client.table("listings").update({
+        "description_generated": description,
+        "form_data": updated_form_data,
+    }).eq("id", listing_id).execute()
 
     return {"description": description, "char_count": len(description)}
 
@@ -347,7 +381,7 @@ Return only the revised content, no explanation."""
             model=settings.groq_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
-            max_tokens=500,
+            max_tokens=1200,
         )
     except Exception as exc:
         raise HTTPException(
@@ -400,7 +434,7 @@ async def generate_neighborhood_guide(
                 },
             ],
             temperature=0.5,
-            max_tokens=700,
+            max_tokens=1500,
         )
     except Exception as exc:
         raise HTTPException(

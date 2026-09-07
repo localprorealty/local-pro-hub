@@ -107,26 +107,48 @@ def test_webhook_signature_verification():
 def test_webhook_500_failure_simulation():
     print("\n--- 3. WEBHOOK 5XX FAILURE SIMULATION TEST (TRIGGERS BROKERMINT RETRY) ---")
     # Send an event with an invalid non-existent transaction that raises an error or simulated failure
-    payload = {
-        "event_id": f"sim-fail-{int(time.time())}",
+    # Part A: Verify unresolvable txn ID returns 200 with status='skipped'
+    unresolved_payload = {
+        "event_id": f"sim-skip-{int(time.time())}",
         "event": "transaction.deleted",
-        # no id in data to force ValueError in synchronous handler
         "data": {}
     }
-    payload_bytes = json.dumps(payload).encode("utf-8")
+    unresolved_bytes = json.dumps(unresolved_payload).encode("utf-8")
+    sig_skip = sign_payload(unresolved_bytes)
+    resp_skip = client.post(
+        "/webhooks/brokermint",
+        content=unresolved_bytes,
+        headers={"Content-Type": "application/json", "X-Brokermint-Webhook-Signature": sig_skip}
+    )
+    print(f"POST /webhooks/brokermint [Unresolvable ID] -> Status: {resp_skip.status_code}")
+    print(f"Response: {resp_skip.json()}")
+    assert resp_skip.status_code == 200
+    assert resp_skip.json().get("status") == "skipped"
+    assert "Could not resolve transaction ID" in resp_skip.json().get("error_message", "")
+    print("✓ Unresolvable transaction ID correctly logged as 'skipped' with clear error_message")
+
+    # Part B: Verify sync failure returns 500 (triggers BrokerMint retry)
+    from unittest.mock import patch
+    fail_payload = {
+        "event_id": f"sim-fail-{int(time.time())}",
+        "event": "transaction.updated",
+        "object": {"id": 999999}
+    }
+    payload_bytes = json.dumps(fail_payload).encode("utf-8")
     sig = sign_payload(payload_bytes)
 
     t0 = time.perf_counter()
-    resp = client.post(
-        "/webhooks/brokermint",
-        content=payload_bytes,
-        headers={
-            "Content-Type": "application/json",
-            "X-Brokermint-Webhook-Signature": sig
-        }
-    )
+    with patch("routers.webhooks.sync_single_transaction", side_effect=RuntimeError("BrokerMint API timeout")):
+        resp = client.post(
+            "/webhooks/brokermint",
+            content=payload_bytes,
+            headers={
+                "Content-Type": "application/json",
+                "X-Brokermint-Webhook-Signature": sig
+            }
+        )
     elapsed_ms = (time.perf_counter() - t0) * 1000
-    print(f"POST /webhooks/brokermint [Simulated Failure] -> Status: {resp.status_code} in {elapsed_ms:.1f}ms")
+    print(f"POST /webhooks/brokermint [Simulated Sync Exception] -> Status: {resp.status_code} in {elapsed_ms:.1f}ms")
     print(f"Response: {resp.json()}")
     assert resp.status_code == 500, f"Expected 500, got {resp.status_code}"
     print(f"✓ Synchronous failure returned HTTP 500 in {elapsed_ms:.1f}ms (BrokerMint retry will trigger)")

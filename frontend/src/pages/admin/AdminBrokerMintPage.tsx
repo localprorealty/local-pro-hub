@@ -368,17 +368,32 @@ function AdminBrokerMintContent() {
                   <div className="pt-1">
                     <span className="block text-gray-400 mb-1">Latest Webhook Activity:</span>
                     {syncHealth?.webhook?.latest_event ? (
-                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] space-y-1">
-                        <div className="flex justify-between">
-                          <span className="text-[var(--color-gold)]">{syncHealth.webhook.latest_event.event_type}</span>
-                          <span className="text-zinc-500">{formatDate(syncHealth.webhook.latest_event.received_at)}</span>
+                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[var(--color-gold)] font-medium">{syncHealth.webhook.latest_event.event_type}</span>
+                          <span className="text-zinc-500 text-[10px]">{formatDate(syncHealth.webhook.latest_event.received_at)}</span>
                         </div>
-                        <div className="flex justify-between text-zinc-400">
+                        <div className="flex justify-between items-center text-zinc-400">
                           <span>Txn: {syncHealth.webhook.latest_event.transaction_id || 'N/A'}</span>
-                          <span className={syncHealth.webhook.latest_event.status === 'processed' ? 'text-emerald-400 font-semibold' : 'text-amber-400'}>
-                            {syncHealth.webhook.latest_event.status}
-                          </span>
+                          {syncHealth.webhook.latest_event.status === 'processed' ? (
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold uppercase text-[9px] tracking-wider">
+                              processed
+                            </span>
+                          ) : syncHealth.webhook.latest_event.status === 'skipped' ? (
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold uppercase text-[9px] tracking-wider" title={syncHealth.webhook.latest_event.error_message || 'Skipped'}>
+                              skipped
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-semibold uppercase text-[9px] tracking-wider" title={syncHealth.webhook.latest_event.error_message || 'Failed'}>
+                              {syncHealth.webhook.latest_event.status}
+                            </span>
+                          )}
                         </div>
+                        {syncHealth.webhook.latest_event.error_message && (
+                          <div className="text-[10px] text-amber-400/90 pt-0.5 truncate border-t border-[#222]" title={syncHealth.webhook.latest_event.error_message}>
+                            ⚠ {syncHealth.webhook.latest_event.error_message}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <span className="text-zinc-500 italic">No events received yet.</span>

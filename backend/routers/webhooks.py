@@ -80,14 +80,20 @@ async def brokermint_webhook(
 
     event_id = str(payload.get("event_id") or payload.get("id") or f"evt_{uuid.uuid4().hex}")
     event_type = str(payload.get("event") or payload.get("event_type") or "unknown")
-    data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+    
+    # BrokerMint API v2 webhooks place the resource under 'object', fallback to 'data', then top-level payload
+    data = (
+        payload.get("object")
+        if isinstance(payload.get("object"), dict)
+        else (payload.get("data") if isinstance(payload.get("data"), dict) else payload)
+    )
 
     # Extract BrokerMint transaction ID
     bm_txn_id = None
     if isinstance(data, dict):
         if "participant" in event_type:
-            # transaction.participant.* usually passes transaction_id or transaction.id
-            bm_txn_id = data.get("transaction_id") or (data.get("transaction") or {}).get("id") or data.get("id")
+            # In participant webhooks, bm_transaction_id points to the parent transaction
+            bm_txn_id = data.get("bm_transaction_id") or data.get("transaction_id") or (data.get("transaction") or {}).get("id")
         else:
             bm_txn_id = data.get("id") or data.get("transaction_id")
 
@@ -125,31 +131,54 @@ async def brokermint_webhook(
     try:
         if event_type == "transaction.deleted":
             if not bm_txn_id:
-                raise ValueError("No transaction ID found in transaction.deleted payload")
-            result = await delete_single_transaction(supabase, str(bm_txn_id))
-            logger.info("Soft-deleted BrokerMint transaction %s via webhook", bm_txn_id)
+                status_val = "skipped"
+                err_msg = "Could not resolve transaction ID from payload shape for transaction.deleted"
+                result = {"status": "skipped", "reason": "no_transaction_id"}
+                logger.warning("Webhook event %s (%s): %s", event_id, event_type, err_msg)
+            else:
+                result = await delete_single_transaction(supabase, str(bm_txn_id))
+                status_val = "processed"
+                err_msg = None
+                logger.info("Soft-deleted BrokerMint transaction %s via webhook", bm_txn_id)
         elif bm_txn_id:
             result = await sync_single_transaction(supabase, str(bm_txn_id))
+            status_val = "processed"
+            err_msg = None
             logger.info("Synced BrokerMint transaction %s via webhook (%s): %s", bm_txn_id, event_type, result)
         else:
-            logger.info("Webhook event %s (%s) has no transaction ID. Acknowledged.", event_id, event_type)
-            result = {"status": "skipped", "reason": "no_transaction_id"}
+            # Check if this is a ping/test event that by design does not require a transaction ID
+            is_ping = (
+                event_type in ["ping", "test"]
+                or (isinstance(data, dict) and data.get("value") == "ping")
+            )
+            if is_ping:
+                status_val = "processed"
+                err_msg = None
+                result = {"status": "processed", "reason": "ping_acknowledged"}
+                logger.info("Webhook ping event %s acknowledged successfully", event_id)
+            else:
+                status_val = "skipped"
+                err_msg = f"Could not resolve transaction ID from payload shape for event type '{event_type}'"
+                result = {"status": "skipped", "reason": "no_transaction_id"}
+                logger.warning("Webhook event %s (%s) skipped: %s", event_id, event_type, err_msg)
 
-        # 7. Update log status to 'processed'
+        # 7. Update log status to 'processed' or 'skipped'
         try:
             supabase.table("bm_webhook_events_log").update({
-                "status": "processed",
+                "status": status_val,
+                "error_message": err_msg,
                 "processed_at": datetime.now(timezone.utc).isoformat(),
             }).eq("event_id", event_id).execute()
         except Exception as update_err:
             logger.warning("Could not update bm_webhook_events_log status: %s", update_err)
 
         return {
-            "status": "processed",
+            "status": status_val,
             "event_id": event_id,
             "event_type": event_type,
             "transaction_id": str(bm_txn_id) if bm_txn_id else None,
             "result": result,
+            "error_message": err_msg,
         }
 
     except Exception as exc:

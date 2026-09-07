@@ -12,6 +12,9 @@ import {
   StopCircle,
   HelpCircle,
   X,
+  Radio,
+  Clock,
+  Zap,
 } from 'lucide-react'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -29,6 +32,48 @@ type SyncLog = {
   txns_synced: number
   errors: any[]
   status: 'running' | 'success' | 'completed_with_errors' | 'failed' | 'never_synced' | 'cancelled'
+  triggered_by?: string
+}
+
+type SyncHealth = {
+  webhook: {
+    status: 'active' | 'deactivated' | 'not_registered' | 'unknown'
+    subscription_id: number | null
+    callback_url: string | null
+    active: boolean
+    event_types: string[]
+    latest_event: {
+      event_id: string
+      event_type: string
+      transaction_id: string | null
+      status: string
+      error_message: string | null
+      received_at: string
+      processed_at: string | null
+    } | null
+    error?: string
+  }
+  reconciliation: {
+    id: string
+    started_at: string
+    finished_at: string | null
+    agents_synced: number
+    agents_failed: number
+    txns_synced: number
+    errors: any[]
+    status: string
+    triggered_by: string
+  } | null
+  manual_sync: {
+    id: string
+    started_at: string
+    finished_at: string | null
+    agents_synced: number
+    agents_failed: number
+    txns_synced: number
+    errors: any[]
+    status: string
+  } | null
 }
 
 
@@ -101,6 +146,9 @@ function AdminBrokerMintContent() {
   const [isSavingMappings, setIsSavingMappings] = useState(false)
   const [mappingsMessage, setMappingsMessage] = useState<string | null>(null)
   const [showMappingInfo, setShowMappingInfo] = useState(false)
+  const [syncHealth, setSyncHealth] = useState<SyncHealth | null>(null)
+  const [isReactivating, setIsReactivating] = useState(false)
+  const [reactivateMessage, setReactivateMessage] = useState<string | null>(null)
 
   const loadStatus = async (showLoader = true) => {
     if (showLoader) setIsLoading(true)
@@ -108,6 +156,14 @@ function AdminBrokerMintContent() {
     try {
       const res = await api<SyncLog>('/brokermint/sync-status')
       setLog(res)
+
+      // Fetch sync health
+      try {
+        const healthRes = await api<SyncHealth>('/brokermint/sync-health')
+        setSyncHealth(healthRes)
+      } catch (hErr) {
+        console.error('Failed to load sync health:', hErr)
+      }
       
       // Fetch mappings
       try {
@@ -136,6 +192,21 @@ function AdminBrokerMintContent() {
       setError(err instanceof Error ? err.message : 'Failed to fetch sync status.')
     } finally {
       if (showLoader) setIsLoading(false)
+    }
+  }
+
+  const handleReactivateWebhook = async () => {
+    setIsReactivating(true)
+    setReactivateMessage(null)
+    setError(null)
+    try {
+      const res = await api<{ status: string; message: string }>('/brokermint/webhook/reactivate', { method: 'POST' })
+      setReactivateMessage(res.message || 'Webhook reactivated successfully!')
+      await loadStatus(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reactivate webhook.')
+    } finally {
+      setIsReactivating(false)
     }
   }
 
@@ -243,6 +314,148 @@ function AdminBrokerMintContent() {
             transition={{ duration: 0.3 }}
             className="space-y-8"
           >
+            {/* Real-time Webhooks & Daily Reconciliation Status Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card 1: Webhook Health */}
+              <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Radio className="size-5 text-[var(--color-gold)] animate-pulse" />
+                    <h3 className="font-semibold text-base text-white">Live Webhook Health</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {syncHealth?.webhook?.status === 'active' ? (
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                        Active
+                      </span>
+                    ) : syncHealth?.webhook?.status === 'deactivated' ? (
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                        Deactivated
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
+                        {syncHealth?.webhook?.status || 'Connecting...'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs text-[var(--color-text-secondary)]">
+                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                    <span>Subscription Mode</span>
+                    <span className="font-mono text-zinc-300">Synchronous (~200ms)</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                    <span>Target Callback</span>
+                    <span className="font-mono text-zinc-400 truncate max-w-[200px]" title={syncHealth?.webhook?.callback_url || '/webhooks/brokermint'}>
+                      {syncHealth?.webhook?.callback_url ? '.../webhooks/brokermint' : 'Production Endpoint'}
+                    </span>
+                  </div>
+                  <div className="py-1 border-b border-[#222]">
+                    <div className="flex justify-between items-center mb-1">
+                      <span>Subscribed Events</span>
+                      <span className="text-zinc-300 font-mono">6 Event Types</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {['tx.create', 'tx.update', 'tx.delete', 'participant.add', 'participant.update', 'participant.remove'].map((e) => (
+                        <span key={e} className="px-1.5 py-0.5 bg-black/40 rounded text-[10px] font-mono text-zinc-400 border border-[#222]">
+                          {e}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pt-1">
+                    <span className="block text-gray-400 mb-1">Latest Webhook Activity:</span>
+                    {syncHealth?.webhook?.latest_event ? (
+                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-[var(--color-gold)]">{syncHealth.webhook.latest_event.event_type}</span>
+                          <span className="text-zinc-500">{formatDate(syncHealth.webhook.latest_event.received_at)}</span>
+                        </div>
+                        <div className="flex justify-between text-zinc-400">
+                          <span>Txn: {syncHealth.webhook.latest_event.transaction_id || 'N/A'}</span>
+                          <span className={syncHealth.webhook.latest_event.status === 'processed' ? 'text-emerald-400 font-semibold' : 'text-amber-400'}>
+                            {syncHealth.webhook.latest_event.status}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-zinc-500 italic">No events received yet.</span>
+                    )}
+                  </div>
+                </div>
+
+                {syncHealth?.webhook?.status === 'deactivated' && (
+                  <Button
+                    type="button"
+                    disabled={isReactivating}
+                    onClick={() => void handleReactivateWebhook()}
+                    className="w-full h-9 rounded-sm bg-red-600 hover:bg-red-700 text-white font-semibold text-xs tracking-wider uppercase"
+                  >
+                    {isReactivating ? 'Reactivating...' : 'Reactivate Webhook'}
+                  </Button>
+                )}
+                {reactivateMessage && (
+                  <p className="text-xs text-emerald-400 font-medium">{reactivateMessage}</p>
+                )}
+              </div>
+
+              {/* Card 2: Daily Reconciliation Cron */}
+              <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="size-5 text-[var(--color-gold)]" />
+                    <h3 className="font-semibold text-base text-white">Daily Reconciliation</h3>
+                  </div>
+                  <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                    <Zap className="size-3" />
+                    Scheduled
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs text-[var(--color-text-secondary)]">
+                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                    <span>Cron Schedule</span>
+                    <span className="font-mono text-zinc-300">Daily at 2:00 AM CST</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                    <span>Orchestration</span>
+                    <span className="font-mono text-zinc-300">Railway n8n (Automated)</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                    <span>Alert Policy</span>
+                    <span className="font-mono text-zinc-300">Failure Only (Resend)</span>
+                  </div>
+                  <div className="pt-1">
+                    <span className="block text-gray-400 mb-1">Last Reconciliation Run:</span>
+                    {syncHealth?.reconciliation ? (
+                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] space-y-1">
+                        <div className="flex justify-between">
+                          <span className={syncHealth.reconciliation.status === 'success' ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
+                            {syncHealth.reconciliation.status.toUpperCase()}
+                          </span>
+                          <span className="text-zinc-500">{formatDate(syncHealth.reconciliation.started_at)}</span>
+                        </div>
+                        <div className="flex justify-between text-zinc-400">
+                          <span>{syncHealth.reconciliation.txns_synced} txns / {syncHealth.reconciliation.agents_synced} agents</span>
+                          <span>Errors: {(syncHealth.reconciliation.errors || []).length}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] text-zinc-500 italic">
+                        First scheduled run pending at 2:00 AM CST.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-1 text-[11px] text-zinc-500 leading-normal">
+                  Safety net synchronization across all agents even during network outages or silent webhook drops.
+                </div>
+              </div>
+            </div>
+
             {/* Sync Control Card */}
             <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">

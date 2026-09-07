@@ -50,8 +50,12 @@ class Settings(BaseSettings):
 
     # BrokerMint
     brokermint_api_key: str = ""
+    brokermint_webhook_secret: str = ""
     brokermint_webhook_secret_created: str = ""
     brokermint_webhook_secret_updated: str = ""
+
+    # Scheduled Cron Security
+    cron_secret: str = ""
 
     # n8n
     n8n_webhook_base_url: str = ""

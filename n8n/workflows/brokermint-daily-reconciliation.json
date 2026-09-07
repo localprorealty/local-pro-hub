@@ -1,0 +1,161 @@
+{
+  "name": "LocalPRO — BrokerMint Daily Reconciliation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 2 * * *"
+            }
+          ]
+        }
+      },
+      "id": "bm-cron-0001",
+      "name": "Schedule — Daily 2am CST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://local-pro-hub-production.up.railway.app/brokermint/sync?triggered_by=cron",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Cron-Secret",
+              "value": "={{ $env.CRON_SECRET }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "bm-cron-0002",
+      "name": "Trigger Daily Reconciliation Sync",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-sync-failure",
+              "leftValue": "={{ $json.statusCode ?? 200 }}",
+              "rightValue": 400,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "cond-body-failed",
+              "leftValue": "={{ $json.body?.status ?? 'ok' }}",
+              "rightValue": "failed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "bm-cron-0003",
+      "name": "IF Sync Failed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.RESEND_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"LocalPRO Hub Alerts <alerts@localprorealty.com>\",\n  \"to\": [\"tricia@localprorealty.com\", \"adarsh@localprorealty.com\"],\n  \"subject\": \"[ALERT] BrokerMint Daily Reconciliation Sync Failed\",\n  \"html\": \"<h2>BrokerMint Daily Reconciliation Sync Failed</h2><p>The automated 2:00 AM CST reconciliation sync encountered an error or failed to trigger successfully.</p><p><strong>Status Code:</strong> \" + ($json.statusCode || 'N/A') + \"</p><p><strong>Response Details:</strong><br/><pre>\" + JSON.stringify($json.body || $json, null, 2) + \"</pre></p><p>Please log in to the LocalPRO Hub Admin Portal (<a href='https://app.localprorealty.com/admin/brokermint'>Admin → BrokerMint</a>) to inspect sync health or trigger a manual sync.</p>\"\n}",
+        "options": {}
+      },
+      "id": "bm-cron-0004",
+      "name": "Send Alert Email (Resend)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, -80]
+    }
+  ],
+  "connections": {
+    "Schedule — Daily 2am CST": {
+      "main": [
+        [
+          {
+            "node": "Trigger Daily Reconciliation Sync",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Daily Reconciliation Sync": {
+      "main": [
+        [
+          {
+            "node": "IF Sync Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Sync Failed": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email (Resend)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Chicago"
+  }
+}

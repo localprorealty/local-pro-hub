@@ -15,6 +15,7 @@ from routers.voice import router as voice_router
 from routers.brokermint import router as brokermint_router
 from routers.revenue_share import router as revenue_share_router
 from routers.extension import router as extension_router
+from routers.webhooks import router as webhooks_router
 
 settings = get_settings()
 
@@ -42,6 +43,7 @@ app.include_router(voice_router)
 app.include_router(brokermint_router)
 app.include_router(revenue_share_router)
 app.include_router(extension_router)
+app.include_router(webhooks_router)
 
 
 @app.get("/health")

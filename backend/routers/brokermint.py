@@ -1,12 +1,17 @@
+import hmac
+import logging
 import os
-from datetime import date, datetime
-from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from datetime import date, datetime, timezone
+from typing import Any, List, Optional
+import httpx
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException
 from pydantic import BaseModel
 from supabase import create_client
 from services.brokermint_sync import run_full_sync
 from deps.auth import require_admin, get_current_user
 from config import get_settings
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/brokermint", tags=["brokermint"])
 
@@ -20,15 +25,181 @@ class MarkPaidRequest(BaseModel):
 
 
 @router.post("/sync")
-async def trigger_sync(background_tasks: BackgroundTasks, _admin_id: str = Depends(require_admin)):
-    """Admin only. Runs full BrokerMint sync in the background."""
+async def trigger_sync(
+    background_tasks: BackgroundTasks,
+    triggered_by: str = "manual",
+    x_cron_secret: Optional[str] = Header(default=None, alias="X-Cron-Secret"),
+    authorization: Optional[str] = Header(default=None),
+):
+    """
+    Runs full BrokerMint sync in the background.
+    Authentication:
+      - Valid X-Cron-Secret header matching CRON_SECRET env var (for scheduled cron runs)
+      - OR Bearer token with admin role (for manual admin runs)
+    """
+    if x_cron_secret:
+        cron_secret = os.environ.get("CRON_SECRET") or get_settings().cron_secret
+        if not cron_secret or not hmac.compare_digest(cron_secret, x_cron_secret):
+            raise HTTPException(status_code=401, detail="Invalid cron secret")
+        actual_triggered_by = "cron"
+    else:
+        # Require admin authorization
+        await require_admin(authorization)
+        actual_triggered_by = triggered_by or "manual"
+
     # Check if a sync is already running
     active_sync = supabase.table("bm_sync_log").select("status").eq("status", "running").execute()
     if active_sync.data:
         raise HTTPException(status_code=400, detail="A sync is already in progress.")
 
-    background_tasks.add_task(run_full_sync, supabase)
-    return {"status": "started"}
+    background_tasks.add_task(run_full_sync, supabase, actual_triggered_by)
+    return {"status": "started", "triggered_by": actual_triggered_by}
+
+
+@router.get("/sync-health")
+async def get_sync_health(_admin_id: str = Depends(require_admin)) -> dict[str, Any]:
+    """Admin only. Returns live webhook subscription health and reconciliation sync history."""
+    api_key = get_settings().brokermint_api_key
+
+    # 1. Fetch live webhook subscription status from BrokerMint
+    webhook_info: dict[str, Any] = {
+        "status": "unknown",
+        "subscription_id": None,
+        "callback_url": None,
+        "active": False,
+        "event_types": [],
+    }
+    if api_key:
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.get("https://my.brokermint.com/api/v1/webhooks", params={"api_key": api_key})
+                if resp.status_code == 200:
+                    hooks = resp.json() or []
+                    hub_hook = next(
+                        (h for h in hooks if "local-pro-hub" in h.get("callback_url", "") or "webhooks/brokermint" in h.get("callback_url", "")),
+                        None
+                    )
+                    if not hub_hook and hooks:
+                        hub_hook = hooks[0]
+                    if hub_hook:
+                        webhook_info = {
+                            "status": "active" if hub_hook.get("active") else "deactivated",
+                            "subscription_id": hub_hook.get("id"),
+                            "callback_url": hub_hook.get("callback_url"),
+                            "active": bool(hub_hook.get("active")),
+                            "event_types": [
+                                e.get("event") for e in (hub_hook.get("event_types") or []) if isinstance(e, dict)
+                            ],
+                        }
+                    else:
+                        webhook_info["status"] = "not_registered"
+        except Exception as e:
+            logger.error("Error fetching BrokerMint webhooks for sync health: %s", e)
+            webhook_info["error"] = str(e)
+
+    # 2. Fetch latest event from bm_webhook_events_log
+    latest_event = None
+    try:
+        res_evt = (
+            supabase.table("bm_webhook_events_log")
+            .select("event_id, event_type, transaction_id, status, error_message, received_at, processed_at")
+            .order("received_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        if res_evt.data:
+            latest_event = res_evt.data[0]
+    except Exception as e:
+        logger.warning("Could not query bm_webhook_events_log for sync-health: %s", e)
+
+    # 3. Fetch latest cron reconciliation sync from bm_sync_log
+    latest_reconciliation = None
+    try:
+        res_cron = (
+            supabase.table("bm_sync_log")
+            .select("*")
+            .eq("triggered_by", "cron")
+            .order("started_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        if res_cron.data:
+            latest_reconciliation = res_cron.data[0]
+    except Exception as e:
+        logger.warning("Could not query bm_sync_log for cron reconciliation: %s", e)
+
+    # 4. Fetch latest manual sync from bm_sync_log
+    latest_manual = None
+    try:
+        res_man = (
+            supabase.table("bm_sync_log")
+            .select("*")
+            .neq("triggered_by", "cron")
+            .order("started_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        if res_man.data:
+            latest_manual = res_man.data[0]
+        else:
+            res_any = (
+                supabase.table("bm_sync_log")
+                .select("*")
+                .order("started_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            if res_any.data:
+                latest_manual = res_any.data[0]
+    except Exception as e:
+        logger.warning("Could not query bm_sync_log for manual sync: %s", e)
+
+    return {
+        "webhook": {
+            **webhook_info,
+            "latest_event": latest_event,
+        },
+        "reconciliation": latest_reconciliation,
+        "manual_sync": latest_manual,
+    }
+
+
+@router.post("/webhook/reactivate")
+async def reactivate_webhook(_admin_id: str = Depends(require_admin)) -> dict[str, Any]:
+    """Admin only. Reactivates a deactivated BrokerMint webhook subscription."""
+    api_key = get_settings().brokermint_api_key
+    if not api_key:
+        raise HTTPException(status_code=500, detail="BROKERMINT_API_KEY not configured")
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get("https://my.brokermint.com/api/v1/webhooks", params={"api_key": api_key})
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail="Failed to query BrokerMint webhooks")
+
+        hooks = resp.json() or []
+        hub_hook = next(
+            (h for h in hooks if "local-pro-hub" in h.get("callback_url", "") or "webhooks/brokermint" in h.get("callback_url", "")),
+            None
+        )
+        if not hub_hook and hooks:
+            hub_hook = hooks[0]
+
+        if not hub_hook:
+            raise HTTPException(status_code=404, detail="No BrokerMint webhook subscription found to reactivate")
+
+        hook_id = hub_hook["id"]
+        activate_resp = await client.put(
+            f"https://my.brokermint.com/api/v1/webhooks/{hook_id}",
+            params={"api_key": api_key},
+            json={"active": True}
+        )
+        if activate_resp.status_code != 200:
+            raise HTTPException(
+                status_code=activate_resp.status_code,
+                detail=f"Failed to reactivate webhook in BrokerMint: {activate_resp.text}"
+            )
+
+        return {"status": "ok", "message": f"Webhook subscription {hook_id} reactivated successfully"}
 
 
 @router.post("/sync/reset")

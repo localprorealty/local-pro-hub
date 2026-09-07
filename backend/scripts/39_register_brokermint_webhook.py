@@ -61,26 +61,26 @@ async def main():
         print("=======================================================\n")
 
         # Activate subscription
-        print(f"Activating subscription {webhook_id} via PUT /v1/webhooks/{webhook_id}...")
-        activate_resp = await client.put(
-            f"{BASE_URL}/v1/webhooks/{webhook_id}",
+        print(f"\nActivating subscription {webhook_id} via POST /v1/webhooks/{webhook_id}/activate...")
+        activate_resp = await client.post(
+            f"{BASE_URL}/v1/webhooks/{webhook_id}/activate",
             params={"api_key": api_key},
-            json={"active": True},
         )
-        print(f"Activation Status: {activate_resp.status_code}")
-        print(f"Activation Body: {activate_resp.text}")
+        print(f"Activation (POST) Status: {activate_resp.status_code}")
+        print(f"Activation (POST) Body: {activate_resp.text}")
 
-        # Send test ping
-        print(f"\nSending test ping via POST /v1/webhooks/{webhook_id}/test...")
-        test_resp = await client.post(
-            f"{BASE_URL}/v1/webhooks/{webhook_id}/test",
-            params={"api_key": api_key},
-        )
-        print(f"Test Ping Status: {test_resp.status_code}")
-        print(f"Test Ping Body: {test_resp.text}")
+        if activate_resp.status_code not in [200, 204]:
+            print(f"POST /activate returned {activate_resp.status_code}, trying PUT /v1/webhooks/{webhook_id} with {{'active': True}}...")
+            put_resp = await client.put(
+                f"{BASE_URL}/v1/webhooks/{webhook_id}",
+                params={"api_key": api_key},
+                json={"active": True},
+            )
+            print(f"Activation (PUT) Status: {put_resp.status_code}")
+            print(f"Activation (PUT) Body: {put_resp.text}")
 
         # Follow-up verification GET /v1/webhooks
-        print("\n=== STEP 4 VERIFICATION: GET /v1/webhooks ===")
+        print("\n=== VERIFICATION: GET /v1/webhooks ===")
         get_resp = await client.get(
             f"{BASE_URL}/v1/webhooks",
             params={"api_key": api_key},

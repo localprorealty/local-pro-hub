@@ -20,6 +20,7 @@ import {
   getSectionStatus,
   getVisibleSections,
   type SectionStatus,
+  type SellerItem,
 } from '@/lib/ntreis-sections'
 import {
   formatPropertyAddress,
@@ -71,6 +72,15 @@ export function NtreisFormBody({
     }
     if (!base.supervisor_id) {
       base.supervisor_id = 'Tricia Andrews (0543406)'
+    }
+    if (!Array.isArray(base.sellers) || (base.sellers as unknown[]).length === 0) {
+      base.sellers = [
+        {
+          name: typeof base.seller_name === 'string' ? base.seller_name : '',
+          email: typeof base.seller_email === 'string' ? base.seller_email : '',
+          phone: typeof base.seller_phone === 'string' ? base.seller_phone : '',
+        },
+      ]
     }
     return base
   })
@@ -127,7 +137,16 @@ export function NtreisFormBody({
   const persist = useCallback(
     async (patch: Record<string, unknown>) => {
       setSaveStatus('saving')
-      const ok = await updateListingFormData(listingId, patch)
+      const patchToSave = { ...patch }
+      if (Array.isArray(patchToSave.sellers) && patchToSave.sellers.length > 0) {
+        const s0 = patchToSave.sellers[0] as SellerItem
+        if (s0) {
+          patchToSave.seller_name = s0.name || ''
+          patchToSave.seller_email = s0.email || ''
+          patchToSave.seller_phone = s0.phone || ''
+        }
+      }
+      const ok = await updateListingFormData(listingId, patchToSave)
       if (ok) {
         setSaveStatus('saved')
         setSavedAt(new Date())
@@ -173,6 +192,43 @@ export function NtreisFormBody({
       handleFieldChange('supervisor_id', 'Tricia Andrews (0543406)')
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps -- seed once on mount
+
+  useEffect(() => {
+    if (!retsFormPatch || Object.keys(retsFormPatch).length === 0) return
+    const incomingSellerName =
+      typeof retsFormPatch.seller_name === 'string'
+        ? retsFormPatch.seller_name.trim()
+        : ''
+    const incomingSellers = Array.isArray(retsFormPatch.sellers)
+      ? (retsFormPatch.sellers as SellerItem[])
+      : null
+
+    const targetName =
+      incomingSellers && incomingSellers[0]?.name
+        ? incomingSellers[0].name.trim()
+        : incomingSellerName
+
+    if (targetName) {
+      setFormData((prev) => {
+        const existingSellers =
+          Array.isArray(prev.sellers) && prev.sellers.length > 0
+            ? [...(prev.sellers as SellerItem[])]
+            : [{ name: '', email: '', phone: '' }]
+
+        if (existingSellers[0]?.name === targetName) {
+          return prev
+        }
+
+        existingSellers[0] = {
+          ...existingSellers[0],
+          name: targetName,
+        }
+        const next = { ...prev, sellers: existingSellers }
+        scheduleSave(next)
+        return next
+      })
+    }
+  }, [retsFormPatch, scheduleSave])
 
   useEffect(() => {
     return () => {

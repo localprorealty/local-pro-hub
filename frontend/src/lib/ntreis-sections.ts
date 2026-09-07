@@ -9,6 +9,13 @@ export type FieldType =
   | 'date'
   | 'room_row'
   | 'yes_no'
+  | 'sellers_list'
+
+export interface SellerItem {
+  name: string
+  email: string
+  phone: string
+}
 
 export interface NtreisField {
   key: string
@@ -248,12 +255,8 @@ export const NTREIS_SECTIONS: NtreisSection[] = [
       { key: "listing_type", label: "Listing Type", 
         type: "select", required: true,
         options: ["listing", "buyer", "lease"] },
-      { key: "seller_name", label: "Seller Name", 
-        type: "text", required: true },
-      { key: "seller_email", label: "Seller Email", 
-        type: "text", required: true },
-      { key: "seller_phone", label: "Seller Phone", 
-        type: "text", required: true },
+      { key: "sellers", label: "Sellers", 
+        type: "sellers_list", required: true },
       { key: "property_sub_type", label: "Property Sub Type", 
         type: "select", required: true,
         options: ["Single Family Residence","Condominium","Townhouse",
@@ -1351,7 +1354,19 @@ export function isFieldFilled(value: unknown): boolean {
   if (typeof value === 'string') return value.trim().length > 0
   if (typeof value === 'number') return !Number.isNaN(value)
   if (typeof value === 'boolean') return true
-  if (Array.isArray(value)) return value.length > 0
+  if (Array.isArray(value)) {
+    if (value.length === 0) return false
+    if (
+      typeof value[0] === 'object' &&
+      value[0] !== null &&
+      ('name' in value[0] || 'email' in value[0] || 'phone' in value[0])
+    ) {
+      return (value as SellerItem[]).every(
+        (s) => Boolean(s?.name?.trim()) && Boolean(s?.email?.trim()) && Boolean(s?.phone?.trim()),
+      )
+    }
+    return value.length > 0
+  }
   if (typeof value === 'object') {
     const row = value as RoomRowValue
     const hasLevel = typeof row.level === 'string' && row.level.trim().length > 0
@@ -1369,18 +1384,51 @@ export function isFieldFilled(value: unknown): boolean {
   return false
 }
 
-export function getSectionStatus(section: NtreisSection, formData: FormData): SectionStatus {
+export function getSectionRequiredCounts(
+  section: NtreisSection,
+  formData: FormData,
+): { requiredCount: number; filledCount: number } {
   const visibleFields = section.fields.filter((field) => isFieldVisible(field, formData))
-  const requiredFields = visibleFields.filter((field) => field.required)
+  let requiredCount = 0
+  let filledCount = 0
 
-  if (requiredFields.length === 0) {
+  for (const field of visibleFields) {
+    if (!field.required) continue
+
+    if (field.type === 'sellers_list') {
+      const sellers =
+        Array.isArray(formData.sellers) && formData.sellers.length > 0
+          ? (formData.sellers as SellerItem[])
+          : [{ name: '', email: '', phone: '' }]
+
+      for (const s of sellers) {
+        requiredCount += 3
+        if (s?.name?.trim()) filledCount += 1
+        if (s?.email?.trim()) filledCount += 1
+        if (s?.phone?.trim()) filledCount += 1
+      }
+    } else {
+      requiredCount += 1
+      if (isFieldFilled(formData[field.key])) {
+        filledCount += 1
+      }
+    }
+  }
+
+  return { requiredCount, filledCount }
+}
+
+export function getSectionStatus(section: NtreisSection, formData: FormData): SectionStatus {
+  const { requiredCount, filledCount } = getSectionRequiredCounts(section, formData)
+
+  if (requiredCount === 0) {
+    const visibleFields = section.fields.filter((field) => isFieldVisible(field, formData))
     const anyFilled = visibleFields.some((field) => isFieldFilled(formData[field.key]))
     return anyFilled ? 'complete' : 'empty'
   }
 
-  const filledRequired = requiredFields.filter((field) => isFieldFilled(formData[field.key]))
-  if (filledRequired.length === 0) return 'empty'
-  if (filledRequired.length === requiredFields.length) return 'complete'
+  if (filledCount === 0) return 'empty'
+  if (filledCount === requiredCount) return 'complete'
   return 'partial'
 }
 
@@ -1392,11 +1440,9 @@ export function countRequiredRemaining(sections: NtreisSection[], formData: Form
   let count = 0
   for (const section of sections) {
     if (!isSectionVisible(section, formData)) continue
-    for (const field of section.fields) {
-      if (!field.required) continue
-      if (!isFieldVisible(field, formData)) continue
-      if (!isFieldFilled(formData[field.key])) count += 1
-    }
+    const { requiredCount, filledCount } = getSectionRequiredCounts(section, formData)
+    count += requiredCount - filledCount
   }
   return count
 }
+

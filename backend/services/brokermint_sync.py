@@ -313,7 +313,7 @@ async def upsert_transaction(
             .execute()
 
 
-async def run_full_sync(supabase) -> dict:
+async def run_full_sync(supabase, triggered_by: str = "manual") -> dict:
     """
     Optimized company-wide sync:
     1. Match all users by email → populate brokermint_id
@@ -349,9 +349,16 @@ async def run_full_sync(supabase) -> dict:
                 logger.error("Failed to update progress: %s", err)
 
     try:
-        log = supabase.table("bm_sync_log") \
-            .insert({"status": "running", "errors": [{"progress": "Initializing sync..."}]}) \
-            .execute()
+        log_payload = {
+            "status": "running",
+            "triggered_by": triggered_by,
+            "errors": [{"progress": "Initializing sync..."}]
+        }
+        try:
+            log = supabase.table("bm_sync_log").insert(log_payload).execute()
+        except Exception:
+            log_payload.pop("triggered_by", None)
+            log = supabase.table("bm_sync_log").insert(log_payload).execute()
         log_id = log.data[0]["id"]
 
         # Step 1: match users
@@ -572,3 +579,180 @@ async def run_full_sync(supabase) -> dict:
         "errors": all_errors,
         "status": final_status,
     }
+
+
+async def sync_single_transaction(supabase, bm_txn_id: str) -> dict:
+    """
+    Fetch and ingest a single transaction from BrokerMint by its BrokerMint ID.
+    Used for synchronous real-time webhook processing.
+    """
+    settings = get_settings()
+    api_key = settings.brokermint_api_key
+    if not api_key:
+        raise BrokerMintError("BROKERMINT_API_KEY not configured")
+
+    url = f"https://my.brokermint.com/api/v2/transactions/{bm_txn_id}"
+    params = {
+        "api_key": api_key,
+        "full_info": 1,
+        "include": "participants,commission_items",
+    }
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        resp = await client.get(url, params=params)
+        if resp.status_code == 404:
+            logger.warning("Transaction %s not found on BrokerMint (404)", bm_txn_id)
+            return {"status": "not_found", "bm_id": str(bm_txn_id)}
+        if resp.status_code != 200:
+            logger.error("BrokerMint API failed for transaction %s: %s %s", bm_txn_id, resp.status_code, resp.text)
+            raise BrokerMintError(f"BrokerMint API returned status {resp.status_code}")
+
+        txn = resp.json()
+
+    closing_dt = parse_epoch_ms(txn.get("closing_date"))
+    closed_dt = parse_epoch_ms(txn.get("closed_at"))
+
+    price_val = 0.0
+    try:
+        price_val = float(txn.get("price") or 0.0)
+    except Exception:
+        pass
+
+    if price_val > 10000000.0:
+        logger.warning(
+            "Sanity check triggered: Transaction %s has price $%s exceeding ceiling of $10M. Skipping commission parsing.",
+            bm_txn_id, price_val
+        )
+        txn["commission_items"] = []
+
+    txn_attrs = {
+        "bm_id": str(bm_txn_id),
+        "address": txn.get("address"),
+        "city": txn.get("city"),
+        "state": txn.get("state"),
+        "zip": txn.get("zip"),
+        "mls_number": txn.get("MLS #") or txn.get("mls_id"),
+        "price": txn.get("price"),
+        "status": normalize_status(txn.get("status")),
+        "representing": txn.get("representing"),
+        "closing_date": closing_dt.date().isoformat() if closing_dt else None,
+        "closed_at": closed_dt.isoformat() if closed_dt else None,
+        "raw": txn,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    res_txns = supabase.table("bm_transactions").upsert(txn_attrs, on_conflict="bm_id").execute()
+    txn_row = res_txns.data[0] if res_txns.data else None
+    txn_uuid = txn_row["id"] if txn_row else None
+
+    # Check for listings associated with this BrokerMint transaction
+    if txn_attrs["status"] == "closed":
+        listings_res = (
+            supabase.table("listings")
+            .select("id, stage")
+            .eq("brokermint_transaction_id", str(bm_txn_id))
+            .execute()
+        )
+        for listing in (listings_res.data or []):
+            if listing.get("stage") != "closed":
+                logger.info(
+                    "Auto-advancing listing %s to 'closed' stage due to closed BrokerMint transaction %s",
+                    listing["id"],
+                    bm_txn_id,
+                )
+                supabase.table("listings").update({"stage": "closed"}).eq("id", listing["id"]).execute()
+
+    # Ingest commission items if present
+    comm_items = txn.get("commission_items") or []
+    if comm_items and txn_uuid:
+        payee_ids = [
+            str(item.get("payee_id"))
+            for item in comm_items
+            if item.get("payee_type") == "User" and item.get("payee_id")
+        ]
+        bm_id_to_user_uuid = {}
+        if payee_ids:
+            users_res = (
+                supabase.table("users")
+                .select("id, brokermint_id")
+                .in_("brokermint_id", payee_ids)
+                .execute()
+            )
+            bm_id_to_user_uuid = {
+                str(u["brokermint_id"]): u["id"]
+                for u in (users_res.data or [])
+                if u.get("brokermint_id")
+            }
+
+        comm_map = {}
+        for item in comm_items:
+            payee_id = str(item.get("payee_id") or "")
+            payee_type = item.get("payee_type", "")
+            if payee_type != "User":
+                continue
+
+            user_uuid = bm_id_to_user_uuid.get(payee_id)
+            if not user_uuid:
+                continue
+
+            item_type = item.get("item_type")
+            key = (txn_uuid, payee_id, item_type)
+            amount = float(item.get("calculated_dollar_amount") or 0.0)
+            if amount > 10000000.0:
+                continue
+
+            if key in comm_map:
+                comm_map[key]["calculated_dollar_amount"] += amount
+            else:
+                comm_map[key] = {
+                    "transaction_id": txn_uuid,
+                    "user_id": user_uuid,
+                    "bm_payee_id": payee_id,
+                    "item_type": item_type,
+                    "calculated_dollar_amount": amount,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }
+
+        comm_batch = list(comm_map.values())
+        if comm_batch:
+            supabase.table("bm_commissions").upsert(
+                comm_batch,
+                on_conflict="transaction_id,bm_payee_id,item_type",
+            ).execute()
+
+    return {"status": "synced", "bm_id": str(bm_txn_id), "txn_uuid": txn_uuid}
+
+
+async def delete_single_transaction(supabase, bm_txn_id: str) -> dict:
+    """
+    Soft-delete a single transaction when BrokerMint sends transaction.deleted.
+    Sets deleted_at = now() and status = 'cancelled'.
+    """
+    now_iso = datetime.now(timezone.utc).isoformat()
+    try:
+        res = (
+            supabase.table("bm_transactions")
+            .update({
+                "deleted_at": now_iso,
+                "status": "cancelled",
+                "updated_at": now_iso,
+            })
+            .eq("bm_id", str(bm_txn_id))
+            .execute()
+        )
+    except Exception as e:
+        logger.warning(
+            "Could not set deleted_at on bm_transactions (column may not exist yet, falling back to status update): %s",
+            e,
+        )
+        res = (
+            supabase.table("bm_transactions")
+            .update({
+                "status": "cancelled",
+                "updated_at": now_iso,
+            })
+            .eq("bm_id", str(bm_txn_id))
+            .execute()
+        )
+
+    return {"status": "deleted", "bm_id": str(bm_txn_id), "rows_affected": len(res.data or [])}

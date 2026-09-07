@@ -102,4 +102,14 @@ async def get_extension_listing(
         if k not in flat_data:
             flat_data[k] = v
             
+    sellers = form_data.get("sellers")
+    if isinstance(sellers, list) and len(sellers) > 0:
+        primary = sellers[0] or {}
+        if not flat_data.get("seller_name") and primary.get("name"):
+            flat_data["seller_name"] = primary["name"]
+        if not flat_data.get("seller_email") and primary.get("email"):
+            flat_data["seller_email"] = primary["email"]
+        if not flat_data.get("seller_phone") and primary.get("phone"):
+            flat_data["seller_phone"] = primary["phone"]
+
     return flat_data

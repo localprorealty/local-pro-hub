@@ -1,0 +1,1312 @@
+{
+  "transactions_schema": [
+    {
+      "uid": "id",
+      "label": "ID",
+      "key": "id",
+      "type": "number",
+      "readonly": true
+    },
+    {
+      "uid": "created_at",
+      "label": "Created at",
+      "key": "created_at",
+      "type": "date",
+      "readonly": true
+    },
+    {
+      "uid": "updated_at",
+      "label": "Updated at",
+      "key": "updated_at",
+      "type": "date",
+      "readonly": true
+    },
+    {
+      "uid": "transaction_type",
+      "label": "Transaction type",
+      "key": "transaction_type",
+      "type": "dropdown",
+      "options": [
+        "traditional sale",
+        "rent/lease",
+        "Referral",
+        "commercial sale",
+        "commercial lease",
+        "REO",
+        "HUD",
+        "short sale",
+        "auction",
+        "appraisal",
+        "other"
+      ],
+      "requirements": {
+        "always": true
+      }
+    },
+    {
+      "uid": "status",
+      "label": "Status",
+      "key": "status",
+      "type": "dropdown",
+      "options": [
+        "opportunity",
+        "active",
+        "pending",
+        "closed",
+        "cancelled"
+      ],
+      "requirements": {
+        "always": true
+      }
+    },
+    {
+      "uid": "representing",
+      "label": "Representing",
+      "key": "representing",
+      "type": "dropdown",
+      "options": [
+        "buyer",
+        "seller",
+        "both"
+      ],
+      "readonly": true
+    },
+    {
+      "uid": "transaction_name",
+      "label": "Transaction name",
+      "key": "transaction_name",
+      "type": "text",
+      "requirements": {
+        "always": false,
+        "when": {
+          "status": [
+            "opportunity",
+            "active"
+          ],
+          "representing": "buyer",
+          "representings": [
+            "buyer"
+          ]
+        }
+      }
+    },
+    {
+      "uid": "address",
+      "label": "Address",
+      "key": "address",
+      "type": "text",
+      "requirements": {
+        "always": false,
+        "except": {
+          "status": [
+            "opportunity",
+            "active",
+            "cancelled"
+          ],
+          "representing": "buyer",
+          "representings": [
+            "buyer"
+          ]
+        }
+      }
+    },
+    {
+      "uid": "city",
+      "label": "City",
+      "key": "city",
+      "type": "text",
+      "requirements": {
+        "always": false,
+        "except": {
+          "status": [
+            "opportunity",
+            "active",
+            "cancelled"
+          ],
+          "representing": "buyer",
+          "representings": [
+            "buyer"
+          ]
+        }
+      }
+    },
+    {
+      "uid": "state",
+      "label": "State",
+      "key": "state",
+      "type": "text",
+      "requirements": {
+        "always": false,
+        "except": {
+          "status": [
+            "opportunity",
+            "active",
+            "cancelled"
+          ],
+          "representing": "buyer",
+          "representings": [
+            "buyer"
+          ]
+        }
+      }
+    },
+    {
+      "uid": "zip",
+      "label": "Zip",
+      "key": "zip",
+      "type": "text",
+      "requirements": {
+        "always": false,
+        "except": {
+          "status": [
+            "opportunity",
+            "active",
+            "cancelled"
+          ],
+          "representing": "buyer",
+          "representings": [
+            "buyer"
+          ]
+        }
+      }
+    },
+    {
+      "uid": "price",
+      "label": "Price",
+      "key": "price",
+      "type": "money",
+      "requirements": {
+        "always": false,
+        "except": {
+          "status": [
+            "opportunity",
+            "active",
+            "cancelled"
+          ],
+          "representing": "buyer",
+          "representings": [
+            "buyer"
+          ]
+        }
+      }
+    },
+    {
+      "uid": "listing_date",
+      "label": "Listing date",
+      "key": "listing_date",
+      "type": "date"
+    },
+    {
+      "uid": "expiration_date",
+      "label": "Listing expiration date",
+      "key": "expiration_date",
+      "type": "date"
+    },
+    {
+      "uid": "acceptance_date",
+      "label": "Acceptance date",
+      "key": "acceptance_date",
+      "type": "date"
+    },
+    {
+      "uid": "closing_date",
+      "label": "Closing date",
+      "key": "closing_date",
+      "type": "date"
+    },
+    {
+      "uid": "buyer_agreement_date",
+      "label": "Buyer agreement date",
+      "key": "buyer_agreement_date",
+      "type": "date",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "buyer_expiration_date",
+      "label": "Buyer expiration date",
+      "key": "buyer_expiration_date",
+      "type": "date",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "external_id",
+      "label": "External ID",
+      "key": "external_id",
+      "type": "text"
+    },
+    {
+      "uid": "timezone",
+      "label": "Timezone",
+      "key": "timezone",
+      "type": "number"
+    },
+    {
+      "uid": "commissions_finalized_at",
+      "label": "Commissions finalized at",
+      "key": "commissions_finalized_at",
+      "type": "date",
+      "readonly": true
+    },
+    {
+      "uid": "custom_id",
+      "label": "Custom ID",
+      "key": "custom_id",
+      "type": "text",
+      "readonly": true
+    },
+    {
+      "uid": "closed_at",
+      "label": "Closed at",
+      "key": "closed_at",
+      "type": "date",
+      "readonly": true
+    },
+    {
+      "uid": "buying_side_representer",
+      "label": "Buying side representer",
+      "key": "buying_side_representer",
+      "type": "object"
+    },
+    {
+      "uid": "listing_side_representer",
+      "label": "Listing side representer",
+      "key": "listing_side_representer",
+      "type": "object"
+    },
+    {
+      "uid": "sales_volume",
+      "label": "Sales volume",
+      "key": "sales_volume",
+      "type": "money",
+      "readonly": true
+    },
+    {
+      "uid": "lead_source",
+      "label": "Lead source",
+      "key": "Lead source",
+      "type": "dropdown",
+      "options": [
+        "Other",
+        "SOI",
+        "Company Lead",
+        "Company Lead Allegiance PM",
+        "OJO Lead",
+        "Primestreet Lead",
+        "Opcity Lead",
+        "Team Lead",
+        "Referral from another company",
+        "Relocation Company Referral",
+        "Referral from LP agent"
+      ],
+      "requirements": {
+        "always": true
+      },
+      "additional": true
+    },
+    {
+      "uid": "f458183117",
+      "label": "Client 1 Name",
+      "key": "Client 1 Name",
+      "type": "text",
+      "requirements": {
+        "always": true
+      },
+      "additional": true
+    },
+    {
+      "uid": "f770006910",
+      "label": "Client 1 Email",
+      "key": "Client 1 Email",
+      "type": "text",
+      "requirements": {
+        "always": true
+      },
+      "additional": true
+    },
+    {
+      "uid": "f426667625",
+      "label": "Client 1 Phone",
+      "key": "Client 1 Phone",
+      "type": "text",
+      "requirements": {
+        "always": true
+      },
+      "additional": true
+    },
+    {
+      "uid": "f723452543",
+      "label": "Client 2 Name",
+      "key": "Client 2 Name",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "f871885828",
+      "label": "Client 2 Phone",
+      "key": "Client 2 Phone",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "f610534092",
+      "label": "Client 2 Email",
+      "key": "Client 2 Email",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "mls_number",
+      "label": "MLS #",
+      "key": "MLS #",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "county",
+      "label": "County",
+      "key": "County",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "property_type",
+      "label": "Property type",
+      "key": "Property type",
+      "type": "dropdown",
+      "options": [
+        "Not specified",
+        "Apartment",
+        "Commercial",
+        "Condo",
+        "Duplex",
+        "Farm",
+        "Land",
+        "Manufactured",
+        "Mobile",
+        "Multi unit",
+        "Rentals",
+        "Single family",
+        "Townhouse",
+        "Other"
+      ],
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "area",
+      "label": "Area",
+      "key": "Area",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "public_remarks",
+      "label": "Public remarks",
+      "key": "Public remarks",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "building_sqft",
+      "label": "Building SQFT",
+      "key": "Building SQFT",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "lot_sqft",
+      "label": "Lot SQFT",
+      "key": "Lot SQFT",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "zoning",
+      "label": "Zoning",
+      "key": "Zoning",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "bedrooms",
+      "label": "Bedrooms",
+      "key": "Bedrooms",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "full_baths",
+      "label": "Full baths",
+      "key": "Full baths",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "half_baths",
+      "label": "Half baths",
+      "key": "Half baths",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "showing_instructions",
+      "label": "Showing instructions",
+      "key": "Showing instructions",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "show_appt",
+      "label": "Show appt",
+      "key": "Show appt",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "description",
+      "label": "Description",
+      "key": "Description",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "legal_description",
+      "label": "Legal description",
+      "key": "Legal description",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "apn",
+      "label": "APN",
+      "key": "APN",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "sqft",
+      "label": "SQFT",
+      "key": "SQFT",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "tenant",
+      "label": "Tenant",
+      "key": "Tenant",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "lockbox",
+      "label": "Lockbox",
+      "key": "Lockbox",
+      "type": "dropdown",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "yard_sign",
+      "label": "Yard sign",
+      "key": "Yard sign",
+      "type": "dropdown",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "escrow_number",
+      "label": "Escrow #",
+      "key": "Escrow #",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "monies_received_from",
+      "label": "Monies received from",
+      "key": "Monies received from",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "amount_received",
+      "label": "Amount received",
+      "key": "Amount received",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "date_received",
+      "label": "Date received",
+      "key": "Date received",
+      "type": "date",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "date_deposited",
+      "label": "Date deposited",
+      "key": "Date deposited",
+      "type": "date",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "date_released",
+      "label": "Date released",
+      "key": "Date released",
+      "type": "date",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    },
+    {
+      "uid": "amount_released",
+      "label": "Amount released",
+      "key": "Amount released",
+      "type": "text",
+      "requirements": {
+        "always": false
+      },
+      "additional": true
+    }
+  ],
+  "contacts_schema": [
+    {
+      "uid": "id",
+      "label": "ID",
+      "key": "id",
+      "type": "number",
+      "readonly": true,
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "created_at",
+      "label": "Created at",
+      "key": "created_at",
+      "type": "date",
+      "readonly": true,
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "updated_at",
+      "label": "Updated at",
+      "key": "updated_at",
+      "type": "date",
+      "readonly": true,
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "first_name",
+      "label": "First name",
+      "key": "first_name",
+      "type": "text",
+      "requirements": {
+        "always": true
+      }
+    },
+    {
+      "uid": "last_name",
+      "label": "Last name",
+      "key": "last_name",
+      "type": "text",
+      "requirements": {
+        "always": true
+      }
+    },
+    {
+      "uid": "email",
+      "label": "Email",
+      "key": "email",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "contact_type",
+      "label": "Type",
+      "key": "contact_type",
+      "type": "dropdown",
+      "options": [
+        "other",
+        "lead",
+        "client",
+        "transaction coordinator",
+        "agent",
+        "broker",
+        "buyer",
+        "seller",
+        "lender",
+        "escrow officer",
+        "title",
+        "appraiser",
+        "home inspector",
+        "termite inspector",
+        "insurance",
+        "home warranty"
+      ],
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "company",
+      "label": "Company",
+      "key": "company",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "address",
+      "label": "Address",
+      "key": "address",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "city",
+      "label": "City",
+      "key": "city",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "state",
+      "label": "State",
+      "key": "state",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "zip",
+      "label": "Zip",
+      "key": "zip",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "phone",
+      "label": "Phone",
+      "key": "phone",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "mobile_phone",
+      "label": "Mobile phone",
+      "key": "mobile_phone",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "fax",
+      "label": "Fax",
+      "key": "fax",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "lead_source",
+      "label": "Lead source",
+      "key": "lead_source",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "external_id",
+      "label": "External ID",
+      "key": "external_id",
+      "type": "text",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "private",
+      "label": "Private",
+      "key": "private",
+      "type": "boolean",
+      "requirements": {
+        "always": false
+      }
+    },
+    {
+      "uid": "assignee_id",
+      "label": "Assignee ID",
+      "key": "assignee_id",
+      "type": "number",
+      "requirements": {
+        "always": false
+      }
+    }
+  ],
+  "participant_roles": [
+    {
+      "name": "Seller",
+      "requirements": {
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [
+            "opportunity",
+            "active"
+          ],
+          "transaction_status": [
+            "pre-listing",
+            "listing"
+          ],
+          "side_representings": [
+            "seller",
+            "both"
+          ],
+          "side_represented": "seller"
+        },
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        }
+      }
+    },
+    {
+      "name": "Buyer",
+      "requirements": {
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [
+            "opportunity",
+            "active"
+          ],
+          "transaction_status": [
+            "pre-listing",
+            "listing"
+          ],
+          "side_representings": [
+            "buyer"
+          ],
+          "side_represented": "buyer"
+        },
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        }
+      }
+    },
+    {
+      "name": "Listing agent",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Buyer's agent",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Transaction coordinator",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Office administrator",
+      "requirements": {
+        "always": true,
+        "fields": [],
+        "default": {
+          "id": 399697,
+          "type": "AccountUser"
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Manager",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Broker",
+      "requirements": {
+        "always": true,
+        "fields": [],
+        "default": {
+          "id": 13708056,
+          "type": "Contact"
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Owner",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Loan officer",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Escrow officer",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Title officer",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Buyer's attorney",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Seller's attorney",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Landlord",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Tenant",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Marketing manager",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Accountant",
+      "requirements": {
+        "always": true,
+        "fields": [],
+        "default": {
+          "id": 399616,
+          "type": "AccountUser"
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "HOA contact",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Home inspector",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Termite inspector",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Other",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "Agent Services",
+      "requirements": {
+        "always": false,
+        "fields": [],
+        "default": {
+          "id": null,
+          "type": null
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    },
+    {
+      "name": "CDA Administrator",
+      "requirements": {
+        "always": true,
+        "fields": [
+          "email"
+        ],
+        "default": {
+          "id": 399697,
+          "type": "AccountUser"
+        },
+        "when": {
+          "transaction_type": null,
+          "transaction_statuses": [],
+          "transaction_status": null,
+          "side_representings": [],
+          "side_represented": null
+        }
+      }
+    }
+  ]
+}

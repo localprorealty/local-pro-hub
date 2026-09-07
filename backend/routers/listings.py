@@ -550,16 +550,20 @@ async def transition_listing(
 
         # 1. Validate required fields in form_data
         form_data = listing.get("form_data") or {}
-        sellers = form_data.get("sellers")
-        if isinstance(sellers, list) and len(sellers) > 0:
-            primary_seller = sellers[0] or {}
-            seller_name = primary_seller.get("name") or form_data.get("seller_name")
-            seller_email = primary_seller.get("email") or form_data.get("seller_email")
-            seller_phone = primary_seller.get("phone") or form_data.get("seller_phone")
+        raw_sellers = form_data.get("sellers")
+        if isinstance(raw_sellers, list) and len(raw_sellers) > 0:
+            sellers_list = [dict(s) for s in raw_sellers if isinstance(s, dict)]
         else:
-            seller_name = form_data.get("seller_name")
-            seller_email = form_data.get("seller_email")
-            seller_phone = form_data.get("seller_phone")
+            sellers_list = [{
+                "name": form_data.get("seller_name") or "",
+                "email": form_data.get("seller_email") or "",
+                "phone": form_data.get("seller_phone") or ""
+            }]
+
+        primary_seller = sellers_list[0] if sellers_list else {}
+        seller_name = (primary_seller.get("name") or form_data.get("seller_name") or "").strip()
+        seller_email = (primary_seller.get("email") or form_data.get("seller_email") or "").strip()
+        seller_phone = (primary_seller.get("phone") or form_data.get("seller_phone") or "").strip()
         listing_type = form_data.get("listing_type") or listing.get("listing_type")
         
         if not seller_name or not seller_email or not seller_phone or not listing_type:
@@ -591,7 +595,7 @@ async def transition_listing(
                 detail="Your agent profile is not synchronized with BrokerMint (missing BrokerMint ID)."
             )
             
-        # 3. Create a real Contact in BrokerMint first
+        # 3. Create real Contacts in BrokerMint for each seller (with idempotency guard)
         from services.brokermint_service import (
             create_bm_transaction,
             create_bm_contact,
@@ -600,20 +604,40 @@ async def transition_listing(
             apply_bm_checklist_template
         )
         
-        parts = seller_name.strip().split(" ", 1)
-        first_name = parts[0]
-        last_name = parts[1] if len(parts) > 1 else ""
-        
         contact_type = "buyer" if listing_type == "buyer" else "seller"
-        contact_payload = {
-            "first_name": first_name,
-            "last_name": last_name,
-            "email": seller_email,
-            "phone": seller_phone,
-            "contact_type": contact_type
-        }
-        contact_res = await create_bm_contact(contact_payload)
-        seller_contact_id = contact_res["id"]
+        seller_contact_ids = []
+        sellers_modified = False
+
+        for s_entry in sellers_list:
+            s_name = (s_entry.get("name") or "").strip()
+            s_email = (s_entry.get("email") or "").strip()
+            s_phone = (s_entry.get("phone") or "").strip()
+
+            existing_cid = s_entry.get("brokermint_contact_id")
+            if existing_cid:
+                seller_contact_ids.append(int(existing_cid))
+                continue
+
+            parts = s_name.split(" ", 1)
+            first_name = parts[0] if parts else ""
+            last_name = parts[1] if len(parts) > 1 else ""
+
+            contact_payload = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": s_email,
+                "phone": s_phone,
+                "contact_type": contact_type
+            }
+            contact_res = await create_bm_contact(contact_payload)
+            cid = contact_res["id"]
+            s_entry["brokermint_contact_id"] = cid
+            seller_contact_ids.append(cid)
+            sellers_modified = True
+
+        if sellers_modified:
+            form_data["sellers"] = sellers_list
+            client.table("listings").update({"form_data": form_data}).eq("id", listing_id).execute()
             
         # 4. Formulate the BrokerMint transaction payload
         # Map property type
@@ -690,6 +714,28 @@ async def transition_listing(
                 "value": form_data.get("yard_sign", "No"), "options": ["Yes", "No"]
             }
         ]
+
+        # Add Client 2 custom attributes if second seller exists
+        if len(sellers_list) > 1:
+            s2 = sellers_list[1]
+            s2_name = (s2.get("name") or "").strip()
+            s2_email = (s2.get("email") or "").strip()
+            s2_phone = (s2.get("phone") or "").strip()
+            if s2_name:
+                custom_attributes.append({
+                    "type": "text", "label": "Client 2 Name", "name": "f723452543",
+                    "value": s2_name, "options": []
+                })
+            if s2_email:
+                custom_attributes.append({
+                    "type": "text", "label": "Client 2 Email", "name": "f610534092",
+                    "value": s2_email, "options": []
+                })
+            if s2_phone:
+                custom_attributes.append({
+                    "type": "text", "label": "Client 2 Phone", "name": "f871885828",
+                    "value": s2_phone, "options": []
+                })
 
         # Add previously-unsent transaction fields if present (skip empty/null)
         bedrooms = _pick(form_data, "bedrooms_total", "bedrooms")
@@ -773,9 +819,10 @@ async def transition_listing(
         await add_bm_user_participant(txn_id, 177899, "Accountant")
         # Angie Smith as office administrator & cda administrator
         await add_bm_user_participant(txn_id, 177976, "office administrator, cda administrator")
-        # Attach the created seller/buyer contact
+        # Attach the created seller/buyer contact(s)
         client_role = "Buyer" if listing_type == "buyer" else "Seller"
-        await add_bm_contact_participant(txn_id, seller_contact_id, client_role)
+        for cid in seller_contact_ids:
+            await add_bm_contact_participant(txn_id, cid, client_role)
         
         # 7. Apply Checklist
         await apply_bm_checklist_template(txn_id, template_id)

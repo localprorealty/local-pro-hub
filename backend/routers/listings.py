@@ -597,11 +597,13 @@ async def transition_listing(
         first_name = parts[0]
         last_name = parts[1] if len(parts) > 1 else ""
         
+        contact_type = "buyer" if listing_type == "buyer" else "seller"
         contact_payload = {
             "first_name": first_name,
             "last_name": last_name,
             "email": seller_email,
-            "phone": seller_phone
+            "phone": seller_phone,
+            "contact_type": contact_type
         }
         contact_res = await create_bm_contact(contact_payload)
         seller_contact_id = contact_res["id"]
@@ -640,6 +642,99 @@ async def transition_listing(
             buying_side_rep = {"id": 15827, "type": "Account"}
         else:
             transaction_type = "traditional sale"
+
+        custom_attributes = [
+            {
+                "type": "dropdown", "label": "Lead source", "name": "lead_source", "value": "Other",
+                "options": ["Other", "SOI", "Company Lead", "Company Lead Allegiance PM", 
+                            "OJO Lead", "Primestreet Lead", "Opcity Lead", "Team Lead", 
+                            "Referral from another company", "Relocation Company Referral", 
+                            "Referral from LP agent"]
+            },
+            {
+                "type": "text", "label": "Client 1 Name", "name": "f458183117", 
+                "value": seller_name, "options": []
+            },
+            {
+                "type": "text", "label": "Client 1 Email", "name": "f770006910", 
+                "value": seller_email, "options": []
+            },
+            {
+                "type": "text", "label": "Client 1 Phone", "name": "f426667625", 
+                "value": seller_phone, "options": []
+            },
+            {
+                "type": "text", "label": "County", "name": "county", 
+                "value": form_data.get("county") or "", "options": []
+            },
+            {
+                "type": "dropdown", "label": "Property type", "name": "property_type",
+                "value": mapped_prop_type,
+                "options": ["Not specified", "Apartment", "Commercial", "Condo", "Duplex",
+                            "Farm", "Land", "Manufactured", "Mobile", "Multi unit",
+                            "Rentals", "Single family", "Townhouse", "Other"]
+            },
+            {
+                "type": "dropdown", "label": "Lockbox", "name": "lockbox",
+                "value": form_data.get("lockbox", "No"), "options": ["Yes", "No"]
+            },
+            {
+                "type": "dropdown", "label": "Yard sign", "name": "yard_sign",
+                "value": form_data.get("yard_sign", "No"), "options": ["Yes", "No"]
+            }
+        ]
+
+        # Add previously-unsent transaction fields if present (skip empty/null)
+        bedrooms = _pick(form_data, "bedrooms_total", "bedrooms")
+        if bedrooms:
+            custom_attributes.append({
+                "type": "text", "label": "Bedrooms", "name": "bedrooms",
+                "value": str(bedrooms), "options": []
+            })
+
+        full_baths = _pick(form_data, "bathrooms_full", "full_baths")
+        if full_baths:
+            custom_attributes.append({
+                "type": "text", "label": "Full baths", "name": "full_baths",
+                "value": str(full_baths), "options": []
+            })
+
+        half_baths = _pick(form_data, "bathrooms_half", "half_baths")
+        if half_baths:
+            custom_attributes.append({
+                "type": "text", "label": "Half baths", "name": "half_baths",
+                "value": str(half_baths), "options": []
+            })
+
+        building_sqft = _pick(form_data, "living_area_sqft", "living_area", "sqft")
+        if building_sqft:
+            custom_attributes.append({
+                "type": "text", "label": "Building SQFT", "name": "building_sqft",
+                "value": str(building_sqft), "options": []
+            })
+
+        lot_sqft = _pick(form_data, "lot_size_area", "lot_sqft")
+        if lot_sqft:
+            custom_attributes.append({
+                "type": "text", "label": "Lot SQFT", "name": "lot_sqft",
+                "value": str(lot_sqft), "options": []
+            })
+
+        area = _pick(form_data, "subdivision", "area")
+        if area:
+            custom_attributes.append({
+                "type": "text", "label": "Area", "name": "area",
+                "value": str(area), "options": []
+            })
+
+        public_remarks = listing.get("description_generated") or _pick(
+            form_data, "description_generated", "property_description", "public_remarks", "remarks"
+        )
+        if public_remarks and str(public_remarks).strip():
+            custom_attributes.append({
+                "type": "text", "label": "Public remarks", "name": "public_remarks",
+                "value": str(public_remarks).strip(), "options": []
+            })
             
         payload = {
             "address": form_data.get("street_number", "") + " " + form_data.get("street_name", ""),
@@ -655,50 +750,8 @@ async def transition_listing(
             "buying_side_representer": buying_side_rep,
             "listing_date": date_to_epoch_ms(form_data.get("list_date")),
             "expiration_date": date_to_epoch_ms(form_data.get("expire_date")),
-            "custom_attributes": [
-                {
-                    "type": "dropdown", "label": "Lead source", "name": "lead_source", "value": "Other",
-                    "options": ["Other", "SOI", "Company Lead", "Company Lead Allegiance PM", 
-                                "OJO Lead", "Primestreet Lead", "Opcity Lead", "Team Lead", 
-                                "Referral from another company", "Relocation Company Referral", 
-                                "Referral from LP agent"]
-                },
-                {
-                    "type": "text", "label": "Client 1 Name", "name": "f458183117", 
-                    "value": seller_name, "options": []
-                },
-                {
-                    "type": "text", "label": "Client 1 Email", "name": "f770006910", 
-                    "value": seller_email, "options": []
-                },
-                {
-                    "type": "text", "label": "Client 1 Phone", "name": "f426667625", 
-                    "value": seller_phone, "options": []
-                },
-                {
-                    "type": "text", "label": "MLS Number", "name": "mls_number", 
-                    "value": listing.get("mls_number") or "", "options": []
-                },
-                {
-                    "type": "text", "label": "County", "name": "county", 
-                    "value": form_data.get("county") or "", "options": []
-                },
-                {
-                    "type": "dropdown", "label": "Property type", "name": "property_type",
-                    "value": mapped_prop_type,
-                    "options": ["Not specified", "Apartment", "Commercial", "Condo", "Duplex",
-                                "Farm", "Land", "Manufactured", "Mobile", "Multi unit",
-                                "Rentals", "Single family", "Townhouse", "Other"]
-                },
-                {
-                    "type": "dropdown", "label": "Lockbox", "name": "lockbox",
-                    "value": form_data.get("lockbox", "No"), "options": ["Yes", "No"]
-                },
-                {
-                    "type": "dropdown", "label": "Yard sign", "name": "yard_sign",
-                    "value": form_data.get("yard_sign", "No"), "options": ["Yes", "No"]
-                }
-            ]
+            "external_id": str(listing_id),
+            "custom_attributes": custom_attributes
         }
         
         # 5. Invoke BrokerMint API to create transaction
@@ -707,13 +760,14 @@ async def transition_listing(
         
         # 6. Attach participants
         # Agent
-        await add_bm_user_participant(txn_id, int(agent_bm_id), "Agent", owner=True)
+        agent_role = "Buyer's agent" if representing == "buyer" else "Listing agent"
+        await add_bm_user_participant(txn_id, int(agent_bm_id), agent_role, owner=True)
         # Tricia as accountant
-        await add_bm_user_participant(txn_id, 177899, "accountant")
+        await add_bm_user_participant(txn_id, 177899, "Accountant")
         # Angie Smith as office administrator & cda administrator
         await add_bm_user_participant(txn_id, 177976, "office administrator, cda administrator")
         # Attach the created seller/buyer contact
-        client_role = "buyer" if listing_type == "buyer" else "seller"
+        client_role = "Buyer" if listing_type == "buyer" else "Seller"
         await add_bm_contact_participant(txn_id, seller_contact_id, client_role)
         
         # 7. Apply Checklist

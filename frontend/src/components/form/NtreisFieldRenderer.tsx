@@ -3,8 +3,9 @@ import { FieldMultiSelect } from '@/components/form/FieldMultiSelect'
 import { FieldRadio, FieldYesNo } from '@/components/form/FieldRadio'
 import { FieldRoomRow } from '@/components/form/FieldRoomRow'
 import { FieldSelect } from '@/components/form/FieldSelect'
+import { FieldSellersList } from '@/components/form/FieldSellersList'
 import { FieldText } from '@/components/form/FieldText'
-import type { NtreisField, RoomRowValue } from '@/lib/ntreis-sections'
+import type { NtreisField, RoomRowValue, SellerItem } from '@/lib/ntreis-sections'
 import { isFieldVisible } from '@/lib/ntreis-sections'
 
 type NtreisFieldRendererProps = {
@@ -32,6 +33,14 @@ function asRoomRow(value: unknown): RoomRowValue {
   }
   return {}
 }
+
+function asSellers(value: unknown): SellerItem[] {
+  if (Array.isArray(value)) {
+    return value as SellerItem[]
+  }
+  return []
+}
+
 
 export function NtreisFieldRenderer({
   field,
@@ -192,6 +201,15 @@ export function NtreisFieldRenderer({
             showRoomName={field.key.startsWith('additional_room_')}
           />
         </div>
+      )
+    case 'sellers_list':
+      return (
+        <FieldSellersList
+          value={asSellers(value)}
+          onChange={(v) => onChange(field.key, v)}
+          isPreFilled={isPreFilled || (preFilledKeys?.has('seller_name') ?? false)}
+          readOnly={readOnly}
+        />
       )
     default:
       return null

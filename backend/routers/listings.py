@@ -550,9 +550,16 @@ async def transition_listing(
 
         # 1. Validate required fields in form_data
         form_data = listing.get("form_data") or {}
-        seller_name = form_data.get("seller_name")
-        seller_email = form_data.get("seller_email")
-        seller_phone = form_data.get("seller_phone")
+        sellers = form_data.get("sellers")
+        if isinstance(sellers, list) and len(sellers) > 0:
+            primary_seller = sellers[0] or {}
+            seller_name = primary_seller.get("name") or form_data.get("seller_name")
+            seller_email = primary_seller.get("email") or form_data.get("seller_email")
+            seller_phone = primary_seller.get("phone") or form_data.get("seller_phone")
+        else:
+            seller_name = form_data.get("seller_name")
+            seller_email = form_data.get("seller_email")
+            seller_phone = form_data.get("seller_phone")
         listing_type = form_data.get("listing_type") or listing.get("listing_type")
         
         if not seller_name or not seller_email or not seller_phone or not listing_type:

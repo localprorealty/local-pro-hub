@@ -86,8 +86,21 @@ function ListingFormContent() {
         ...nextRets,
         address_step_complete: true,
       }
-      if (filledKeys.length > 0) {
-        patch._rets_prefilled_keys = filledKeys
+
+      if (nextRets.seller_name && !nextRets.sellers) {
+        patch.sellers = [{ name: String(nextRets.seller_name).trim(), email: '', phone: '' }]
+      }
+
+      const updatedFilledKeys = [...filledKeys]
+      if (
+        (filledKeys.includes('seller_name') || filledKeys.includes('sellers')) &&
+        !updatedFilledKeys.includes('sellers')
+      ) {
+        updatedFilledKeys.push('sellers')
+      }
+
+      if (updatedFilledKeys.length > 0) {
+        patch._rets_prefilled_keys = updatedFilledKeys
       }
 
       const ok = await persistFormData(patch)
@@ -108,8 +121,10 @@ function ListingFormContent() {
       }
 
       setAddress(nextAddress)
-      setRetsFormPatch(nextRets)
-      setPreFilledKeys(new Set(filledKeys))
+      setRetsFormPatch(
+        nextRets.sellers ? nextRets : { ...nextRets, ...(patch.sellers ? { sellers: patch.sellers } : {}) },
+      )
+      setPreFilledKeys(new Set(updatedFilledKeys))
       setShowFormSections(true)
       setIsSubmitting(false)
     },

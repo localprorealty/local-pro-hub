@@ -225,6 +225,7 @@ def _extract_realist_pdf_text_deterministic(text: str) -> dict[str, Any]:
         raw_owner = m.group(1).strip()
         # Clean up owner name if needed
         data["seller_name"] = raw_owner
+        data["sellers"] = [{"name": raw_owner, "email": "", "phone": ""}]
 
     # 3. Subdivision
     m = re.search(r"Subdivision\s+([^\n\r]+?)(?:\s+Census Tract|\n|\r)", text, re.IGNORECASE)
@@ -476,6 +477,7 @@ Return ONLY the raw JSON object inside a code block.
             "living_area_sqft": parsed_data.get("living_area_sqft"),
             "year_built": parsed_data.get("year_built"),
             "seller_name": parsed_data.get("seller_name"),
+            "sellers": [{"name": str(parsed_data.get("seller_name")).strip(), "email": "", "phone": ""}] if parsed_data.get("seller_name") else [],
             "property_sub_type": parsed_data.get("property_sub_type"),
             "housing_type": parsed_data.get("housing_type"),
             "parcel_id": parsed_data.get("parcel_id"),

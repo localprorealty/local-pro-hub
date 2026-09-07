@@ -3,9 +3,8 @@ import { AlertCircle, CheckCircle2, Circle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   countRequiredRemaining,
+  getSectionRequiredCounts,
   getSectionStatus,
-  isFieldFilled,
-  isFieldVisible,
   isSectionVisible,
   type NtreisSection,
 } from '@/lib/ntreis-sections'
@@ -71,17 +70,13 @@ export function ReviewSection({
           </thead>
           <tbody>
             {visibleSections.map((section) => {
-              const visibleFields = section.fields.filter((f) => isFieldVisible(f, formData))
-              const requiredFields = visibleFields.filter((f) => f.required)
-              const filledRequired = requiredFields.filter((f) =>
-                isFieldFilled(formData[f.key]),
-              )
+              const { requiredCount, filledCount } = getSectionRequiredCounts(section, formData)
               const status = getSectionStatus(section, formData)
               return (
                 <tr key={section.id} className="border-t border-[#2a2a2a]">
                   <td className="px-4 py-3 text-white">{section.name}</td>
-                  <td className="px-4 py-3 text-[#888888]">{requiredFields.length}</td>
-                  <td className="px-4 py-3 text-[#888888]">{filledRequired.length}</td>
+                  <td className="px-4 py-3 text-[#888888]">{requiredCount}</td>
+                  <td className="px-4 py-3 text-[#888888]">{filledCount}</td>
                   <td className="px-4 py-3">
                     <StatusIcon status={status} />
                   </td>

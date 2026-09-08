@@ -9,15 +9,15 @@
   --color-black: #000000;
   --color-white: #ffffff;
 
-  /* Light theme values (Alabaster / Taupe / Ash palette) */
-  --color-bg-base: #fbf7f4;
+  /* Light theme values */
+  --color-bg-base: #f8fafc;
   --color-surface: #ffffff;
-  --color-surface-2: #f2eee9;
-  --color-surface-3: #e8e3dc;
-  --color-border: #e4dfd7;
-  --color-text: #1c1815;
-  --color-text-secondary: #62584f;
-  --color-text-tertiary: #82776f;
+  --color-surface-2: #f1f5f9;
+  --color-surface-3: #e2e8f0;
+  --color-border: #e2e8f0;
+  --color-text: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
   --color-gold: #b3974d;
   --color-gold-hover: #9c823e;
   --color-gold-dim: rgba(179, 151, 77, 0.12);
@@ -35,7 +35,7 @@
   --popover-foreground: var(--color-text);
   --primary: var(--color-gold);
   --primary-hover: var(--color-gold-hover);
-  --primary-foreground: #000000;
+  --primary-foreground: #ffffff;
   --secondary: var(--color-surface-2);
   --secondary-foreground: var(--color-text);
   --muted: var(--color-surface-2);
@@ -56,7 +56,7 @@
   --sidebar: var(--color-surface);
   --sidebar-foreground: var(--color-text);
   --sidebar-primary: var(--color-gold);
-  --sidebar-primary-foreground: #000000;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: var(--color-surface-2);
   --sidebar-accent-foreground: var(--color-text);
   --sidebar-border: var(--color-border);
@@ -65,10 +65,10 @@
 }
 
 .dark {
-  --color-bg-base: #0a0a0a;
-  --color-surface: #1a1a1a;
-  --color-surface-2: #141414;
-  --color-surface-3: #222222;
+  --color-bg-base: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-2: #111111;
+  --color-surface-3: #1a1a1a;
   --color-border: #2a2a2a;
   --color-text: #ffffff;
   --color-text-secondary: #888888;
@@ -80,7 +80,7 @@
 
   --background: var(--color-bg-base);
   --foreground: var(--color-text);
-  --card: var(--color-surface);
+  --card: var(--color-surface-2);
   --card-foreground: var(--color-text);
   --popover: var(--color-surface-3);
   --popover-foreground: var(--color-text);

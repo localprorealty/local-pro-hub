@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ListingDetailsPanel } from '@/components/listings/ListingDetailsPanel'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { UserRole } from '@/lib/auth'
 import {
   LISTING_COLUMNS,
@@ -184,7 +185,8 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
             ) : null}
           </div>
         </div>
-        <div className="flex items-center gap-3 mr-12 sm:mr-14">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           <ProfileMenu role={menuRole} />
         </div>
       </header>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { UserRole } from '@/lib/auth'
 
 type ListingMissionHeaderProps = {
@@ -51,7 +52,8 @@ export function ListingMissionHeader({
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-3 mr-12 sm:mr-14">
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
         <ProfileMenu role={role} email={email} />
       </div>
     </header>

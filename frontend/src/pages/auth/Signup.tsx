@@ -18,6 +18,7 @@ import { AuthBrandPanel } from '@/components/auth/AuthBrandPanel'
 import { GridBackground } from '@/components/layout/GridBackground'
 import { SecureAuthNote } from '@/components/auth/SecureAuthNote'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,7 +29,7 @@ import { notifySignupPending } from '@/lib/notify-signup'
 import lpMonogram from '@/assets/branding/LP_Gold.png'
 
 const fieldClass =
-  'h-11 rounded-sm border-[#cfc4c5] bg-white px-4 text-[var(--color-black)] shadow-none focus-visible:border-[var(--color-gold)] focus-visible:ring-1 focus-visible:ring-[var(--color-gold)]'
+  'h-11 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[var(--color-text)] shadow-none placeholder:text-[var(--color-text-tertiary)] focus-visible:border-[var(--color-gold)] focus-visible:ring-1 focus-visible:ring-[var(--color-gold)]'
 
 const ACCESS_ROLES: {
   value: UserRole
@@ -258,15 +259,18 @@ function SignupWizard() {
     <main className="flex h-svh w-full overflow-hidden">
       <AuthBrandPanel step={step} totalSteps={totalSteps} variant="signup" />
 
-      <section className="relative flex h-svh min-h-0 w-full flex-col overflow-hidden bg-[var(--color-white)] md:flex-1">
-        <GridBackground variant="light" />
-        <div className="relative z-10 shrink-0 border-b border-[#f4f3f2] px-8 py-6 md:hidden">
+      <section className="relative flex h-svh min-h-0 w-full flex-col overflow-hidden bg-[var(--color-bg-base)] text-[var(--color-text)] md:flex-1">
+        <GridBackground />
+        <div className="absolute top-6 right-6 z-20">
+          <ThemeToggle />
+        </div>
+        <div className="relative z-10 shrink-0 border-b border-[var(--color-border)] px-8 py-6 md:hidden">
           <img
             src={lpMonogram}
             alt="LocalPRO"
             className="h-10 w-auto object-contain object-left"
           />
-          <p className="mt-2 text-[11px] tracking-widest text-[#888888] uppercase">
+          <p className="mt-2 text-[11px] tracking-widest text-[var(--color-text-secondary)] uppercase">
             Step {String(step).padStart(2, '0')} of {String(totalSteps).padStart(2, '0')}
           </p>
         </div>
@@ -284,16 +288,16 @@ function SignupWizard() {
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                 >
                   <header className="mb-8 text-left">
-                    <h2 className="mb-1 font-[family-name:var(--font-display)] text-[22px] font-semibold text-[var(--color-black)]">
+                    <h2 className="mb-1 font-[family-name:var(--font-display)] text-[22px] font-semibold text-[var(--color-text)]">
                       Request access
                     </h2>
-                    <p className="text-[13px] text-[#4c4546]">
+                    <p className="text-[13px] text-[var(--color-text-secondary)]">
                       Choose your role, then complete the form for that access type.
                     </p>
                   </header>
 
                   <div className="mb-8">
-                    <Label className="mb-3 block text-[14px] text-[#888888]">
+                    <Label className="mb-3 block text-[14px] text-[var(--color-text-secondary)]">
                       I am requesting access as
                     </Label>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -305,22 +309,22 @@ function SignupWizard() {
                             key={role.value}
                             type="button"
                             onClick={() => handleRoleChange(role.value)}
-                            className={`border p-4 text-left transition-colors ${
+                            className={`rounded-sm border p-4 text-left transition-colors ${
                               selected
-                                ? 'border-[var(--color-black)] bg-[#faf9f8] shadow-[0_0_0_2px_var(--color-gold)]'
-                                : 'border-[#e9e8e7] bg-white hover:border-[#cfc4c5]'
+                                ? 'border-[var(--color-gold)] bg-[var(--color-surface-2)] shadow-[0_0_0_1px_var(--color-gold)]'
+                                : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-gold)]/50'
                             }`}
                           >
                             <div className="mb-2 flex items-center gap-2">
                               <Icon
-                                className={`size-5 ${selected ? 'text-[var(--color-gold)]' : 'text-[#7e7576]'}`}
+                                className={`size-5 ${selected ? 'text-[var(--color-gold)]' : 'text-[var(--color-text-secondary)]'}`}
                                 aria-hidden
                               />
-                              <span className="text-sm font-semibold tracking-wide text-[var(--color-black)] uppercase">
+                              <span className="text-sm font-semibold tracking-wide text-[var(--color-text)] uppercase">
                                 {role.label}
                               </span>
                             </div>
-                            <p className="text-[12px] leading-snug text-[#4c4546]">
+                            <p className="text-[12px] leading-snug text-[var(--color-text-secondary)]">
                               {role.description}
                             </p>
                           </button>
@@ -330,10 +334,10 @@ function SignupWizard() {
                   </div>
 
                   <header className="mb-6 text-left">
-                    <h3 className="font-[family-name:var(--font-display)] text-[18px] font-semibold text-[var(--color-black)]">
+                    <h3 className="font-[family-name:var(--font-display)] text-[18px] font-semibold text-[var(--color-text)]">
                       {pageCopy.title}
                     </h3>
-                    <p className="mt-1 text-[13px] text-[#4c4546]">{pageCopy.subtitle}</p>
+                    <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">{pageCopy.subtitle}</p>
                   </header>
 
                   <form className="space-y-5" onSubmit={handleStepOne} noValidate>
@@ -385,7 +389,7 @@ function SignupWizard() {
                             aria-label={showPassword ? 'Hide password' : 'Show password'}
                             aria-pressed={showPassword}
                             onClick={() => setShowPassword((previous) => !previous)}
-                            className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-black)]"
+                            className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]"
                           >
                             {showPassword ? (
                               <EyeOff className="size-4" aria-hidden />
@@ -398,7 +402,7 @@ function SignupWizard() {
                       <div className="space-y-1.5">
                         <Label
                           htmlFor="confirmPassword"
-                          className="text-[14px] text-[#888888]"
+                          className="text-[14px] text-[var(--color-text-secondary)]"
                         >
                           Confirm password
                         </Label>
@@ -545,7 +549,7 @@ function SignupWizard() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="mt-2 h-12 w-full rounded-sm bg-[var(--color-gold)] font-semibold tracking-widest text-[var(--color-black)] uppercase hover:bg-[#dcc487] disabled:opacity-60"
+                      className="mt-2 h-12 w-full rounded-sm bg-[var(--color-gold)] font-semibold tracking-widest text-black uppercase hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
                     >
                       {isLoading ? (
                         <>
@@ -572,10 +576,10 @@ function SignupWizard() {
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                 >
                   <header className="mb-10 text-left">
-                    <h2 className="mb-2 font-[family-name:var(--font-display)] text-[22px] font-semibold text-[var(--color-black)]">
+                    <h2 className="mb-2 font-[family-name:var(--font-display)] text-[22px] font-semibold text-[var(--color-text)]">
                       Almost done
                     </h2>
-                    <p className="text-[16px] text-[#4c4546]">
+                    <p className="text-[16px] text-[var(--color-text-secondary)]">
                       Choose your default photographer tier for listings
                     </p>
                   </header>
@@ -599,27 +603,27 @@ function SignupWizard() {
                               className="sr-only"
                             />
                             <div
-                              className={`flex h-full flex-col border p-6 transition-colors ${
+                              className={`flex h-full flex-col rounded-sm border p-6 transition-colors ${
                                 selected
-                                  ? 'border-[var(--color-black)] bg-[#faf9f8] shadow-[0_0_0_2px_var(--color-gold)]'
-                                  : 'border-[#e9e8e7] bg-white hover:border-[#cfc4c5]'
+                                  ? 'border-[var(--color-gold)] bg-[var(--color-surface-2)] shadow-[0_0_0_1px_var(--color-gold)]'
+                                  : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-gold)]/50'
                               }`}
                             >
                               <div className="mb-4 flex items-start justify-between">
                                 <Icon
-                                  className={`size-6 ${selected ? 'text-[var(--color-gold)]' : 'text-[#7e7576]'}`}
+                                  className={`size-6 ${selected ? 'text-[var(--color-gold)]' : 'text-[var(--color-text-secondary)]'}`}
                                   aria-hidden
                                 />
                                 {tier.badge ? (
-                                  <span className="bg-[var(--color-gold)] px-2 py-0.5 text-[10px] font-medium text-[var(--color-black)]">
+                                  <span className="bg-[var(--color-gold)] px-2 py-0.5 text-[10px] font-medium text-black">
                                     {tier.badge}
                                   </span>
                                 ) : null}
                               </div>
-                              <h3 className="mb-2 text-sm font-semibold tracking-wide text-[var(--color-black)] uppercase">
+                              <h3 className="mb-2 text-sm font-semibold tracking-wide text-[var(--color-text)] uppercase">
                                 {tier.title}
                               </h3>
-                              <p className="text-[12px] leading-tight text-[#4c4546]">
+                              <p className="text-[12px] leading-tight text-[var(--color-text-secondary)]">
                                 {tier.description}
                               </p>
                             </div>
@@ -638,7 +642,7 @@ function SignupWizard() {
                       <Button
                         type="submit"
                         disabled={isLoading}
-                        className="h-12 w-full rounded-sm bg-[var(--color-gold)] font-semibold tracking-widest text-[var(--color-black)] uppercase hover:bg-[#dcc487] disabled:opacity-60"
+                        className="h-12 w-full rounded-sm bg-[var(--color-gold)] font-semibold tracking-widest text-black uppercase hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
                       >
                         {isLoading ? (
                           <>
@@ -653,7 +657,7 @@ function SignupWizard() {
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="text-sm text-[#4c4546] hover:text-[var(--color-black)]"
+                        className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                       >
                         ← Back to details
                       </button>
@@ -664,11 +668,11 @@ function SignupWizard() {
             </AnimatePresence>
 
             <footer className="mt-12 text-left">
-              <p className="text-[13px] text-[#4c4546]">
+              <p className="text-[13px] text-[var(--color-text-secondary)]">
                 Already have access?{' '}
                 <Link
                   to="/login"
-                  className="inline-flex items-center gap-1 font-bold text-[var(--color-black)] hover:text-[var(--color-gold)]"
+                  className="inline-flex items-center gap-1 font-bold text-[var(--color-gold)] hover:underline"
                 >
                   Sign in
                   <ArrowRight className="size-4" aria-hidden />

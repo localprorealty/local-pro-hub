@@ -115,7 +115,7 @@ function AdminPasswordResetSection({ userId, userEmail }: { userId: string; user
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Min 8 characters"
               disabled={isResetting}
-              className="h-9 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+              className="h-9 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
             />
           </div>
           <div className="flex gap-2">
@@ -135,7 +135,7 @@ function AdminPasswordResetSection({ userId, userEmail }: { userId: string; user
                 setSuccess(null)
               }}
               disabled={isResetting}
-              className="h-9 border-[var(--color-border)] bg-transparent text-[var(--color-white)]"
+              className="h-9 border-[var(--color-border)] bg-transparent text-[var(--color-text)]"
             >
               Cancel
             </Button>
@@ -463,7 +463,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search name, email, MLS..."
-              className="h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pl-10 text-[var(--color-white)]"
+              className="h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pl-10 text-[var(--color-text)]"
             />
           </label>
           <div className="flex flex-wrap gap-2">
@@ -479,7 +479,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
               type="button"
               variant="outline"
               onClick={() => setBulkAddOpen(true)}
-              className="h-10 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+              className="h-10 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
             >
               Bulk add
             </Button>
@@ -507,7 +507,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
             variant="outline"
             disabled={isSaving}
             onClick={() => void runBulk('active')}
-            className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+            className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
           >
             Bulk activate
           </Button>
@@ -516,7 +516,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
             variant="outline"
             disabled={isSaving}
             onClick={() => void runBulk('suspended')}
-            className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+            className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
           >
             Bulk reject
           </Button>
@@ -582,7 +582,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                       type="button"
                       variant="outline"
                       onClick={() => setEditingUser(user)}
-                      className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+                      className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
                     >
                       <UserPen className="mr-1 size-4" aria-hidden />
                       Edit
@@ -605,7 +605,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
         )}
 
         <Dialog open={Boolean(editingUser)} onOpenChange={(open) => !open && setEditingUser(null)}>
-          <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-white)] sm:max-w-xl">
+          <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] sm:max-w-xl">
             <DialogHeader>
               <DialogTitle className="font-[family-name:var(--font-display)]">
                 Edit user
@@ -641,7 +641,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
         </Dialog>
 
         <Dialog open={bulkAddOpen} onOpenChange={setBulkAddOpen}>
-          <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-white)] sm:max-w-lg">
+          <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] sm:max-w-lg">
             <DialogHeader>
               <DialogTitle className="font-[family-name:var(--font-display)]">
                 Bulk add users
@@ -657,7 +657,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
               onChange={(e) => setBulkAddText(e.target.value)}
               rows={8}
               placeholder="agent@localpro.com,TempPass123!,Jane Agent,5551234567,1234567,TX-12345"
-              className="mt-3 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-3 font-mono text-xs text-[var(--color-white)]"
+              className="mt-3 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3 font-mono text-xs text-[var(--color-text)]"
             />
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <div>
@@ -672,7 +672,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                       role: e.target.value as UserRole,
                     }))
                   }
-                  className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]"
+                  className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-sm text-[var(--color-text)]"
                 >
                   {(['agent', 'marketing', 'photographer', 'admin'] as UserRole[]).map(
                     (r) => (
@@ -695,7 +695,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                       status: e.target.value as UserProfileStatus,
                     }))
                   }
-                  className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]"
+                  className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-sm text-[var(--color-text)]"
                 >
                   {(['pending', 'active', 'suspended'] as UserProfileStatus[]).map((s) => (
                     <option key={s} value={s}>
@@ -717,7 +717,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
         </Dialog>
 
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
-          <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-white)] sm:max-w-lg">
+          <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] sm:max-w-lg">
             <DialogHeader>
               <DialogTitle className="font-[family-name:var(--font-display)]">
                 Add user
@@ -744,7 +744,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                     onChange={(e) =>
                       setNewUser((prev) => ({ ...prev, [key]: e.target.value }))
                     }
-                    className="mt-1 h-10 border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)]"
+                    className="mt-1 h-10 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]"
                   />
                 </div>
               ))}
@@ -761,7 +761,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                         role: e.target.value as UserRole,
                       }))
                     }
-                    className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]"
+                    className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-sm text-[var(--color-text)]"
                   >
                     {(['agent', 'marketing', 'photographer', 'admin'] as UserRole[]).map(
                       (r) => (
@@ -784,7 +784,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                         status: e.target.value as UserProfileStatus,
                       }))
                     }
-                    className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]"
+                    className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-sm text-[var(--color-text)]"
                   >
                     {(['pending', 'active', 'suspended'] as UserProfileStatus[]).map((s) => (
                       <option key={s} value={s}>

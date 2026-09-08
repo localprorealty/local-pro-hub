@@ -20,7 +20,7 @@ import {
 } from '@/lib/milestones'
 
 const fieldClass =
-  'rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
+  'rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
 
 function formatSentAt(value: string): string {
   try {
@@ -158,7 +158,7 @@ function AdminAutomationsContent() {
             variant="outline"
             disabled={isLoading}
             onClick={() => void loadAll()}
-            className="h-10 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+            className="h-10 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
           >
             <RefreshCw className="mr-2 size-4" aria-hidden />
             Refresh log
@@ -171,7 +171,7 @@ function AdminAutomationsContent() {
         </section>
 
         <section className="mb-8 border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-          <h2 className="font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--color-white)]">
+          <h2 className="font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--color-text)]">
             Sent today
           </h2>
           <p className="mb-4 text-xs text-[var(--color-text-secondary)]">
@@ -197,7 +197,7 @@ function AdminAutomationsContent() {
                 <tbody>
                   {sendsToday.map((row) => (
                     <tr key={row.log_id} className="border-b border-[var(--color-border)]/50">
-                      <td className="py-2 pr-4 text-[var(--color-white)]">{row.agent_name}</td>
+                      <td className="py-2 pr-4 text-[var(--color-text)]">{row.agent_name}</td>
                       <td className="py-2 pr-4">{milestoneTypeLabel(row.milestone_type)}</td>
                       <td className="py-2 pr-4">{row.agent_email}</td>
                       <td className="py-2 pr-4">{formatSentAt(row.sent_at)}</td>
@@ -228,7 +228,7 @@ function AdminAutomationsContent() {
                 >
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <h2 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--color-white)]">
+                      <h2 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--color-text)]">
                         {milestoneTypeLabel(template.milestone_type)}
                       </h2>
                       <p className="text-xs text-[var(--color-text-secondary)]">
@@ -240,7 +240,7 @@ function AdminAutomationsContent() {
                         type="button"
                         variant="outline"
                         onClick={() => setPreviewType(template.milestone_type)}
-                        className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+                        className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                       >
                         <Eye className="mr-1 size-4" aria-hidden />
                         Preview
@@ -250,7 +250,7 @@ function AdminAutomationsContent() {
                         variant="outline"
                         disabled={savingType === template.milestone_type}
                         onClick={() => void handleToggle(template)}
-                        className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+                        className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                       >
                         {template.is_active ? 'Disable' : 'Enable'}
                       </Button>
@@ -309,7 +309,7 @@ function AdminAutomationsContent() {
                           type="button"
                           variant="outline"
                           onClick={() => setPreviewType(template.milestone_type)}
-                          className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-white)]"
+                          className="h-9 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                         >
                           <Eye className="mr-1 size-4" aria-hidden />
                           Preview

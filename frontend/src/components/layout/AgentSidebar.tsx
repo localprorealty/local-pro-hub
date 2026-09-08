@@ -41,7 +41,7 @@ function SidebarNavLink({
         `flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-xs tracking-wide uppercase transition-colors ${
           isActive
             ? 'border-l-4 border-[var(--color-gold)] bg-[var(--color-surface-3)] pl-2 text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]'
+            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-white)]'
         }`
       }
     >
@@ -93,7 +93,7 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
           <p className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[var(--color-gold)]">
             LP
           </p>
-          <h2 className="mt-1 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text)]">
+          <h2 className="mt-1 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-white)]">
             Mission Control
           </h2>
         </NavLink>

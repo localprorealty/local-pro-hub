@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { UserRole } from '@/lib/auth'
 
 type ListingMissionHeaderProps = {
@@ -26,17 +25,17 @@ export function ListingMissionHeader({
   email,
 }: ListingMissionHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 px-8 py-5 backdrop-blur">
+    <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[#0a0a0a]/95 px-8 py-5 backdrop-blur">
       <div className="flex min-w-0 items-center gap-4">
         <Link
           to={backTo}
-          className="shrink-0 rounded-sm p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
+          className="shrink-0 rounded-sm p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
           aria-label={backLabel}
         >
           <ArrowLeft className="size-5" />
         </Link>
         <div className="min-w-0">
-          <h1 className="truncate font-[family-name:var(--font-display)] text-xl text-[var(--color-text)]">
+          <h1 className="truncate font-[family-name:var(--font-display)] text-xl text-white">
             {title}
           </h1>
           <div className="flex flex-wrap items-center gap-2">
@@ -45,17 +44,14 @@ export function ListingMissionHeader({
             ) : null}
             {listingId ? (
               <>
-                {subtitle ? <span className="text-[var(--color-text-tertiary)]">·</span> : null}
+                {subtitle ? <span className="text-[#555555]">·</span> : null}
                 <ListingIdBadge id={listingId} />
               </>
             ) : null}
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <ThemeToggle />
-        <ProfileMenu role={role} email={email} />
-      </div>
+      <ProfileMenu role={role} email={email} />
     </header>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { LogOut, Moon, Sun, User } from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const ChromeIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -23,7 +23,6 @@ const ChromeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 import { useAuth } from '@/hooks/useAuth'
 import type { UserRole } from '@/lib/auth'
 import { getSupabaseClient } from '@/lib/supabase'
-import { useTheme } from '@/lib/theme'
 import { fetchUserProfile, getDisplayInitials } from '@/lib/users'
 import {
   Avatar,
@@ -47,7 +46,6 @@ type ProfileMenuProps = {
 export function ProfileMenu({ role, email }: ProfileMenuProps) {
   const navigate = useNavigate()
   const { signOut } = useAuth()
-  const { theme, toggleTheme } = useTheme()
   const [initials, setInitials] = useState(() =>
     getDisplayInitials({ role, email }),
   )
@@ -119,11 +117,11 @@ export function ProfileMenu({ role, email }: ProfileMenuProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-48 rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-surface)] p-1 text-[var(--color-text)] shadow-lg"
+        className="w-48 rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-surface-2)] p-1 text-[var(--color-white)]"
       >
         <DropdownMenuLabel className="font-normal">
           {displayName ? (
-            <span className="block truncate text-sm text-[var(--color-text)]">
+            <span className="block truncate text-sm text-[var(--color-white)]">
               {displayName}
             </span>
           ) : null}
@@ -134,33 +132,21 @@ export function ProfileMenu({ role, email }: ProfileMenuProps) {
         <DropdownMenuSeparator className="bg-[var(--color-border)]" />
         <DropdownMenuItem
           onSelect={handleProfile}
-          className="cursor-pointer rounded-sm py-2 text-[var(--color-text)] focus:bg-[var(--color-gold-dim)]"
+          className="cursor-pointer rounded-sm py-2 text-[var(--color-white)] focus:bg-[var(--color-gold-dim)]"
         >
           <User className="mr-2 size-4" aria-hidden />
           Profile
         </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => navigate('/extension')}
-          className="cursor-pointer rounded-sm py-2 text-[var(--color-text)] focus:bg-[var(--color-gold-dim)]"
+          className="cursor-pointer rounded-sm py-2 text-[var(--color-white)] focus:bg-[var(--color-gold-dim)]"
         >
           <ChromeIcon className="mr-2 size-4" aria-hidden />
           Chrome Extension
         </DropdownMenuItem>
         <DropdownMenuItem
-          onSelect={toggleTheme}
-          className="cursor-pointer rounded-sm py-2 text-[var(--color-text)] focus:bg-[var(--color-gold-dim)]"
-        >
-          {theme === 'dark' ? (
-            <Sun className="mr-2 size-4 text-[var(--color-gold)]" aria-hidden />
-          ) : (
-            <Moon className="mr-2 size-4 text-[var(--color-gold)]" aria-hidden />
-          )}
-          {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-[var(--color-border)]" />
-        <DropdownMenuItem
           onSelect={() => void handleLogout()}
-          className="cursor-pointer rounded-sm py-2 text-[var(--color-text)] focus:bg-[var(--color-gold-dim)]"
+          className="cursor-pointer rounded-sm py-2 text-[var(--color-white)] focus:bg-[var(--color-gold-dim)]"
         >
           <LogOut className="mr-2 size-4" aria-hidden />
           Log out

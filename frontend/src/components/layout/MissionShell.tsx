@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { AgentSidebar } from '@/components/layout/AgentSidebar'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { UserRole } from '@/lib/auth'
 
 type MissionShellProps = {
@@ -29,14 +28,14 @@ export function MissionShell({
       <div className="grid min-h-svh lg:grid-cols-[220px_1fr]">
         <AgentSidebar role={role} />
 
-        <section className="flex min-h-svh flex-col bg-[var(--color-bg-base)] text-[var(--color-text)]">
+        <section className="flex min-h-svh flex-col bg-[#0a0a0a]">
           {headerSlot ? (
             headerSlot
           ) : hideDefaultHeader ? null : (
             <header className="flex items-start justify-between border-b border-[var(--color-border)] px-8 py-8">
               <div>
                 {title ? (
-                  <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-text)]">
+                  <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
                     {title}
                   </h1>
                 ) : null}
@@ -44,10 +43,7 @@ export function MissionShell({
                   <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{subtitle}</p>
                 ) : null}
               </div>
-              <div className="flex items-center gap-3">
-                <ThemeToggle />
-                <ProfileMenu role={role} email={email} />
-              </div>
+              <ProfileMenu role={role} email={email} />
             </header>
           )}
           <div className="flex-1 overflow-y-auto px-8 py-10">{children}</div>

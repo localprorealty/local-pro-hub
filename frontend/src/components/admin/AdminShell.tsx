@@ -14,7 +14,6 @@ import {
 import { shellPanelClass } from '@/components/layout/GridBackground'
 import { QuickLinks } from '@/components/layout/QuickLinks'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 type AdminShellProps = {
   title: string
@@ -41,7 +40,7 @@ function ShellNavLink({
         `flex w-full items-center gap-3 px-4 py-3 text-left text-xs tracking-wide uppercase transition-colors ${
           isActive
             ? 'border-l-4 border-[var(--color-gold)] bg-[var(--color-surface-3)] text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]'
+            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-white)]'
         }`
       }
     >
@@ -56,7 +55,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
 
 
   return (
-    <main className="relative min-h-svh bg-[var(--color-bg-base)] text-[var(--color-text)]">
+    <main className="relative min-h-svh text-[var(--color-white)]">
       <div className="grid min-h-svh lg:grid-cols-[220px_1fr]">
         <aside
           className={`sticky top-0 flex h-svh flex-col overflow-hidden border-r border-[var(--color-border)] ${shellPanelClass}`}
@@ -142,7 +141,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
           </div>
         </aside>
 
-        <section className="flex min-h-svh flex-col bg-[var(--color-bg-base)] text-[var(--color-text)]">
+        <section className="flex min-h-svh flex-col">
           <header className="flex items-start justify-between border-b border-[var(--color-border)] px-6 py-8 md:px-10">
             <div>
               <p className="mb-2 text-xs tracking-widest text-[var(--color-gold)] uppercase">
@@ -150,10 +149,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
               </p>
               <h2 className="font-[family-name:var(--font-display)] text-3xl">{title}</h2>
             </div>
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <ProfileMenu role="admin" />
-            </div>
+            <ProfileMenu role="admin" />
           </header>
           <div className="flex-1 overflow-y-auto px-6 py-8 md:px-10">{children}</div>
         </section>

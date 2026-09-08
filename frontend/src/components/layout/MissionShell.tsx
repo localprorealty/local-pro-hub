@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { AgentSidebar } from '@/components/layout/AgentSidebar'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { UserRole } from '@/lib/auth'
 
 type MissionShellProps = {
@@ -44,8 +43,7 @@ export function MissionShell({
                   <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{subtitle}</p>
                 ) : null}
               </div>
-              <div className="flex items-center gap-3">
-                <ThemeToggle />
+              <div className="flex items-center gap-3 mr-12 sm:mr-14">
                 <ProfileMenu role={role} email={email} />
               </div>
             </header>

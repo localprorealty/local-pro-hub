@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout'
 import { GridBackground } from '@/components/layout/GridBackground'
 import type { UserProfile, UserRole } from '@/lib/auth'
 import { getSupabaseClient } from '@/lib/supabase'
@@ -87,7 +88,7 @@ function ProtectedRoute({ state, children, allowedRoles }: GuardProps) {
     return <Navigate to={resolveHomeRoute(state.profile)} replace />
   }
 
-  return <>{children}</>
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>
 }
 
 function RevenueRoute({ state, children }: { state: AuthState; children: ReactNode }) {
@@ -103,7 +104,7 @@ function RevenueRoute({ state, children }: { state: AuthState; children: ReactNo
     return <Navigate to={resolveHomeRoute(state.profile)} replace />
   }
 
-  return <>{children}</>
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>
 }
 
 function PublicOnlyRoute({ state, children }: Omit<GuardProps, 'allowedRoles'>) {

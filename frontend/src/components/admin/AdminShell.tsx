@@ -14,7 +14,6 @@ import {
 import { shellPanelClass } from '@/components/layout/GridBackground'
 import { QuickLinks } from '@/components/layout/QuickLinks'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 type AdminShellProps = {
   title: string
@@ -150,8 +149,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
               </p>
               <h2 className="font-[family-name:var(--font-display)] text-3xl">{title}</h2>
             </div>
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
+            <div className="flex items-center gap-3 mr-12 sm:mr-14">
               <ProfileMenu role="admin" />
             </div>
           </header>

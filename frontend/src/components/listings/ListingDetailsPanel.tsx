@@ -5,6 +5,7 @@ import { Circle, CircleDot, Loader2, Sparkles, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BookingNegotiationPanel } from '@/components/booking/BookingNegotiationPanel'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
+import { ListingImageLibrary } from '@/components/listings/ListingImageLibrary'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { buildFormDataFromRows, flattenFormData } from '@/lib/listing-form'
@@ -333,6 +334,9 @@ export function ListingDetailsPanel({
             </div>
           ) : null}
         </div>
+
+        {/* Listing Photo & Media Library */}
+        <ListingImageLibrary listingId={listing.id} canManage={canManage} />
 
         <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
           <div className="mb-4">

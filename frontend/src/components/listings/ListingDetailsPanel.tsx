@@ -4,6 +4,7 @@ import { Circle, CircleDot, Loader2, Sparkles, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { BookingNegotiationPanel } from '@/components/booking/BookingNegotiationPanel'
+import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { buildFormDataFromRows, flattenFormData } from '@/lib/listing-form'
@@ -139,6 +140,9 @@ export function ListingDetailsPanel({
               <h3 className="mt-1 text-xl font-semibold text-[var(--color-white)]">
                 {listing.address_full ?? 'Unnamed listing'}
               </h3>
+              <div className="mt-1.5">
+                <ListingIdBadge id={listing.id} />
+              </div>
             </div>
             <Button
               type="button"

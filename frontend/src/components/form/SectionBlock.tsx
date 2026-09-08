@@ -14,6 +14,7 @@ type SectionBlockProps = {
   onEditAddress?: () => void
   preFilledKeys?: Set<string>
   readOnlyKeys?: Set<string>
+  isAutoPopulated?: boolean
   defaultExpanded?: boolean
   sectionRef?: (el: HTMLElement | null) => void
   children?: ReactNode
@@ -29,6 +30,7 @@ export function SectionBlock({
   onEditAddress,
   preFilledKeys,
   readOnlyKeys,
+  isAutoPopulated = false,
   defaultExpanded = true,
   sectionRef,
   children,
@@ -106,6 +108,7 @@ export function SectionBlock({
                       onEditAddress={onEditAddress}
                       preFilledKeys={preFilledKeys}
                       readOnlyKeys={readOnlyKeys}
+                      isAutoPopulated={isAutoPopulated}
                     />
                   ))}
                 </div>

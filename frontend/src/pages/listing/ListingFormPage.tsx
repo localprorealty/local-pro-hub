@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { DeleteDraftButton } from '@/components/listings/DeleteDraftButton'
+import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { PropertySearchStep } from '@/components/listing/PropertySearchStep'
 import { NtreisFormBody } from '@/components/form/NtreisFormBody'
 import {
@@ -299,12 +300,14 @@ function ListingFormContent() {
         >
           LP
         </Link>
-        <div className="flex items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
+        <div className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
           <span>New Listing</span>
           <span className="text-[#555555]">·</span>
           <span className="rounded border border-[#CFB87C]/40 bg-[#CFB87C]/10 px-2 py-0.5 text-xs text-[#CFB87C]">
             {TYPE_LABEL[listing.listing_type]}
           </span>
+          <span className="text-[#555555]">·</span>
+          <ListingIdBadge id={listing.id} />
         </div>
         <div className="flex items-center gap-4">
           {listing.stage === 'draft' && agentId ? (

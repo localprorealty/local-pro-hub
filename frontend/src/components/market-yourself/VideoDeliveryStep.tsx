@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { CheckCircle2, Copy, Download, Loader2, RefreshCw, Share2, Check, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 
 type VideoDeliveryStepProps = {
@@ -21,10 +22,11 @@ type VideoDeliveryStepProps = {
     tiktok?: string
     facebook?: string
   }
+  onCaptionChange?: (platform: SocialPlatform, text: string) => void
   postingTips?: string
 }
 
-type SocialPlatform = 'instagram' | 'tiktok' | 'facebook'
+export type SocialPlatform = 'instagram' | 'tiktok' | 'facebook'
 
 export function VideoDeliveryStep({
   status,
@@ -39,6 +41,7 @@ export function VideoDeliveryStep({
   onTryAgain,
   onGenerateAnother,
   socialCaptions,
+  onCaptionChange,
   postingTips,
 }: VideoDeliveryStepProps) {
   const [copySuccess, setCopySuccess] = useState(false)
@@ -175,11 +178,21 @@ export function VideoDeliveryStep({
                     ))}
                   </div>
 
-                  {/* Caption preview & copy box */}
-                  <div className="relative rounded-sm border border-[#222] bg-[#0d0d0d] p-4 min-h-[140px] max-h-[220px] overflow-y-auto">
-                    <p className="text-xs text-white leading-relaxed whitespace-pre-wrap select-all">
-                      {activeCaptionText || 'No caption generated for this platform.'}
-                    </p>
+                  {/* Caption edit & copy box */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] font-medium text-[var(--color-text-secondary)]">
+                        Caption (freely editable)
+                      </Label>
+                      <span className="text-[10px] text-[#777777]">Edit before copying</span>
+                    </div>
+                    <textarea
+                      value={activeCaptionText}
+                      onChange={(e) => onCaptionChange?.(activeTab, e.target.value)}
+                      rows={6}
+                      placeholder={`Write or paste your ${activeTab} caption here...`}
+                      className="w-full resize-y rounded-sm border border-[#222] bg-[#0d0d0d] p-3 text-xs leading-relaxed text-white focus:border-[#CFB87C] focus:outline-none"
+                    />
                   </div>
 
                   {activeCaptionText && (

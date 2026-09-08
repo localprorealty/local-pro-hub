@@ -58,12 +58,12 @@ export function AiRefinementPanel({
   const pageHistory = history[activePage.key] ?? []
 
   return (
-    <aside className="w-[280px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4">
-      <h3 className="text-sm font-semibold text-white">AI refinement</h3>
+    <aside className="w-[320px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4">
+      <h3 className="text-sm font-semibold text-white">Text editor & AI refine</h3>
 
       <div className="mt-4">
         <Label className="text-xs text-[var(--color-text-secondary)]">
-          Select page to refine
+          Select section to edit
         </Label>
         <Select value={activePage.key} onValueChange={onActivePageChange}>
           <SelectTrigger className="mt-1 w-full border-[var(--color-border)] bg-[#0a0a0a] text-white">
@@ -80,8 +80,25 @@ export function AiRefinementPanel({
       </div>
 
       <div className="mt-4">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="active-page-content" className="text-xs font-medium text-[var(--color-text-secondary)]">
+            Content (freely editable)
+          </Label>
+          <span className="text-[10px] text-[#888888]">Live preview</span>
+        </div>
+        <textarea
+          id="active-page-content"
+          value={activePage.getContent()}
+          onChange={(event) => activePage.applyContent(event.target.value)}
+          rows={6}
+          className="mt-1 w-full resize-y rounded-sm border border-[var(--color-border)] bg-[#0a0a0a] px-3 py-2 text-xs leading-relaxed text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
+          placeholder="Enter or edit text..."
+        />
+      </div>
+
+      <div className="mt-5 border-t border-[var(--color-border)] pt-4">
         <Label htmlFor="refine-instruction" className="text-xs text-[var(--color-text-secondary)]">
-          What would you like to change?
+          AI rewrite / instructions
         </Label>
         <textarea
           id="refine-instruction"
@@ -92,7 +109,7 @@ export function AiRefinementPanel({
               ? 'Change the email address to test@localprorealty.com'
               : 'Make the description more luxurious and focus on the pool'
           }
-          className="mt-1 min-h-28 w-full rounded-sm border border-[var(--color-border)] bg-[#0a0a0a] px-3 py-2 text-sm text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
+          className="mt-1 min-h-20 w-full rounded-sm border border-[var(--color-border)] bg-[#0a0a0a] px-3 py-2 text-xs text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
         />
       </div>
 

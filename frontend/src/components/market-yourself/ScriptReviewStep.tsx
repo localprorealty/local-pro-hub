@@ -42,6 +42,7 @@ type ScriptReviewStepProps = {
   videoError: string | null
   consentRequired?: boolean
   profileVoiceId?: string | null
+  onScenesChange?: (scenes: StoryboardScene[]) => void
 }
 
 export function ScriptReviewStep({
@@ -50,6 +51,7 @@ export function ScriptReviewStep({
   videoAgentPrompt,
   onVideoAgentPromptChange,
   scenes,
+  onScenesChange,
   options,
   voices,
   voiceId,
@@ -208,8 +210,8 @@ export function ScriptReviewStep({
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              {scenes.map((scene) => (
-                <div key={scene.scene_number} className="rounded-sm border border-[#2a2a2a] bg-[#111] p-4 space-y-2">
+              {scenes.map((scene, index) => (
+                <div key={scene.scene_number} className="rounded-sm border border-[#2a2a2a] bg-[#111] p-4 space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="flex size-5 items-center justify-center rounded-full bg-[#CFB87C]/20 text-[10px] font-bold text-[#CFB87C]">
                       {scene.scene_number}
@@ -219,16 +221,36 @@ export function ScriptReviewStep({
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] text-[#CFB87C] font-semibold uppercase tracking-wider">Visual Environment:</p>
-                    <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed italic">
-                      "{scene.visual}"
-                    </p>
+                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-[#CFB87C]">
+                      Visual Environment (editable):
+                    </Label>
+                    <textarea
+                      value={scene.visual}
+                      onChange={(e) => {
+                        if (!onScenesChange) return
+                        const next = [...scenes]
+                        next[index] = { ...next[index], visual: e.target.value }
+                        onScenesChange(next)
+                      }}
+                      rows={2}
+                      className="w-full resize-y rounded-sm border border-[#222] bg-[#0a0a0a] p-2 text-xs leading-relaxed text-[var(--color-text-secondary)] focus:border-[#CFB87C] focus:text-white focus:outline-none"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] text-[#CFB87C] font-semibold uppercase tracking-wider">Spoken Script:</p>
-                    <p className="text-xs text-white leading-relaxed">
-                      {scene.script}
-                    </p>
+                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-[#CFB87C]">
+                      Spoken Script (editable):
+                    </Label>
+                    <textarea
+                      value={scene.script}
+                      onChange={(e) => {
+                        if (!onScenesChange) return
+                        const next = [...scenes]
+                        next[index] = { ...next[index], script: e.target.value }
+                        onScenesChange(next)
+                      }}
+                      rows={2}
+                      className="w-full resize-y rounded-sm border border-[#222] bg-[#0a0a0a] p-2 text-xs leading-relaxed text-white focus:border-[#CFB87C] focus:outline-none"
+                    />
                   </div>
                 </div>
               ))}

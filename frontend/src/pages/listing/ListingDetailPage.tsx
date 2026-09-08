@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ListingDetailsPanel } from '@/components/listings/ListingDetailsPanel'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { UserRole } from '@/lib/auth'
 import {
   LISTING_COLUMNS,
@@ -163,7 +164,7 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
         <div className="flex min-w-0 items-start gap-4">
           <Link
             to={backPath}
-            className="mt-1 shrink-0 rounded-sm p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
+            className="mt-1 shrink-0 rounded-sm p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
             aria-label="Back to overview"
           >
             <ArrowLeft className="size-5" />
@@ -172,19 +173,22 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
             <p className="mb-2 text-xs tracking-widest text-[var(--color-gold)] uppercase">
               Mission Control
             </p>
-            <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--color-white)]">
+            <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--color-text)]">
               Listing Hub
             </h1>
             {listing ? (
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                 <span>{listing.address_full ?? 'Unnamed listing'}</span>
-                <span className="text-[#555555]">·</span>
+                <span className="text-[var(--color-text-tertiary)]">·</span>
                 <ListingIdBadge id={listing.id} />
               </div>
             ) : null}
           </div>
         </div>
-        <ProfileMenu role={menuRole} />
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <ProfileMenu role={menuRole} />
+        </div>
       </header>
 
       {bookingSuccess ? (

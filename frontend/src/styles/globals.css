@@ -7,40 +7,43 @@
 
 :root {
   --color-black: #000000;
-  --color-gold: #cfb87c;
-  --color-gold-hover: #dcc487;
-  --color-gold-dim: rgba(207, 184, 124, 0.13);
-  --color-gold-border: rgba(207, 184, 124, 0.33);
   --color-white: #ffffff;
-  --color-surface: #0a0a0a;
-  --color-surface-2: #111111;
-  --color-surface-3: #1a1a1a;
-  --color-border: #2a2a2a;
-  --color-text: #ffffff;
-  --color-text-secondary: #888888;
-  --color-text-tertiary: #555555;
+
+  /* Light theme values */
+  --color-bg-base: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f5f9;
+  --color-surface-3: #e2e8f0;
+  --color-border: #e2e8f0;
+  --color-text: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-gold: #b3974d;
+  --color-gold-hover: #9c823e;
+  --color-gold-dim: rgba(179, 151, 77, 0.12);
+  --color-gold-border: rgba(179, 151, 77, 0.35);
 
   --font-display: 'Mont', system-ui, sans-serif;
   --font-body: 'Glacial Indifference', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  --background: var(--color-black);
+  --background: var(--color-bg-base);
   --foreground: var(--color-text);
-  --card: var(--color-surface-2);
+  --card: var(--color-surface);
   --card-foreground: var(--color-text);
-  --popover: var(--color-surface-3);
+  --popover: var(--color-surface);
   --popover-foreground: var(--color-text);
   --primary: var(--color-gold);
   --primary-hover: var(--color-gold-hover);
-  --primary-foreground: var(--color-black);
-  --secondary: var(--color-surface-3);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-surface-2);
   --secondary-foreground: var(--color-text);
   --muted: var(--color-surface-2);
   --muted-foreground: var(--color-text-secondary);
   --accent: var(--color-gold-dim);
   --accent-foreground: var(--color-gold);
   --destructive: #dc2626;
-  --destructive-foreground: var(--color-white);
+  --destructive-foreground: #ffffff;
   --border: var(--color-border);
   --input: var(--color-border);
   --ring: var(--color-gold);
@@ -53,15 +56,29 @@
   --sidebar: var(--color-surface);
   --sidebar-foreground: var(--color-text);
   --sidebar-primary: var(--color-gold);
-  --sidebar-primary-foreground: var(--color-black);
-  --sidebar-accent: var(--color-surface-3);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-surface-2);
   --sidebar-accent-foreground: var(--color-text);
   --sidebar-border: var(--color-border);
   --sidebar-ring: var(--color-gold);
+  --grid-line-color: rgba(0, 0, 0, 0.05);
 }
 
 .dark {
-  --background: var(--color-black);
+  --color-bg-base: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-2: #111111;
+  --color-surface-3: #1a1a1a;
+  --color-border: #2a2a2a;
+  --color-text: #ffffff;
+  --color-text-secondary: #888888;
+  --color-text-tertiary: #555555;
+  --color-gold: #cfb87c;
+  --color-gold-hover: #dcc487;
+  --color-gold-dim: rgba(207, 184, 124, 0.13);
+  --color-gold-border: rgba(207, 184, 124, 0.33);
+
+  --background: var(--color-bg-base);
   --foreground: var(--color-text);
   --card: var(--color-surface-2);
   --card-foreground: var(--color-text);
@@ -69,7 +86,7 @@
   --popover-foreground: var(--color-text);
   --primary: var(--color-gold);
   --primary-hover: var(--color-gold-hover);
-  --primary-foreground: var(--color-black);
+  --primary-foreground: #000000;
   --secondary: var(--color-surface-3);
   --secondary-foreground: var(--color-text);
   --muted: var(--color-surface-2);
@@ -77,17 +94,19 @@
   --accent: var(--color-gold-dim);
   --accent-foreground: var(--color-gold);
   --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
   --border: var(--color-border);
   --input: var(--color-border);
   --ring: var(--color-gold);
   --sidebar: var(--color-surface);
   --sidebar-foreground: var(--color-text);
   --sidebar-primary: var(--color-gold);
-  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: var(--color-surface-3);
   --sidebar-accent-foreground: var(--color-text);
   --sidebar-border: var(--color-border);
   --sidebar-ring: var(--color-gold);
+  --grid-line-color: rgba(255, 255, 255, 0.05);
 }
 
 @theme inline {
@@ -134,6 +153,18 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  --color-bg-base: var(--color-bg-base);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-surface-3: var(--color-surface-3);
+  --color-text: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-gold: var(--color-gold);
+  --color-gold-hover: var(--color-gold-hover);
+  --color-gold-dim: var(--color-gold-dim);
+  --color-gold-border: var(--color-gold-border);
 }
 
 @layer base {
@@ -143,6 +174,10 @@
 
   html {
     @apply font-sans;
+    color-scheme: light;
+  }
+
+  html.dark {
     color-scheme: dark;
   }
 

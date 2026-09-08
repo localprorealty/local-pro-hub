@@ -202,7 +202,7 @@ function App() {
   }, [authState.profile?.role])
 
   return (
-    <div className="relative min-h-svh bg-[var(--color-black)]">
+    <div className="relative min-h-svh bg-[var(--color-bg-base)] text-[var(--color-text)]">
       <GridBackground fixed />
       <BrowserRouter>
         <ErrorBoundary title="Application">

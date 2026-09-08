@@ -33,6 +33,7 @@ export function ListingMissionLayout({
           backTo={`/listing/${listingId}`}
           title={title}
           subtitle={subtitle}
+          listingId={listingId}
           role={role}
           email={email}
         />

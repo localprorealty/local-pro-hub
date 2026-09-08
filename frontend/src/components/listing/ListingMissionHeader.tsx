@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import type { UserRole } from '@/lib/auth'
 
@@ -9,6 +10,7 @@ type ListingMissionHeaderProps = {
   backLabel?: string
   title: string
   subtitle?: string
+  listingId?: string
   role?: Exclude<UserRole, 'admin'>
   email?: string
 }
@@ -18,6 +20,7 @@ export function ListingMissionHeader({
   backLabel = 'Back to listing',
   title,
   subtitle,
+  listingId,
   role = 'agent',
   email,
 }: ListingMissionHeaderProps) {
@@ -35,9 +38,17 @@ export function ListingMissionHeader({
           <h1 className="truncate font-[family-name:var(--font-display)] text-xl text-white">
             {title}
           </h1>
-          {subtitle ? (
-            <p className="truncate text-sm text-[var(--color-text-secondary)]">{subtitle}</p>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            {subtitle ? (
+              <p className="truncate text-sm text-[var(--color-text-secondary)]">{subtitle}</p>
+            ) : null}
+            {listingId ? (
+              <>
+                {subtitle ? <span className="text-[#555555]">·</span> : null}
+                <ListingIdBadge id={listingId} />
+              </>
+            ) : null}
+          </div>
         </div>
       </div>
       <ProfileMenu role={role} email={email} />

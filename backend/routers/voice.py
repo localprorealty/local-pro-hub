@@ -94,7 +94,7 @@ Return ONLY this JSON, nothing else:
             model=settings.groq_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
-            max_tokens=200,
+            max_tokens=800,
         )
         content = response.choices[0].message.content or ""
         return _parse_llm_json(content)

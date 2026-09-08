@@ -480,6 +480,7 @@ function MarketYourselfContent() {
                 videoAgentPrompt={videoAgentPrompt}
                 onVideoAgentPromptChange={setVideoAgentPrompt}
                 scenes={scenes}
+                onScenesChange={setScenes}
                 options={optionsForm}
                 voices={voices}
                 voiceId={voiceId}
@@ -521,6 +522,9 @@ function MarketYourselfContent() {
                 onTryAgain={handleTryAgain}
                 onGenerateAnother={handleGenerateAnother}
                 socialCaptions={socialCaptions}
+                onCaptionChange={(platform, text) =>
+                  setSocialCaptions((prev) => ({ ...prev, [platform]: text }))
+                }
                 postingTips={postingTips}
               />
             </motion.div>

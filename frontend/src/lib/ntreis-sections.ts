@@ -1427,7 +1427,6 @@ export function getSectionStatus(section: NtreisSection, formData: FormData): Se
     return anyFilled ? 'complete' : 'empty'
   }
 
-  if (filledCount === 0) return 'empty'
   if (filledCount === requiredCount) return 'complete'
   return 'partial'
 }

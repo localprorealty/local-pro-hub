@@ -1,3 +1,5 @@
+import { AlertCircle } from 'lucide-react'
+
 import { FieldDate } from '@/components/form/FieldDate'
 import { FieldMultiSelect } from '@/components/form/FieldMultiSelect'
 import { FieldRadio, FieldYesNo } from '@/components/form/FieldRadio'
@@ -16,6 +18,7 @@ type NtreisFieldRendererProps = {
   onEditAddress?: () => void
   preFilledKeys?: Set<string>
   readOnlyKeys?: Set<string>
+  isAutoPopulated?: boolean
 }
 
 function asString(value: unknown): string {
@@ -50,6 +53,7 @@ export function NtreisFieldRenderer({
   onEditAddress,
   preFilledKeys,
   readOnlyKeys,
+  isAutoPopulated = false,
 }: NtreisFieldRendererProps) {
   if (!isFieldVisible(field, formData)) return null
 
@@ -123,8 +127,9 @@ export function NtreisFieldRenderer({
           readOnly={readOnly}
         />
       )
-    case 'textarea':
-      return (
+    case 'textarea': {
+      const isPrivateRemarks = field.key === 'private_remarks'
+      const textareaField = (
         <FieldText
           label={field.label}
           value={asString(value)}
@@ -137,6 +142,29 @@ export function NtreisFieldRenderer({
           readOnly={readOnly}
         />
       )
+
+      if (isPrivateRemarks) {
+        return (
+          <div className="space-y-3 md:col-span-2">
+            {isAutoPopulated ? (
+              <div
+                role="alert"
+                className="flex items-start gap-3 rounded-sm border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-200"
+              >
+                <AlertCircle className="mt-0.5 size-4 shrink-0 text-amber-400" />
+                <p className="leading-relaxed">
+                  Some information on this listing was populated automatically from MLS/PDF data.
+                  Please review for accuracy before submission.
+                </p>
+              </div>
+            ) : null}
+            {textareaField}
+          </div>
+        )
+      }
+
+      return textareaField
+    }
     case 'select':
       return (
         <FieldSelect

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Circle, CircleDot, Trash2 } from 'lucide-react'
+import { Circle, CircleDot, Loader2, Sparkles, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { BookingNegotiationPanel } from '@/components/booking/BookingNegotiationPanel'
+import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { buildFormDataFromRows, flattenFormData } from '@/lib/listing-form'
@@ -13,6 +14,7 @@ import {
   STAGE_LABEL,
   TYPE_LABEL,
   canDeleteListing,
+  generateListingDescription,
   getListingFormPath,
   getGoLivePath,
   getMarketingPath,
@@ -48,10 +50,28 @@ export function ListingDetailsPanel({
   const [isSaving, setIsSaving] = useState(false)
   const [isAdvancing, setIsAdvancing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
+  const [generateError, setGenerateError] = useState<string | null>(null)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  const handleGenerateDescription = async () => {
+    setIsGeneratingDescription(true)
+    setGenerateError(null)
+    try {
+      const res = await generateListingDescription(listing.id)
+      setDescription(res.description)
+      setSaveMessage('Description generated and saved.')
+    } catch (error) {
+      setGenerateError(
+        error instanceof Error ? error.message : 'Description generation failed.',
+      )
+    } finally {
+      setIsGeneratingDescription(false)
+    }
+  }
 
   const guidance = STAGE_GUIDANCE[listing.stage]
   const nextStage = getNextStage(listing.stage)
@@ -120,6 +140,9 @@ export function ListingDetailsPanel({
               <h3 className="mt-1 text-xl font-semibold text-[var(--color-white)]">
                 {listing.address_full ?? 'Unnamed listing'}
               </h3>
+              <div className="mt-1.5">
+                <ListingIdBadge id={listing.id} />
+              </div>
             </div>
             <Button
               type="button"
@@ -313,9 +336,43 @@ export function ListingDetailsPanel({
 
         <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
           <div className="mb-4">
-            <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
-              AI Description
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                AI Description
+              </Label>
+              {canManage ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void handleGenerateDescription()}
+                  disabled={isGeneratingDescription}
+                  className="h-7 border-[var(--color-gold-border)] bg-transparent px-2.5 text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)] hover:text-[var(--color-gold)] disabled:opacity-50"
+                >
+                  {isGeneratingDescription ? (
+                    <>
+                      <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                      Generating...
+                    </>
+                  ) : description.trim() ? (
+                    <>
+                      <Sparkles className="mr-1.5 size-3.5" />
+                      Regenerate
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-1.5 size-3.5" />
+                      Generate Description
+                    </>
+                  )}
+                </Button>
+              ) : null}
+            </div>
+            {generateError ? (
+              <p className="mt-2 text-xs text-red-400" role="alert">
+                {generateError}
+              </p>
+            ) : null}
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}

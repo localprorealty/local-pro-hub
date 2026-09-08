@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ListingDetailsPanel } from '@/components/listings/ListingDetailsPanel'
+import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import type { UserRole } from '@/lib/auth'
 import {
@@ -175,9 +176,11 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
               Listing Hub
             </h1>
             {listing ? (
-              <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                {listing.address_full ?? 'Unnamed listing'}
-              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                <span>{listing.address_full ?? 'Unnamed listing'}</span>
+                <span className="text-[#555555]">·</span>
+                <ListingIdBadge id={listing.id} />
+              </div>
             ) : null}
           </div>
         </div>

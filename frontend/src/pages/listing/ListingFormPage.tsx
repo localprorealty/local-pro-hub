@@ -3,10 +3,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { DeleteDraftButton } from '@/components/listings/DeleteDraftButton'
+import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { PropertySearchStep } from '@/components/listing/PropertySearchStep'
 import { NtreisFormBody } from '@/components/form/NtreisFormBody'
 import {
   formatPropertyAddress,
+  generateListingDescription,
   getListing,
   propertyAddressFromFormData,
   TYPE_LABEL,
@@ -127,6 +129,23 @@ function ListingFormContent() {
       setPreFilledKeys(new Set(updatedFilledKeys))
       setShowFormSections(true)
       setIsSubmitting(false)
+
+      // If property details were imported (e.g. from PDF import or RETS search), trigger initial description generation
+      if (listingIdRef.current && (filledKeys.length > 0 || Object.keys(nextRets).length > 0)) {
+        const lid = listingIdRef.current
+        void generateListingDescription(lid)
+          .then((res) => {
+            if (res?.description) {
+              setRetsFormPatch((prev) => ({
+                ...prev,
+                property_description: res.description,
+              }))
+            }
+          })
+          .catch((err) => {
+            console.warn('Initial description generation skipped or failed:', err)
+          })
+      }
     },
     [persistFormData],
   )
@@ -281,12 +300,14 @@ function ListingFormContent() {
         >
           LP
         </Link>
-        <div className="flex items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
+        <div className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
           <span>New Listing</span>
           <span className="text-[#555555]">·</span>
           <span className="rounded border border-[#CFB87C]/40 bg-[#CFB87C]/10 px-2 py-0.5 text-xs text-[#CFB87C]">
             {TYPE_LABEL[listing.listing_type]}
           </span>
+          <span className="text-[#555555]">·</span>
+          <ListingIdBadge id={listing.id} />
         </div>
         <div className="flex items-center gap-4">
           {listing.stage === 'draft' && agentId ? (

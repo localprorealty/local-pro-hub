@@ -132,6 +132,14 @@ export function NtreisFormBody({
     }
     return keys
   }, [agentMlsId, initialFormData._rets_prefilled_keys, initialPreFilledKeys])
+
+  const isAutoPopulated = useMemo(() => {
+    const stored = (formData._rets_prefilled_keys ?? initialFormData._rets_prefilled_keys) as unknown
+    if (Array.isArray(stored) && stored.length > 0) return true
+    if (initialPreFilledKeys.length > 0) return true
+    return false
+  }, [formData._rets_prefilled_keys, initialFormData._rets_prefilled_keys, initialPreFilledKeys])
+
   const addressSummary = formatPropertyAddress(address)
 
   const persist = useCallback(
@@ -346,6 +354,7 @@ export function NtreisFormBody({
                 onEditAddress={onEditAddress}
                 readOnlyKeys={readOnlyKeys}
                 preFilledKeys={preFilledKeys}
+                isAutoPopulated={isAutoPopulated}
                 sectionRef={(el) => {
                   sectionRefs.current[section.id] = el
                 }}

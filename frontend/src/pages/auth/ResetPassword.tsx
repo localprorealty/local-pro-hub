@@ -7,7 +7,6 @@ import { AuthBrandPanel } from '@/components/auth/AuthBrandPanel'
 import { GridBackground } from '@/components/layout/GridBackground'
 import { SecureAuthNote } from '@/components/auth/SecureAuthNote'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +14,7 @@ import { getSupabaseClient } from '@/lib/supabase'
 import lpMonogram from '@/assets/branding/LP_Gold.png'
 
 const fieldClass =
-  'h-11 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[var(--color-text)] shadow-none placeholder:text-[var(--color-text-tertiary)] focus-visible:border-[var(--color-gold)] focus-visible:ring-1 focus-visible:ring-[var(--color-gold)]'
+  'h-11 rounded-sm border-[#cfc4c5] bg-white px-4 text-[var(--color-black)] shadow-none focus-visible:border-[var(--color-gold)] focus-visible:ring-1 focus-visible:ring-[var(--color-gold)]'
 
 function ResetPasswordForm() {
   const navigate = useNavigate()
@@ -61,12 +60,9 @@ function ResetPasswordForm() {
   }
 
   return (
-    <section className="relative flex h-svh min-h-0 w-full flex-col overflow-hidden bg-[var(--color-bg-base)] text-[var(--color-text)] md:flex-1">
-      <GridBackground />
-      <div className="absolute top-6 right-6 z-20">
-        <ThemeToggle />
-      </div>
-      <div className="relative z-10 shrink-0 border-b border-[var(--color-border)] px-8 py-6 md:hidden">
+    <section className="relative flex h-svh min-h-0 w-full flex-col overflow-hidden bg-[var(--color-white)] md:flex-1">
+      <GridBackground variant="light" />
+      <div className="relative z-10 shrink-0 border-b border-[#f4f3f2] px-8 py-6 md:hidden">
         <img
           src={lpMonogram}
           alt="LocalPRO"
@@ -83,7 +79,7 @@ function ResetPasswordForm() {
         >
           <div className="mx-auto w-full max-w-xl">
             <header className="mb-8 space-y-2 text-left">
-              <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--color-text)]">
+              <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--color-black)]">
                 Create New Password
               </h2>
               <p className="text-[13px] text-[var(--color-text-secondary)]">
@@ -149,7 +145,7 @@ function ResetPasswordForm() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="mt-2 h-11 w-full rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
+                  className="mt-2 h-11 w-full rounded-sm bg-[var(--color-black)] font-semibold text-[var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-[var(--color-black)] disabled:opacity-60"
                 >
                   {isLoading ? (
                     <>
@@ -163,8 +159,8 @@ function ResetPasswordForm() {
               </form>
             )}
 
-            <footer className="mt-12 border-t border-[var(--color-border)] pt-8">
-              <div className="flex items-start gap-2 text-[var(--color-text-tertiary)]">
+            <footer className="mt-12 border-t border-[#f4f3f2] pt-8">
+              <div className="flex items-start gap-2 text-[#888888]">
                 <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
                 <p className="text-[11px] tracking-tight uppercase">
                   For agent use only. Unauthorized access prohibited.

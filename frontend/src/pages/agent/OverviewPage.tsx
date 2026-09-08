@@ -166,7 +166,7 @@ function OverviewContent() {
         className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
           activeTab === 'history'
             ? 'text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
+            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
         }`}
       >
         Property History
@@ -185,7 +185,7 @@ function OverviewContent() {
             className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
               activeTab === 'earnings'
                 ? 'text-[var(--color-gold)]'
-                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
             }`}
           >
             My Earnings
@@ -202,7 +202,7 @@ function OverviewContent() {
             className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
               activeTab === 'revenue_share'
                 ? 'text-[var(--color-gold)]'
-                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
             }`}
           >
             Revenue Share
@@ -444,7 +444,7 @@ function OverviewContent() {
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Total Closed</p>
-                      <h3 className="text-3xl font-bold text-[var(--color-text)] mt-2">{closedCount}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--color-white)] mt-2">{closedCount}</h3>
                     </div>
                     <p className="text-[11px] text-[var(--color-text-secondary)] mt-2">transactions finalized</p>
                     <Briefcase className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />
@@ -453,7 +453,7 @@ function OverviewContent() {
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">In Progress</p>
-                      <h3 className="text-3xl font-bold text-[var(--color-text)] mt-2">{inProgressCount}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--color-white)] mt-2">{inProgressCount}</h3>
                     </div>
                     <p className="text-[11px] text-[var(--color-text-secondary)] mt-2">active, pending, or listings</p>
                     <Calendar className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />

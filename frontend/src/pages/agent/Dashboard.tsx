@@ -143,7 +143,7 @@ function DashboardContent({ role }: DashboardPageProps) {
       <div className="grid min-h-svh lg:grid-cols-[220px_1fr]">
         <AgentSidebar role={role} />
 
-        <section className="flex min-h-svh flex-col bg-[var(--color-bg-base)] text-[var(--color-text)]">
+        <section className="flex min-h-svh flex-col">
           {liveBannerId ? (
             <motion.div
               initial={{ y: -60, opacity: 0 }}
@@ -166,7 +166,7 @@ function DashboardContent({ role }: DashboardPageProps) {
 
           <header className="flex items-start justify-between border-b border-[var(--color-border)] px-8 py-8">
             <div>
-              <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-text)]">
+              <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
                 Overview
               </h1>
               <div className="mt-4 flex flex-wrap gap-6">
@@ -180,7 +180,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                       className={`text-sm transition-colors ${
                         isActive
                           ? 'border-b border-[var(--color-gold)] pb-1 text-[var(--color-gold)]'
-                          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
+                          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
                       }`}
                     >
                       {tabLabel(tab)} ({tabCounts[tab]})
@@ -206,7 +206,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search listings..."
-                  className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-text)]"
+                  className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
                 />
               </label>
               <ProfileMenu role={role} />
@@ -226,7 +226,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search listings..."
-                    className="h-10 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-text)]"
+                    className="h-10 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
                   />
                 </label>
               </div>
@@ -256,7 +256,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                 </div>
                 <p className="text-sm text-[var(--color-text-secondary)]">
                   Showing{' '}
-                  <span className="font-semibold text-[var(--color-text)]">
+                  <span className="font-semibold text-[var(--color-white)]">
                     {filteredListings.length}
                   </span>{' '}
                   pipelines

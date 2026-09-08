@@ -8,7 +8,7 @@ import { formatUsPhone, isValidMlsId } from '@/lib/format'
 import type { UserProfileRow } from '@/lib/users'
 
 const fieldClass =
-  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
+  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
 
 export type ProfileFormValues = {
   email: string
@@ -141,7 +141,7 @@ export function UserProfileForm({
             <p className="text-[10px] tracking-wide text-[var(--color-text-secondary)] uppercase">
               Status
             </p>
-            <p className="text-[var(--color-text)]">{initial.status}</p>
+            <p className="text-[var(--color-white)]">{initial.status}</p>
           </div>
         </div>
       ) : (
@@ -251,7 +251,7 @@ export function UserProfileForm({
       {initial.role === 'agent' ? (
         <div className="grid gap-4 sm:grid-cols-2 border-t border-[#2a2a2a] pt-4 mt-4">
           <div className="sm:col-span-2">
-            <h4 className="text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider">HeyGen Video Replica Settings</h4>
+            <h4 className="text-xs font-semibold text-white uppercase tracking-wider">HeyGen Video Replica Settings</h4>
             <p className="text-[11px] text-[var(--color-text-secondary)] mt-0.5">Your HeyGen integration Look ID and Voice ID configurations.</p>
           </div>
           <div>
@@ -322,7 +322,7 @@ export function UserProfileForm({
             type="button"
             variant="outline"
             onClick={onCancel}
-            className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
+            className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)]"
           >
             Cancel
           </Button>

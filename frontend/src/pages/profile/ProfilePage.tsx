@@ -98,7 +98,7 @@ function ChangePasswordSection() {
   return (
     <div className="border-t border-[var(--color-border)] pt-8">
       <div className="mb-6 space-y-1">
-        <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text)]">
+        <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-white)]">
           Security
         </h3>
         <p className="text-xs text-[var(--color-text-secondary)]">
@@ -128,7 +128,7 @@ function ChangePasswordSection() {
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isUpdating}
-                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
               />
               <button
                 type="button"
@@ -136,7 +136,7 @@ function ChangePasswordSection() {
                 aria-pressed={showCurrentPassword}
                 onClick={() => setShowCurrentPassword((prev) => !prev)}
                 disabled={isUpdating}
-                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-white)] disabled:opacity-50"
               >
                 {showCurrentPassword ? (
                   <EyeOff className="size-4" aria-hidden />
@@ -160,7 +160,7 @@ function ChangePasswordSection() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isUpdating}
-                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
               />
               <button
                 type="button"
@@ -168,7 +168,7 @@ function ChangePasswordSection() {
                 aria-pressed={showNewPassword}
                 onClick={() => setShowNewPassword((prev) => !prev)}
                 disabled={isUpdating}
-                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-white)] disabled:opacity-50"
               >
                 {showNewPassword ? (
                   <EyeOff className="size-4" aria-hidden />
@@ -192,7 +192,7 @@ function ChangePasswordSection() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isUpdating}
-                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
               />
               <button
                 type="button"
@@ -200,7 +200,7 @@ function ChangePasswordSection() {
                 aria-pressed={showConfirmPassword}
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 disabled={isUpdating}
-                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-white)] disabled:opacity-50"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="size-4" aria-hidden />

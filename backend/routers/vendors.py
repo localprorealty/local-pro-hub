@@ -57,7 +57,7 @@ class SendVendorOrderEmailBody(BaseModel):
 def _require_agent_listing(client: Any, listing_id: str, agent_id: str) -> dict[str, Any]:
     res = (
         client.table("listings")
-        .select("id, agent_id, address_full, address_line1, address_city, stage, list_price, form_data")
+        .select("id, agent_id, address_full, stage, list_price, form_data")
         .eq("id", listing_id)
         .maybe_single()
         .execute()
@@ -376,16 +376,28 @@ async def send_vendor_order_email(
         import resend
         resend.api_key = settings.resend_api_key
 
-        from_email = settings.resend_from_email or "LocalPRO Hub <notifications@localprorealty.com>"
+        base_sender = "notifications@localprorealty.com"
+        if "<" in settings.resend_from_email and ">" in settings.resend_from_email:
+            base_sender = settings.resend_from_email.split("<")[1].split(">")[0].strip()
+        elif settings.resend_from_email.strip():
+            base_sender = settings.resend_from_email.strip()
+
+        from_display_name = f"{agent_name} via LocalPRO Hub" if agent_name else "LocalPRO Hub"
+        from_email = f"{from_display_name} <{base_sender}>"
+
         try:
-            resend.Emails.send({
+            email_params: dict[str, Any] = {
                 "from": from_email,
                 "to": [payload.to_email],
-                "reply_to": agent_email,
-                "cc": [agent_email] if agent_email else [],
+                "reply_to": agent_email or None,
                 "subject": payload.subject.strip(),
                 "text": payload.body_text,
-            })
+            }
+            # Add agent CC when using custom domain (sandbox onboarding@resend.dev restricts CC to owner)
+            if agent_email and agent_email != payload.to_email and "resend.dev" not in base_sender:
+                email_params["cc"] = [agent_email]
+
+            resend.Emails.send(email_params)
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Failed to send email via Resend: {e}")
 

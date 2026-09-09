@@ -38,6 +38,10 @@ class Settings(BaseSettings):
 
     # Email
     resend_api_key: str = ""
+    resend_from_email: str = "LocalPRO Hub <notifications@localprorealty.com>"
+
+    # Credentials Encryption (Fernet 32 url-safe base64-encoded bytes)
+    app_credentials_encryption_key: str = ""
 
     # Twilio
     twilio_account_sid: str = ""
@@ -111,6 +115,15 @@ class Settings(BaseSettings):
         if not self.resend_api_key:
             raise RuntimeError("RESEND_API_KEY is not configured")
         return self.resend_api_key
+
+    def require_credentials_encryption_key(self) -> bytes:
+        if not self.app_credentials_encryption_key.strip():
+            raise RuntimeError(
+                "CRITICAL: APP_CREDENTIALS_ENCRYPTION_KEY is not configured in environment. "
+                "Generate a key using `python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'` "
+                "and set it in your environment."
+            )
+        return self.app_credentials_encryption_key.strip().encode()
 
     def require_stripe(self) -> str:
         if not self.stripe_secret_key:

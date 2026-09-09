@@ -3,10 +3,8 @@ import { motion } from 'framer-motion'
 
 import { AdminShell } from '@/components/admin/AdminShell'
 import { ConfirmSaveDialog } from '@/components/profile/ConfirmSaveDialog'
-import {
-  UserProfileForm,
-  type ProfileFormValues,
-} from '@/components/profile/UserProfileForm'
+import { UserProfileForm, type ProfileFormValues } from '@/components/profile/UserProfileForm'
+import { ExternalVendorsSection } from '@/components/profile/ExternalVendorsSection'
 import { MissionShell } from '@/components/layout/MissionShell'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import type { UserRole } from '@/lib/auth'
@@ -370,6 +368,9 @@ function ProfileContent({ role }: ProfilePageProps) {
               onConfirm={() => void handleConfirmSave()}
               isLoading={isSaving}
             />
+            {profile.role === 'agent' || profile.role === 'admin' ? (
+              <ExternalVendorsSection />
+            ) : null}
             <ChangePasswordSection />
           </div>
         </>

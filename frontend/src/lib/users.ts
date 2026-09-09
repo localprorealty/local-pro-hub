@@ -1,5 +1,5 @@
 import type { PhotographerTier, UserRole, UserProfileStatus } from '@/lib/auth'
-import { api } from '@/lib/api'
+import { API_BASE_URL, api } from '@/lib/api'
 import { getSupabaseClient } from '@/lib/supabase'
 
 export type UserProfileRow = {
@@ -19,10 +19,16 @@ export type UserProfileRow = {
   heygen_talking_photo_id?: string | null
   heygen_avatar_type?: string | null
   can_view_revenue?: boolean | null
+  brand_logo_url?: string | null
+  brand_color_primary?: string | null
+  brand_color_secondary?: string | null
 }
 
-export const PROFILE_SELECT =
+export const PROFILE_BASE_SELECT =
   'id, email, full_name, phone, mls_id, brokermint_id, role, status, photographer_tier, created_at, approved_at, heygen_avatar_id, heygen_voice_id, heygen_talking_photo_id, heygen_avatar_type, can_view_revenue'
+
+export const PROFILE_SELECT =
+  `${PROFILE_BASE_SELECT}, brand_logo_url, brand_color_primary, brand_color_secondary`
 
 export type OwnProfileUpdate = {
   full_name: string
@@ -32,6 +38,9 @@ export type OwnProfileUpdate = {
   photographer_tier?: PhotographerTier | null
   heygen_avatar_id?: string | null
   heygen_voice_id?: string | null
+  brand_logo_url?: string | null
+  brand_color_primary?: string | null
+  brand_color_secondary?: string | null
 }
 
 export type AdminProfileUpdate = Partial<OwnProfileUpdate> & {
@@ -40,6 +49,9 @@ export type AdminProfileUpdate = Partial<OwnProfileUpdate> & {
   status?: UserProfileStatus
   photographer_tier?: PhotographerTier | null
   approved_at?: string | null
+  brand_logo_url?: string | null
+  brand_color_primary?: string | null
+  brand_color_secondary?: string | null
 }
 
 export type AdminCreateUserPayload = {
@@ -61,7 +73,19 @@ export async function fetchUserProfile(userId: string): Promise<UserProfileRow |
     .eq('id', userId)
     .maybeSingle()
 
-  if (error) throw error
+  if (error) {
+    // If branding columns not yet added to schema, fallback to base select
+    if (error.code === '42703' || error.message?.includes('brand_')) {
+      const fallback = await getSupabaseClient()
+        .from('users')
+        .select(PROFILE_BASE_SELECT)
+        .eq('id', userId)
+        .maybeSingle()
+      if (fallback.error) throw fallback.error
+      return (fallback.data as UserProfileRow | null) ?? null
+    }
+    throw error
+  }
   return (data as UserProfileRow | null) ?? null
 }
 
@@ -78,7 +102,19 @@ export async function fetchUsersByRole(
   }
 
   const { data, error } = await query
-  if (error) throw error
+  if (error) {
+    if (error.code === '42703' || error.message?.includes('brand_')) {
+      let fb = getSupabaseClient()
+        .from('users')
+        .select(PROFILE_BASE_SELECT)
+        .order('created_at', { ascending: false })
+      if (roleFilter !== 'all') fb = fb.eq('role', roleFilter)
+      const res = await fb
+      if (res.error) throw res.error
+      return (res.data ?? []) as UserProfileRow[]
+    }
+    throw error
+  }
   return (data ?? []) as UserProfileRow[]
 }
 
@@ -104,16 +140,43 @@ export async function updateOwnProfile(
   if ('heygen_voice_id' in payload) {
     update.heygen_voice_id = payload.heygen_voice_id?.trim() || null
   }
+  if ('brand_logo_url' in payload) {
+    update.brand_logo_url = payload.brand_logo_url ?? null
+  }
+  if ('brand_color_primary' in payload) {
+    update.brand_color_primary = payload.brand_color_primary?.trim() || null
+  }
+  if ('brand_color_secondary' in payload) {
+    update.brand_color_secondary = payload.brand_color_secondary?.trim() || null
+  }
 
-  const { data, error } = await getSupabaseClient()
-    .from('users')
-    .update(update)
-    .eq('id', userId)
-    .select(PROFILE_SELECT)
-    .single()
+  try {
+    const { data, error } = await getSupabaseClient()
+      .from('users')
+      .update(update)
+      .eq('id', userId)
+      .select(PROFILE_SELECT)
+      .single()
 
-  if (error) throw error
-  return data as UserProfileRow
+    if (error) throw error
+    return data as UserProfileRow
+  } catch (err: any) {
+    // If branding columns pending in schema, retry without branding columns
+    if (err?.code === '42703' || err?.message?.includes('brand_')) {
+      delete update.brand_logo_url
+      delete update.brand_color_primary
+      delete update.brand_color_secondary
+      const { data, error } = await getSupabaseClient()
+        .from('users')
+        .update(update)
+        .eq('id', userId)
+        .select(PROFILE_BASE_SELECT)
+        .single()
+      if (error) throw error
+      return data as UserProfileRow
+    }
+    throw err
+  }
 }
 
 export async function adminUpdateUser(
@@ -134,6 +197,44 @@ export async function adminUpdateUser(
 
   if (error) throw error
   return data as UserProfileRow
+}
+
+/** Upload brand logo file for the currently authenticated user */
+export async function uploadBrandLogo(file: File): Promise<string> {
+  const session = await getSupabaseClient().auth.getSession()
+  const token = session.data.session?.access_token
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const res = await fetch(`${API_BASE_URL}/users/me/brand-logo`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  })
+
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => null)
+    throw new Error(errBody?.detail || `Logo upload failed (${res.status})`)
+  }
+
+  const data = await res.json()
+  return data.brand_logo_url
+}
+
+/** Delete brand logo for the currently authenticated user */
+export async function deleteBrandLogo(): Promise<void> {
+  const session = await getSupabaseClient().auth.getSession()
+  const token = session.data.session?.access_token
+
+  const res = await fetch(`${API_BASE_URL}/users/me/brand-logo`, {
+    method: 'DELETE',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => null)
+    throw new Error(errBody?.detail || `Logo deletion failed (${res.status})`)
+  }
 }
 
 /** Full admin edit (includes email) — syncs Auth + public.users via backend. */
@@ -220,6 +321,9 @@ export function profileFieldLabels(): Record<string, string> {
     photographer_tier: 'Photographer tier',
     role: 'Role',
     status: 'Status',
+    brand_logo_url: 'Brand logo',
+    brand_color_primary: 'Primary brand color',
+    brand_color_secondary: 'Secondary brand color',
   }
 }
 

@@ -89,6 +89,9 @@ export type AgentMarketingProfile = {
   phone: string
   email: string
   headshot_url: string | null
+  brand_logo_url?: string | null
+  brand_color_primary?: string | null
+  brand_color_secondary?: string | null
 }
 
 export type CollageSection = {

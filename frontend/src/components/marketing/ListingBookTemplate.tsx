@@ -56,16 +56,18 @@ export function ListingBookTemplate({
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <BookCoverPage context={context} heroPhoto={hero} />
+      <BookCoverPage context={context} heroPhoto={hero} agent={agent} />
       <BookNeighborhoodPage
         context={context}
         guide={neighborhoodGuide}
         neighborhoodPhoto={neighborhood}
+        agent={agent}
       />
       <BookPropertyDetailsPage
         context={context}
         description={propertyDescription}
         edgePhotos={edgePhotos}
+        agent={agent}
       />
       {collagePages.map((page) => (
         <PhotoCollagePage

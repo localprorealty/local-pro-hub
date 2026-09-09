@@ -279,6 +279,9 @@ function ProfileContent({ role }: ProfilePageProps) {
         profile.role === 'photographer' ? pendingValues.photographer_tier : undefined,
       heygen_avatar_id: pendingValues.heygen_avatar_id,
       heygen_voice_id: pendingValues.heygen_voice_id,
+      brand_logo_url: pendingValues.brand_logo_url,
+      brand_color_primary: pendingValues.brand_color_primary,
+      brand_color_secondary: pendingValues.brand_color_secondary,
     }
     if (profile.role === 'admin') {
       after.email = pendingValues.email
@@ -306,6 +309,9 @@ function ProfileContent({ role }: ProfilePageProps) {
           profile.role === 'photographer' ? pendingValues.photographer_tier : null,
         heygen_avatar_id: pendingValues.heygen_avatar_id,
         heygen_voice_id: pendingValues.heygen_voice_id,
+        brand_logo_url: pendingValues.brand_logo_url || null,
+        brand_color_primary: pendingValues.brand_color_primary || null,
+        brand_color_secondary: pendingValues.brand_color_secondary || null,
       }
 
       const updated =

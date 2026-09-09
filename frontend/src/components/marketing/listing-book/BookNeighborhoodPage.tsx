@@ -1,11 +1,16 @@
 import { BookPagePreviewFrame } from '@/components/marketing/listing-book/BookPagePreviewFrame'
 import { EXPORT_BODY_TEXT, EXPORT_LABEL_CAPS } from '@/lib/export-text-styles'
-import type { ListingMarketingContext, NeighborhoodGuide } from '@/lib/marketing-types'
+import type {
+  AgentMarketingProfile,
+  ListingMarketingContext,
+  NeighborhoodGuide,
+} from '@/lib/marketing-types'
 
 type BookNeighborhoodPageProps = {
   context: ListingMarketingContext
   guide: NeighborhoodGuide
   neighborhoodPhoto: string | null
+  agent?: AgentMarketingProfile
   pageId?: string
 }
 
@@ -16,9 +21,11 @@ export function BookNeighborhoodPage({
   context,
   guide,
   neighborhoodPhoto,
+  agent,
   pageId = 'book-page-neighborhood',
 }: BookNeighborhoodPageProps) {
   const city = context.address_city || 'North Texas'
+  const brandColor = agent?.brand_color_primary || '#CFB87C'
 
   return (
     <BookPagePreviewFrame
@@ -58,7 +65,10 @@ export function BookNeighborhoodPage({
       <div className="space-y-4 px-8 py-6 text-sm leading-relaxed">
         <p style={{ ...EXPORT_BODY_TEXT, color: '#262626' }}>{guide.intro}</p>
 
-        <div className="grid grid-cols-2 gap-6 border-y border-neutral-200 py-4">
+        <div
+          className="grid grid-cols-2 gap-6 border-b border-neutral-200 py-4"
+          style={{ borderTop: `2px solid ${brandColor}` }}
+        >
           <div>
             <p className="mb-2 text-xs font-bold" style={EXPORT_LABEL_CAPS}>
               Commute Times
@@ -95,7 +105,7 @@ export function BookNeighborhoodPage({
           ] as const
         ).map(([heading, text]) => (
           <div key={heading}>
-            <p className="text-xs font-bold" style={{ ...EXPORT_LABEL_CAPS, color: '#CFB87C' }}>
+            <p className="text-xs font-bold" style={{ ...EXPORT_LABEL_CAPS, color: brandColor }}>
               {heading}
             </p>
             <p className="mt-1" style={EXPORT_BODY_TEXT}>

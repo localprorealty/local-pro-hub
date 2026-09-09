@@ -118,6 +118,9 @@ export function buildAgentProfile(
     phone: profile?.phone?.trim() || '',
     email: profile?.email?.trim() || '',
     headshot_url: headshot,
+    brand_logo_url: profile?.brand_logo_url || null,
+    brand_color_primary: profile?.brand_color_primary || null,
+    brand_color_secondary: profile?.brand_color_secondary || null,
   }
 }
 

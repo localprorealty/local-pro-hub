@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { PhotographerTier, UserRole, UserProfileStatus } from '@/lib/auth'
 import { formatUsPhone, isValidMlsId } from '@/lib/format'
-import type { UserProfileRow } from '@/lib/users'
+import { uploadBrandLogo, deleteBrandLogo, type UserProfileRow } from '@/lib/users'
 
 const fieldClass =
   'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
@@ -21,6 +21,9 @@ export type ProfileFormValues = {
   status: UserProfileStatus
   heygen_avatar_id: string
   heygen_voice_id: string
+  brand_logo_url: string
+  brand_color_primary: string
+  brand_color_secondary: string
 }
 
 type UserProfileFormProps = {
@@ -51,6 +54,9 @@ function toFormValues(row: UserProfileRow): ProfileFormValues {
     status: row.status,
     heygen_avatar_id: row.heygen_avatar_id ?? '',
     heygen_voice_id: row.heygen_voice_id ?? '',
+    brand_logo_url: row.brand_logo_url ?? '',
+    brand_color_primary: row.brand_color_primary ?? '',
+    brand_color_secondary: row.brand_color_secondary ?? '',
   }
 }
 
@@ -63,6 +69,8 @@ export function UserProfileForm({
 }: UserProfileFormProps) {
   const [values, setValues] = useState<ProfileFormValues>(() => toFormValues(initial))
   const [error, setError] = useState<string | null>(null)
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
   const canEditEmail = mode === 'admin' || (mode === 'self' && initial.role === 'admin')
 
@@ -70,6 +78,34 @@ export function UserProfileForm({
     mode === 'admin'
       ? values.role === 'photographer'
       : initial.role === 'photographer'
+
+  const handleLogoSelected = async (file?: File) => {
+    if (!file) return
+    setIsUploadingLogo(true)
+    setError(null)
+    try {
+      const url = await uploadBrandLogo(file)
+      setValues((v) => ({ ...v, brand_logo_url: url }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload logo.')
+    } finally {
+      setIsUploadingLogo(false)
+      if (logoInputRef.current) logoInputRef.current.value = ''
+    }
+  }
+
+  const handleRemoveLogo = async () => {
+    setIsUploadingLogo(true)
+    setError(null)
+    try {
+      await deleteBrandLogo()
+      setValues((v) => ({ ...v, brand_logo_url: '' }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove logo.')
+    } finally {
+      setIsUploadingLogo(false)
+    }
+  }
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
@@ -280,6 +316,157 @@ export function UserProfileForm({
               className={`mt-1 ${fieldClass}`}
             />
           </div>
+        </div>
+      ) : null}
+
+      {/* Optional Branding & Marketing Identity Section (Agents & Admins) */}
+      {(initial.role === 'agent' || initial.role === 'admin' || values.role === 'agent') ? (
+        <div className="border-t border-[#2a2a2a] pt-5 mt-5 space-y-4">
+          <div>
+            <h4 className="text-xs font-semibold text-white uppercase tracking-wider">
+              Marketing Branding & Identity (Optional)
+            </h4>
+            <p className="text-[11px] text-[var(--color-text-secondary)] mt-0.5">
+              Customize marketing assets (Just Sold posts, Flyers, Listing Books) with your team logo and brand accent colors. LocalPRO&apos;s licensed brokerage logo remains anchored on all materials.
+            </p>
+          </div>
+
+          {/* Logo Upload & Preview */}
+          <div>
+            <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+              Agent / Team Logo
+            </Label>
+            <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              {values.brand_logo_url ? (
+                <div className="relative flex h-20 w-44 items-center justify-center rounded-sm border border-[var(--color-border)] bg-[#141414] p-2">
+                  <img
+                    src={values.brand_logo_url}
+                    alt="Brand logo"
+                    className="max-h-16 max-w-full object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-20 w-44 items-center justify-center rounded-sm border border-dashed border-[var(--color-border)] bg-[#141414] text-xs text-[var(--color-text-secondary)]">
+                  No logo uploaded
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isUploadingLogo}
+                    onClick={() => logoInputRef.current?.click()}
+                    className="h-8 border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[#2a2a2a]"
+                  >
+                    {isUploadingLogo ? 'Uploading...' : values.brand_logo_url ? 'Change Logo' : 'Upload Logo'}
+                  </Button>
+
+                  {values.brand_logo_url ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => void handleRemoveLogo()}
+                      className="h-8 text-xs text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                    >
+                      Remove
+                    </Button>
+                  ) : null}
+                </div>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={(e) => void handleLogoSelected(e.target.files?.[0])}
+                />
+                <p className="text-[10px] text-[var(--color-text-secondary)]">
+                  PNG with transparent background or SVG recommended · Max 5MB
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Color Pickers */}
+          <div className="grid gap-4 sm:grid-cols-2 pt-2">
+            <div>
+              <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                Primary Brand Color
+              </Label>
+              <div className="mt-1.5 flex items-center gap-2">
+                <input
+                  type="color"
+                  value={values.brand_color_primary || '#CFB87C'}
+                  onChange={(e) =>
+                    setValues((v) => ({ ...v, brand_color_primary: e.target.value }))
+                  }
+                  className="size-9 cursor-pointer rounded border border-[var(--color-border)] bg-transparent p-0.5"
+                />
+                <Input
+                  value={values.brand_color_primary}
+                  onChange={(e) =>
+                    setValues((v) => ({ ...v, brand_color_primary: e.target.value }))
+                  }
+                  placeholder="#CFB87C"
+                  className={fieldClass}
+                />
+              </div>
+              <p className="mt-1 text-[10px] text-[var(--color-text-secondary)]">
+                Used for footer accents, dividers, and headshot rings.
+              </p>
+            </div>
+
+            <div>
+              <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                Secondary Brand Color (Optional)
+              </Label>
+              <div className="mt-1.5 flex items-center gap-2">
+                <input
+                  type="color"
+                  value={values.brand_color_secondary || '#141414'}
+                  onChange={(e) =>
+                    setValues((v) => ({ ...v, brand_color_secondary: e.target.value }))
+                  }
+                  className="size-9 cursor-pointer rounded border border-[var(--color-border)] bg-transparent p-0.5"
+                />
+                <Input
+                  value={values.brand_color_secondary}
+                  onChange={(e) =>
+                    setValues((v) => ({ ...v, brand_color_secondary: e.target.value }))
+                  }
+                  placeholder="Optional hex code"
+                  className={fieldClass}
+                />
+              </div>
+              <p className="mt-1 text-[10px] text-[var(--color-text-secondary)]">
+                Secondary accent for borders and cards.
+              </p>
+            </div>
+          </div>
+
+          {/* Reset to LocalPRO Gold */}
+          {(values.brand_color_primary || values.brand_color_secondary) ? (
+            <div className="pt-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setValues((v) => ({
+                    ...v,
+                    brand_color_primary: '',
+                    brand_color_secondary: '',
+                  }))
+                }
+                className="h-7 px-2 text-[11px] text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)]"
+              >
+                Reset Colors to LocalPRO Gold (#CFB87C)
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

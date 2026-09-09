@@ -83,7 +83,9 @@ function FlyerBody({
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm font-semibold text-neutral-700">
           {stats.map((stat, index) => (
             <span key={`${stat}-${index}`} className="inline-flex items-center gap-3">
-              {index > 0 ? <span style={{ color: '#d4d4d4' }}>|</span> : null}
+              {index > 0 ? (
+                <span style={{ color: agent.brand_color_primary || '#d4d4d4' }}>|</span>
+              ) : null}
               <span style={exportNowrap()}>{stat}</span>
             </span>
           ))}
@@ -108,10 +110,26 @@ function FlyerBody({
         ))}
       </div>
 
-      <footer className="shrink-0 bg-black px-8 py-5 text-center text-white">
-        <p className="text-lg font-bold" style={exportNowrap()}>
-          {agent.full_name} | {agent.phone} | {agent.email}
-        </p>
+      <footer
+        className="shrink-0 bg-black px-8 py-5 text-white"
+        style={{
+          borderTop: `4px solid ${agent.brand_color_primary || '#CFB87C'}`,
+        }}
+      >
+        <div
+          className={`flex items-center ${agent.brand_logo_url ? 'justify-between' : 'justify-center'}`}
+        >
+          <p className="text-lg font-bold" style={exportNowrap()}>
+            {agent.full_name} | {agent.phone} | {agent.email}
+          </p>
+          {agent.brand_logo_url && (
+            <img
+              src={agent.brand_logo_url}
+              alt="Agent Brand"
+              className="max-h-10 max-w-[140px] object-contain"
+            />
+          )}
+        </div>
       </footer>
     </>
   )

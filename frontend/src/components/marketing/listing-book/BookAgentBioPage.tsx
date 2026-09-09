@@ -29,12 +29,31 @@ export function BookAgentBioPage({
       <p className="text-5xl font-bold" style={EXPORT_BODY_TEXT}>
         {agent.full_name}
       </p>
-      <p className="mt-2 text-center text-sm font-semibold" style={EXPORT_LABEL_CAPS}>
-        Realtor®
-      </p>
+      <div className="mt-3 flex items-center justify-center gap-3">
+        <div
+          className="h-0.5 w-8"
+          style={{ backgroundColor: agent.brand_color_primary || '#CFB87C' }}
+        />
+        <p className="text-center text-sm font-semibold" style={EXPORT_LABEL_CAPS}>
+          Realtor®
+        </p>
+        <div
+          className="h-0.5 w-8"
+          style={{ backgroundColor: agent.brand_color_primary || '#CFB87C' }}
+        />
+      </div>
 
       <div className="mt-10 grid grid-cols-[1fr_280px] gap-8">
         <div>
+          {agent.brand_logo_url && (
+            <div className="mb-6">
+              <img
+                src={agent.brand_logo_url}
+                alt="Agent Brand"
+                className="max-h-12 max-w-[180px] object-contain"
+              />
+            </div>
+          )}
           <p
             className="text-sm leading-relaxed"
             style={{ ...EXPORT_BODY_TEXT, color: '#404040' }}
@@ -48,6 +67,10 @@ export function BookAgentBioPage({
           >
             Contact Information
           </p>
+          <div
+            className="mt-2 mb-3 h-0.5 w-12"
+            style={{ backgroundColor: agent.brand_color_primary || '#CFB87C' }}
+          />
           <p className="mt-3 font-semibold" style={EXPORT_BODY_TEXT}>
             {agent.email}
           </p>
@@ -61,6 +84,9 @@ export function BookAgentBioPage({
             src={agent.headshot_url}
             alt={agent.full_name}
             className="aspect-square w-full object-cover"
+            style={{
+              boxShadow: `0 0 0 3px ${agent.brand_color_primary || '#CFB87C'}`,
+            }}
           />
         ) : (
           <div className="flex aspect-square w-full items-center justify-center bg-neutral-200 text-neutral-500">
@@ -69,7 +95,11 @@ export function BookAgentBioPage({
         )}
       </div>
 
-      <img src={lpLogo} alt="LocalPRO" className="absolute bottom-10 right-10 h-14 w-auto" />
+      <img
+        src={lpLogo}
+        alt="LocalPRO"
+        className="absolute bottom-10 right-10 h-14 w-auto object-contain"
+      />
     </BookPagePreviewFrame>
   )
 }

@@ -52,6 +52,9 @@ class AdminPatchUserBody(BaseModel):
         pattern=r"^(elite|standard|basic)$",
     )
     approved_at: str | None = None
+    brand_logo_url: str | None = None
+    brand_color_primary: str | None = None
+    brand_color_secondary: str | None = None
 
     @field_validator("email")
     @classmethod

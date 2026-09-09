@@ -4,7 +4,7 @@ from typing import Any
 
 import groq
 import httpx
-from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 
 from config import get_settings
@@ -1067,4 +1067,195 @@ async def upload_marketing_photo(
         "photo_path": photo_path,
         "signed_url": signed_url,
     }
+
+
+MAX_IMAGE_SIZE_BYTES = 15 * 1024 * 1024  # 15MB hard ceiling
+ALLOWED_IMAGE_MIME_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+    "image/jpg",
+}
+
+
+@router.get("/{listing_id}/images")
+async def get_listing_images(
+    listing_id: str,
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+
+    try:
+        res = (
+            client.table("listing_images")
+            .select("*")
+            .eq("listing_id", listing_id)
+            .order("sort_order", desc=False)
+            .order("created_at", desc=False)
+            .execute()
+        )
+        return {"images": res.data or []}
+    except Exception as e:
+        err_msg = str(e)
+        if "PGRST205" in err_msg or "schema cache" in err_msg:
+            return {"images": []}
+        raise HTTPException(status_code=500, detail=f"Failed to fetch listing images: {e}")
+
+
+@router.post("/{listing_id}/images")
+async def upload_listing_image(
+    listing_id: str,
+    file: UploadFile = File(...),
+    category: str = Form("other"),
+    caption: str | None = Form(None),
+    is_hero: bool = Form(False),
+    image_type: str = Form("gallery"),
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+
+    # 1. Server-side validation: MIME type
+    content_type = (file.content_type or "image/jpeg").lower()
+    if content_type not in ALLOWED_IMAGE_MIME_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported image type '{content_type}'. Allowed types: JPEG, PNG, WebP, HEIC/HEIF.",
+        )
+
+    # 2. Server-side validation: file size ceiling (15MB)
+    contents = await file.read()
+    file_size = len(contents)
+    if file_size > MAX_IMAGE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Image size exceeds 15MB limit ({file_size / (1024 * 1024):.1f}MB). Please upload a compressed image.",
+        )
+
+    import os
+    import uuid
+
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if not ext or ext not in [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"]:
+        ext = ".webp" if "webp" in content_type else ".jpg"
+
+    image_uuid = str(uuid.uuid4())
+    storage_path = f"{listing_id}/{image_uuid}{ext}"
+
+    # 3. Upload to public listing-images storage bucket
+    try:
+        client.storage.from_("listing-images").upload(
+            storage_path,
+            contents,
+            {"content-type": content_type},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload image to storage: {e}")
+
+    public_url = client.storage.from_("listing-images").get_public_url(storage_path)
+
+    # 4. Enforce single-hero constraint at application layer
+    if is_hero:
+        try:
+            client.table("listing_images").update({"is_hero": False}).eq("listing_id", listing_id).eq("is_hero", True).execute()
+        except Exception:
+            pass
+
+    record = {
+        "id": image_uuid,
+        "listing_id": listing_id,
+        "storage_path": storage_path,
+        "public_url": public_url,
+        "image_type": image_type or "gallery",
+        "category": category or "other",
+        "caption": caption.strip() if caption else None,
+        "is_hero": bool(is_hero),
+        "file_size_bytes": file_size,
+        "mime_type": content_type,
+        "uploaded_by": agent_id,
+    }
+
+    try:
+        res = client.table("listing_images").insert(record).execute()
+        created = res.data[0] if res.data else record
+    except Exception as e:
+        err_msg = str(e)
+        if "PGRST205" in err_msg or "schema cache" in err_msg:
+            return {"success": True, "image": record, "warning": "listing_images table pending migration"}
+        raise HTTPException(status_code=500, detail=f"Failed to record image in database: {e}")
+
+    return {"success": True, "image": created}
+
+
+@router.patch("/{listing_id}/images/{image_id}")
+async def update_listing_image(
+    listing_id: str,
+    image_id: str,
+    payload: dict[str, Any] = Body(...),
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+
+    update_fields: dict[str, Any] = {}
+    if "caption" in payload:
+        update_fields["caption"] = payload["caption"]
+    if "category" in payload:
+        update_fields["category"] = payload["category"]
+    if "image_type" in payload:
+        update_fields["image_type"] = payload["image_type"]
+    if "sort_order" in payload:
+        update_fields["sort_order"] = int(payload["sort_order"])
+    if "is_hero" in payload:
+        is_hero = bool(payload["is_hero"])
+        update_fields["is_hero"] = is_hero
+        if is_hero:
+            try:
+                client.table("listing_images").update({"is_hero": False}).eq("listing_id", listing_id).eq("is_hero", True).execute()
+            except Exception:
+                pass
+
+    if not update_fields:
+        return {"success": True}
+
+    from datetime import datetime, timezone
+    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    try:
+        res = (
+            client.table("listing_images")
+            .update(update_fields)
+            .eq("id", image_id)
+            .eq("listing_id", listing_id)
+            .execute()
+        )
+        return {"success": True, "image": res.data[0] if res.data else None}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update image: {e}")
+
+
+@router.delete("/{listing_id}/images/{image_id}")
+async def delete_listing_image(
+    listing_id: str,
+    image_id: str,
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+
+    try:
+        img_res = client.table("listing_images").select("storage_path").eq("id", image_id).eq("listing_id", listing_id).maybe_single().execute()
+        storage_path = img_res.data.get("storage_path") if img_res and img_res.data else None
+
+        client.table("listing_images").delete().eq("id", image_id).eq("listing_id", listing_id).execute()
+
+        if storage_path:
+            client.storage.from_("listing-images").remove([storage_path])
+
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete image: {e}")
 

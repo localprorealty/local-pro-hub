@@ -147,7 +147,18 @@ function MarketingAssetsContent() {
       if (draft.neighborhoodGuide) setNeighborhoodGuide(draft.neighborhoodGuide)
       if (draft.refinementHistory) setRefinementHistory(draft.refinementHistory)
       if (draft.undoStacks) setUndoStacks(draft.undoStacks)
-      if (draft.photos) setPhotos(draft.photos)
+      if (draft.photos) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+        const restoredPhotos = (draft.photos as any[]).map((p) => ({
+          ...p,
+          preview:
+            p.preview ||
+            (p.photo_path
+              ? `${supabaseUrl}/storage/v1/object/public/listing-images/${p.photo_path}`
+              : ''),
+        }))
+        setPhotos(restoredPhotos)
+      }
       setIsDraftRestored(true)
     }
     setHasCheckedDraft(true)
@@ -202,6 +213,7 @@ function MarketingAssetsContent() {
           id: p.id,
           category: p.category,
           photo_path: p.photo_path,
+          preview: p.preview,
         }))
 
         const statePayload = {

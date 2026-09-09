@@ -1,12 +1,13 @@
 import { BookPagePreviewFrame } from '@/components/marketing/listing-book/BookPagePreviewFrame'
 import { EXPORT_BODY_TEXT, EXPORT_LABEL_CAPS } from '@/lib/export-text-styles'
-import type { ListingMarketingContext } from '@/lib/marketing-types'
+import type { AgentMarketingProfile, ListingMarketingContext } from '@/lib/marketing-types'
 import { formatSqft } from '@/lib/marketing-data'
 
 type BookPropertyDetailsPageProps = {
   context: ListingMarketingContext
   description: string
   edgePhotos: string[]
+  agent?: AgentMarketingProfile
   pageId?: string
 }
 
@@ -17,6 +18,7 @@ export function BookPropertyDetailsPage({
   context,
   description,
   edgePhotos,
+  agent,
   pageId = 'book-page-details',
 }: BookPropertyDetailsPageProps) {
   const leftPhoto = edgePhotos[0]
@@ -70,7 +72,10 @@ export function BookPropertyDetailsPage({
             {leftStats.map((stat) => (
               <div key={stat}>
                 <p style={EXPORT_BODY_TEXT}>{stat}</p>
-                <div className="mt-2 h-px bg-[#CFB87C]" />
+                <div
+                  className="mt-2 h-px"
+                  style={{ backgroundColor: agent?.brand_color_primary || '#CFB87C' }}
+                />
               </div>
             ))}
           </div>
@@ -79,13 +84,19 @@ export function BookPropertyDetailsPage({
               rightStats.map((stat) => (
                 <div key={stat}>
                   <p style={EXPORT_BODY_TEXT}>{stat}</p>
-                  <div className="mt-2 h-px bg-[#CFB87C]" />
+                  <div
+                    className="mt-2 h-px"
+                    style={{ backgroundColor: agent?.brand_color_primary || '#CFB87C' }}
+                  />
                 </div>
               ))
             ) : (
               <div>
                 <p style={EXPORT_BODY_TEXT}>PREMIER FINISHES</p>
-                <div className="mt-2 h-px bg-[#CFB87C]" />
+                <div
+                  className="mt-2 h-px"
+                  style={{ backgroundColor: agent?.brand_color_primary || '#CFB87C' }}
+                />
               </div>
             )}
           </div>

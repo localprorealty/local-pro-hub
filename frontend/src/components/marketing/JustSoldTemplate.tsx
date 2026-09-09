@@ -64,7 +64,10 @@ function JustSoldBody({
 
       <footer
         className="flex shrink-0 items-center justify-between bg-black px-10"
-        style={{ height: 160 }}
+        style={{
+          height: 160,
+          borderTop: `3px solid ${agent.brand_color_primary || '#CFB87C'}`,
+        }}
       >
         <div className="flex items-center gap-5">
           {agent.headshot_url ? (
@@ -72,6 +75,9 @@ function JustSoldBody({
               src={agent.headshot_url}
               alt={agent.full_name}
               className="size-20 rounded-full object-cover"
+              style={{
+                boxShadow: `0 0 0 2px ${agent.brand_color_primary || '#CFB87C'}`,
+              }}
             />
           ) : (
             <div className="flex size-20 items-center justify-center rounded-full bg-neutral-800 text-sm text-neutral-400">
@@ -96,7 +102,16 @@ function JustSoldBody({
             </p>
           </div>
         </div>
-        <img src={lpLogo} alt="LocalPRO" className="h-14 w-auto object-contain" />
+        <div className="flex items-center gap-6">
+          {agent.brand_logo_url && (
+            <img
+              src={agent.brand_logo_url}
+              alt="Agent Brand"
+              className="max-h-12 max-w-[160px] object-contain"
+            />
+          )}
+          <img src={lpLogo} alt="LocalPRO" className="h-14 w-auto object-contain" />
+        </div>
       </footer>
     </>
   )

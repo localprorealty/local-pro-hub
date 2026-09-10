@@ -348,21 +348,12 @@ export function ListingDetailsPanel({
                 ) : null}
 
                 {listing.stage === 'docs_signed' ? (
-                  <>
-                    <Button
-                      asChild
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
-                    >
-                      <Link to={photographyPath}>Book photography →</Link>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
-                    >
-                      <Link to={`${photographyPath}?tab=vendor`}>Use external vendor →</Link>
-                    </Button>
-                  </>
+                  <Button
+                    asChild
+                    className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                  >
+                    <Link to={photographyPath}>Book photography →</Link>
+                  </Button>
                 ) : null}
 
                 {listing.stage === 'marketing' ? (

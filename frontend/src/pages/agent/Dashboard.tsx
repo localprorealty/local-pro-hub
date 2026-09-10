@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AgentSidebar } from '@/components/layout/AgentSidebar'
 import { PipelineListingCard } from '@/components/listings/PipelineListingCard'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import { Input } from '@/components/ui/input'
 import type { UserRole } from '@/lib/auth'
@@ -209,6 +210,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                   className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
                 />
               </label>
+              <NotificationBell />
               <ProfileMenu role={role} />
             </div>
           </header>

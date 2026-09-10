@@ -192,3 +192,44 @@ export async function deleteListingComment(listingId: string, commentId: string)
     throw new Error(err?.detail || 'Failed to delete comment.')
   }
 }
+
+export type UnreadComment = {
+  id: string
+  listing_id: string
+  address_full: string
+  commenter_name: string
+  comment_text: string
+  created_at: string
+  read_at?: string | null
+}
+
+export type UnreadCommentsResponse = {
+  count: number
+  unread: UnreadComment[]
+}
+
+/**
+ * Agent authenticated endpoint: Fetch unread comments across all of an agent's listings.
+ */
+export async function fetchUnreadComments(): Promise<UnreadCommentsResponse> {
+  const headers = await getAuthHeader()
+  const res = await fetch(`${API_BASE_URL}/listings/comments/unread`, { headers })
+  if (!res.ok) {
+    return { count: 0, unread: [] }
+  }
+  return res.json()
+}
+
+/**
+ * Agent authenticated endpoint: Mark all comments for a listing as read.
+ */
+export async function markListingCommentsRead(listingId: string): Promise<void> {
+  const headers = await getAuthHeader()
+  await fetch(`${API_BASE_URL}/listings/${listingId}/comments/mark-read`, {
+    method: 'POST',
+    headers,
+  }).catch(() => {
+    // Non-blocking mark read
+  })
+}
+

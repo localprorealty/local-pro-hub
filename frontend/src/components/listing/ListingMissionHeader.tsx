@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import type { UserRole } from '@/lib/auth'
 
@@ -51,7 +52,10 @@ export function ListingMissionHeader({
           </div>
         </div>
       </div>
-      <ProfileMenu role={role} email={email} />
+      <div className="flex items-center gap-3">
+        <NotificationBell />
+        <ProfileMenu role={role} email={email} />
+      </div>
     </header>
   )
 }

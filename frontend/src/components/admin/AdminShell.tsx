@@ -13,6 +13,7 @@ import {
 
 import { shellPanelClass } from '@/components/layout/GridBackground'
 import { QuickLinks } from '@/components/layout/QuickLinks'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 
 type AdminShellProps = {
@@ -149,7 +150,10 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
               </p>
               <h2 className="font-[family-name:var(--font-display)] text-3xl">{title}</h2>
             </div>
-            <ProfileMenu role="admin" />
+            <div className="flex items-center gap-3">
+              <NotificationBell />
+              <ProfileMenu role="admin" />
+            </div>
           </header>
           <div className="flex-1 overflow-y-auto px-6 py-8 md:px-10">{children}</div>
         </section>

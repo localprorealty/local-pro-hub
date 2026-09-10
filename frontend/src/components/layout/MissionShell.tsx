@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { AgentSidebar } from '@/components/layout/AgentSidebar'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import type { UserRole } from '@/lib/auth'
 
@@ -43,7 +44,10 @@ export function MissionShell({
                   <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{subtitle}</p>
                 ) : null}
               </div>
-              <ProfileMenu role={role} email={email} />
+              <div className="flex items-center gap-3">
+                <NotificationBell />
+                <ProfileMenu role={role} email={email} />
+              </div>
             </header>
           )}
           <div className="flex-1 overflow-y-auto px-8 py-10">{children}</div>

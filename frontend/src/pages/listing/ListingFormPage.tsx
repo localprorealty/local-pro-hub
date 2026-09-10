@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -294,12 +295,21 @@ function ListingFormContent() {
   return (
     <main className="min-h-svh bg-[#0a0a0a]">
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[#2a2a2a] bg-[#0a0a0a]/95 px-6 py-4 backdrop-blur-sm md:px-10">
-        <Link
-          to="/dashboard"
-          className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[#CFB87C]"
-        >
-          LP
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to={`/listing/${listing.id}`}
+            className="shrink-0 rounded-sm p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
+            aria-label="Back to listing hub"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+          <Link
+            to="/dashboard"
+            className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[#CFB87C]"
+          >
+            LP
+          </Link>
+        </div>
         <div className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
           <span>New Listing</span>
           <span className="text-[#555555]">·</span>

@@ -142,6 +142,7 @@ export function PublicListingSharePage() {
   }
 
   const setCommentNameReset = () => {
+    setCommenterName('')
     setCommentText('')
     setHoneypot('')
   }

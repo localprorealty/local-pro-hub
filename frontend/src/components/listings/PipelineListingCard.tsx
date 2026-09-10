@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { DeleteDraftButton } from '@/components/listings/DeleteDraftButton'
 import {
@@ -32,6 +32,7 @@ export function PipelineListingCard({
   showViewForm = false,
   onDraftDeleted,
 }: PipelineListingCardProps) {
+  const navigate = useNavigate()
   const showDelete =
     canDeleteListing(listing.stage) && !!agentId && listing.agent_id === agentId
   const specs = listingSpecsFromForm(listing.form_data)
@@ -41,9 +42,29 @@ export function PipelineListingCard({
       ? 'border border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text-secondary)]'
       : 'bg-[var(--color-gold)] text-[var(--color-black)]'
 
+  const hubPath = `/listing/${listing.id}`
+
+  const handleCardClick = (_e: React.MouseEvent) => {
+    // Only navigate if not selecting text
+    const selection = window.getSelection()
+    if (selection && selection.toString().length > 0) return
+    navigate(hubPath)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      navigate(hubPath)
+    }
+  }
+
   return (
     <motion.article
-      className="group flex min-h-32 flex-col border border-[var(--color-border)] bg-[var(--color-surface-2)] transition-all hover:border-[var(--color-gold-border)] lg:flex-row"
+      role="button"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      className="group flex min-h-32 cursor-pointer flex-col border border-[var(--color-border)] bg-[var(--color-surface-2)] transition-all hover:border-[var(--color-gold-border)] focus:outline-none focus:ring-1 focus:ring-[var(--color-gold)] lg:flex-row"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
@@ -77,6 +98,7 @@ export function PipelineListingCard({
               href={`https://my.brokermint.com/#/transactions/${listing.brokermint_transaction_id}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="font-mono text-[#CFB87C] hover:underline"
             >
               {listing.brokermint_transaction_id}
@@ -122,16 +144,19 @@ export function PipelineListingCard({
         </div>
         <div className="mt-4 flex items-center gap-3 lg:justify-end">
           {showDelete ? (
-            <DeleteDraftButton
-              listingId={listing.id}
-              agentId={agentId!}
-              variant="icon"
-              onDeleted={onDraftDeleted}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <DeleteDraftButton
+                listingId={listing.id}
+                agentId={agentId!}
+                variant="icon"
+                onDeleted={onDraftDeleted}
+              />
+            </div>
           ) : null}
           {showViewForm && (
             <Link
               to={`/listing/${listing.id}/form`}
+              onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center justify-center whitespace-nowrap shrink-0 gap-1.5 text-xs font-bold tracking-wider text-[var(--color-text-secondary)] hover:text-white uppercase border border-[var(--color-border)] px-3.5 py-1.5 rounded-sm hover:border-[var(--color-gold)] transition-colors"
             >
               View Form
@@ -139,6 +164,13 @@ export function PipelineListingCard({
           )}
           <Link
             to={listingPath}
+            onClick={(e) => {
+              if (listingPath === hubPath) {
+                // Let card-level navigation handle or let link navigate
+              } else {
+                e.stopPropagation()
+              }
+            }}
             className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-[var(--color-gold)] uppercase transition-all group-hover:gap-3 whitespace-nowrap shrink-0"
           >
             {ctaLabel}

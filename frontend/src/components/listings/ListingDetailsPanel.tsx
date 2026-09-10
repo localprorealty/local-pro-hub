@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
+  Camera,
   Check,
+  ChevronDown,
+  ChevronUp,
   Circle,
   CircleDot,
   Copy,
   ExternalLink,
+  FileText,
   Globe,
+  Info,
   Loader2,
   MessageSquare,
   RefreshCw,
@@ -14,6 +19,8 @@ import {
   Trash2,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+
+export type ListingHubTab = 'action' | 'photos' | 'share' | 'docs' | 'details'
 
 import { Button } from '@/components/ui/button'
 import { BookingNegotiationPanel } from '@/components/booking/BookingNegotiationPanel'
@@ -263,11 +270,33 @@ export function ListingDetailsPanel({
     }
   }
 
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const activeTab: ListingHubTab =
+    tabParam === 'photos' || tabParam === 'share' || tabParam === 'docs' || tabParam === 'details'
+      ? tabParam
+      : 'action'
+
+  const handleSelectTab = (tab: ListingHubTab) => {
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set('tab', tab)
+    setSearchParams(nextParams, { replace: true })
+  }
+
+  const TABS: { id: ListingHubTab; label: string; icon: typeof Sparkles }[] = [
+    { id: 'action', label: 'Stage Action', icon: Sparkles },
+    { id: 'photos', label: 'Photos & Media', icon: Camera },
+    { id: 'share', label: 'Client Share', icon: Globe },
+    { id: 'docs', label: 'Documents', icon: FileText },
+    { id: 'details', label: 'Property Copy & Details', icon: FileText },
+  ]
+
   return (
     <section className="grid gap-6 lg:grid-cols-[1fr_260px]">
       <div className="space-y-6">
+        {/* Persistent Top Summary Card */}
         <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-          <div className="mb-5 flex items-start justify-between gap-3">
+          <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <p className="text-xs tracking-widest text-[var(--color-gold)] uppercase">
                 Listing Hub
@@ -289,12 +318,12 @@ export function ListingDetailsPanel({
             </Button>
           </div>
 
-          <div className="mb-5 grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <p className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 Type
               </p>
-              <p className="text-sm text-[var(--color-white)]">
+              <p className="text-sm font-medium text-[var(--color-white)]">
                 {TYPE_LABEL[listing.listing_type]}
               </p>
             </div>
@@ -302,7 +331,7 @@ export function ListingDetailsPanel({
               <p className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 MLS
               </p>
-              <p className="text-sm text-[var(--color-white)]">
+              <p className="text-sm font-medium text-[var(--color-white)]">
                 {listing.mls_number ?? 'N/A'}
               </p>
             </div>
@@ -310,119 +339,471 @@ export function ListingDetailsPanel({
               <p className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 List Price
               </p>
-              <p className="text-sm text-[var(--color-white)]">
+              <p className="text-sm font-medium text-[var(--color-white)]">
                 {listing.list_price ? `$${listing.list_price.toLocaleString()}` : 'N/A'}
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="rounded-sm border border-[var(--color-gold)]/25 bg-[var(--color-gold)]/5 p-4">
-            <p className="text-xs tracking-widest text-[var(--color-gold)] uppercase">
-              {STAGE_LABEL[listing.stage]}
-            </p>
-            <h4 className="mt-1 text-lg font-semibold text-[var(--color-white)]">
-              {guidance.headline}
-            </h4>
-            <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-              {guidance.description}
-            </p>
-
-            {canManage &&
-            (listing.stage === 'docs_signed' || listing.stage === 'shoot_booked') ? (
-              <BookingNegotiationPanel
-                listingId={listing.id}
-                listingStage={listing.stage}
-                onBookingUpdated={onBookingUpdated}
-              />
-            ) : null}
-
-            {canManage ? (
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                {listing.stage === 'draft' ? (
-                  <Button
-                    asChild
-                    className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
-                  >
-                    <Link to={formPath}>Continue NTREIS form →</Link>
-                  </Button>
+        {/* Tab Navigation Bar */}
+        <div className="flex border-b border-[var(--color-border)] gap-1 overflow-x-auto">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleSelectTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 -mb-px ${
+                  isActive
+                    ? 'border-[var(--color-gold)] text-[var(--color-gold)] bg-[var(--color-gold)]/5'
+                    : 'border-transparent text-[var(--color-text-secondary)] hover:text-white hover:border-zinc-700'
+                }`}
+              >
+                <Icon className="size-3.5" />
+                <span>{tab.label}</span>
+                {tab.id === 'share' && comments.length > 0 ? (
+                  <span className="rounded-full bg-[var(--color-gold)]/20 px-1.5 py-0.2 text-[10px] font-bold text-[var(--color-gold)] border border-[var(--color-gold)]/30">
+                    {comments.length}
+                  </span>
                 ) : null}
+              </button>
+            )
+          })}
+        </div>
 
-                {listing.stage === 'docs_signed' ? (
-                  <>
+        {/* Tab 1: Stage Action */}
+        {activeTab === 'action' && (
+          <div className="space-y-6">
+            <div className="rounded-sm border border-[var(--color-gold)]/25 bg-[var(--color-gold)]/5 p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs tracking-widest text-[var(--color-gold)] uppercase font-semibold">
+                  Current Phase: {STAGE_LABEL[listing.stage]}
+                </p>
+              </div>
+              <h4 className="mt-1 text-lg font-semibold text-[var(--color-white)]">
+                {guidance.headline}
+              </h4>
+              <p className="mt-2 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                {guidance.description}
+              </p>
+
+              {canManage &&
+              (listing.stage === 'docs_signed' || listing.stage === 'shoot_booked') ? (
+                <div className="mt-4 border-t border-[var(--color-gold)]/20 pt-4">
+                  <BookingNegotiationPanel
+                    listingId={listing.id}
+                    listingStage={listing.stage}
+                    onBookingUpdated={onBookingUpdated}
+                  />
+                </div>
+              ) : null}
+
+              {canManage ? (
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {listing.stage === 'draft' ? (
+                    <Button
+                      asChild
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                    >
+                      <Link to={formPath}>Continue NTREIS form →</Link>
+                    </Button>
+                  ) : null}
+
+                  {listing.stage === 'docs_signed' ? (
                     <Button
                       asChild
                       className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
                     >
                       <Link to={photographyPath}>Book photography →</Link>
                     </Button>
+                  ) : null}
+
+                  {listing.stage === 'marketing' ? (
+                    <>
+                      <Button
+                        asChild
+                        className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                      >
+                        <Link to={marketingPath}>Select marketing assets →</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
+                      >
+                        <Link to={mlsPath}>Finalize MLS submission →</Link>
+                      </Button>
+                    </>
+                  ) : null}
+
+                  {listing.stage === 'mls_submitted' ? (
+                    <Button
+                      asChild
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                    >
+                      <Link to={goLivePath}>Go Live →</Link>
+                    </Button>
+                  ) : null}
+
+                  {listing.stage !== 'draft' && listing.stage !== 'closed' ? (
                     <Button
                       asChild
                       variant="outline"
                       className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
                     >
-                      <Link to={`${photographyPath}?tab=vendor`}>Use external vendor →</Link>
+                      <Link to={formPath}>Edit NTREIS form</Link>
                     </Button>
-                  </>
-                ) : null}
+                  ) : null}
 
-                {listing.stage === 'marketing' ? (
-                  <Button
-                    asChild
-                    className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
-                  >
-                    <Link to={marketingPath}>Select marketing assets →</Link>
-                  </Button>
-                ) : null}
+                  {canManage && guidance.advanceLabel && nextStage && onAdvanceStage ? (
+                    <Button
+                      type="button"
+                      onClick={() => void handleAdvance()}
+                      disabled={isAdvancing}
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+                    >
+                      {isAdvancing ? 'Updating...' : guidance.advanceLabel}
+                    </Button>
+                  ) : null}
+                </div>
+              ) : null}
 
-                {listing.stage === 'marketing' ? (
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
-                  >
-                    <Link to={mlsPath}>Finalize MLS submission →</Link>
-                  </Button>
-                ) : null}
+              {actionError ? (
+                <p className="mt-3 text-sm text-red-300" role="alert">
+                  {actionError}
+                </p>
+              ) : null}
+            </div>
 
-                {listing.stage === 'mls_submitted' ? (
-                  <Button
-                    asChild
-                    className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
-                  >
-                    <Link to={goLivePath}>Go Live →</Link>
-                  </Button>
-                ) : null}
-
-                {listing.stage !== 'draft' && listing.stage !== 'closed' ? (
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
-                  >
-                    <Link to={formPath}>Edit NTREIS form</Link>
-                  </Button>
-                ) : null}
-
-                {canManage && guidance.advanceLabel && nextStage && onAdvanceStage ? (
-                  <Button
-                    type="button"
-                    onClick={() => void handleAdvance()}
-                    disabled={isAdvancing}
-                    className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
-                  >
-                    {isAdvancing ? 'Updating...' : guidance.advanceLabel}
-                  </Button>
-                ) : null}
+            {canManage && canDeleteListing(listing.stage) && onDelete ? (
+              <div className="flex items-center justify-between rounded-sm border border-red-500/20 bg-red-500/5 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-[var(--color-white)]">Delete draft</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    Remove this unfinished listing from your drafts.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void handleDelete()}
+                  disabled={isDeleting}
+                  className="border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                >
+                  <Trash2 className="mr-2 size-4" />
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </Button>
               </div>
             ) : null}
+          </div>
+        )}
 
-            {listing.brokermint_transaction_id ? (
-              <div className="mt-5 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-3">
-                <h5 className="text-xs tracking-wider text-white uppercase font-semibold">BrokerMint Transaction Documents</h5>
-                <p className="text-xs text-[var(--color-text-secondary)]">
-                  Curated Document Folder: <strong className="text-white">IABS, Listing Agreement, and disclosures</strong>
+        {/* Tab 2: Photos & Media */}
+        {activeTab === 'photos' && (
+          <div className="space-y-6">
+            {(listing.stage === 'draft' || listing.stage === 'docs_pending') && (
+              <div className="flex items-start gap-3 rounded-sm border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/10 p-4 text-xs text-[var(--color-gold)]">
+                <Info className="size-4 shrink-0 mt-0.5" />
+                <p>
+                  Photos are typically booked after docs are signed, but you can upload early drafts anytime.
                 </p>
-                <div className="flex flex-wrap items-center gap-3">
+              </div>
+            )}
+            <ListingImageLibrary listingId={listing.id} canManage={canManage} />
+          </div>
+        )}
+
+        {/* Tab 3: Client Share & Feedback */}
+        {activeTab === 'share' && (
+          <div className="space-y-6">
+            {(listing.stage === 'draft' || listing.stage === 'docs_pending') && (
+              <div className="flex items-start gap-3 rounded-sm border border-blue-500/30 bg-blue-500/10 p-4 text-xs text-blue-300">
+                <Info className="size-4 shrink-0 mt-0.5" />
+                <p>
+                  Public sharing is typically activated once photos are booked and approved. You can generate a preview link now if needed, but client feedback features activate during the Marketing stage.
+                </p>
+              </div>
+            )}
+
+            {/* Public Listing Share Link Card */}
+            <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-7 items-center justify-center rounded bg-[#241e15] text-[#CFB87C]">
+                    <Globe className="size-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold tracking-wider text-[var(--color-white)] uppercase">
+                      Public Listing Share Link
+                    </h4>
+                    <p className="text-[11px] text-[var(--color-text-secondary)]">
+                      Read-only presentation for clients & prospective buyers (no login required)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
+                      shareStatus?.is_publicly_shared
+                        ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40'
+                        : 'bg-zinc-800/60 text-zinc-400 border border-zinc-700/40'
+                    }`}
+                  >
+                    <span
+                      className={`size-1.5 rounded-full ${
+                        shareStatus?.is_publicly_shared ? 'bg-emerald-400' : 'bg-zinc-500'
+                      }`}
+                    />
+                    {shareStatus?.is_publicly_shared ? 'Publicly Active' : 'Private (Inactive)'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                  Anyone with this link can view the pipeline milestone progress, property specifications,
+                  high-res photos, and leave direct feedback. Sensitive documents, BrokerMint IDs, seller
+                  contacts, and access codes are strictly excluded.
+                </p>
+
+                {shareError ? (
+                  <p className="text-xs text-red-400" role="alert">
+                    {shareError}
+                  </p>
+                ) : null}
+
+                {loadingShareStatus ? (
+                  <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] py-2">
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span>Checking share link status...</span>
+                  </div>
+                ) : shareStatus?.token ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={`${window.location.origin}/share/${shareStatus.token}`}
+                        className="h-9 flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs text-stone-300 font-mono select-all focus:outline-none focus:border-[var(--color-gold)]"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopyLink}
+                        className="h-9 border-[var(--color-gold-border)] bg-transparent text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)]"
+                      >
+                        {copiedLink ? (
+                          <>
+                            <Check className="mr-1.5 size-3.5 text-emerald-400" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="mr-1.5 size-3.5" />
+                            Copy Link
+                          </>
+                        )}
+                      </Button>
+
+                      <Button
+                        type="button"
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="h-9 border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[var(--color-surface)]"
+                      >
+                        <a
+                          href={`/share/${shareStatus.token}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5"
+                        >
+                          <ExternalLink className="size-3.5" />
+                          View Page
+                        </a>
+                      </Button>
+                    </div>
+
+                    {canManage ? (
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[var(--color-border)]">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void handleToggleShare()}
+                          disabled={togglingShare}
+                          className={`h-8 text-xs ${
+                            shareStatus.is_publicly_shared
+                              ? 'border-amber-700/50 text-amber-300 hover:bg-amber-950/20'
+                              : 'border-emerald-700/50 text-emerald-300 hover:bg-emerald-950/20'
+                          }`}
+                        >
+                          {togglingShare ? (
+                            <>
+                              <Loader2 className="mr-1.5 size-3 animate-spin" />
+                              Updating...
+                            </>
+                          ) : shareStatus.is_publicly_shared ? (
+                            'Deactivate Public Link'
+                          ) : (
+                            'Activate Public Link'
+                          )}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => void handleRegenerateToken()}
+                          disabled={togglingShare}
+                          className="h-8 text-[11px] text-[var(--color-text-secondary)] hover:text-red-300 hover:bg-red-950/10"
+                        >
+                          <RefreshCw className="mr-1.5 size-3" />
+                          Regenerate Secret Token
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : canManage ? (
+                  <div>
+                    <Button
+                      type="button"
+                      onClick={() => void handleToggleShare()}
+                      disabled={togglingShare}
+                      className="h-9 rounded-sm bg-[var(--color-gold)] px-4 text-xs font-semibold text-black hover:bg-[#dcc487] disabled:opacity-60"
+                    >
+                      {togglingShare ? (
+                        <>
+                          <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Globe className="mr-1.5 size-3.5" />
+                          Create Public Share Link
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[var(--color-text-secondary)] italic">
+                    No public share link has been created for this listing yet.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Client & Visitor Feedback (Comments Moderation) Card */}
+            <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-7 items-center justify-center rounded bg-[#241e15] text-[#CFB87C]">
+                    <MessageSquare className="size-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold tracking-wider text-[var(--color-white)] uppercase">
+                      Client & Visitor Feedback
+                    </h4>
+                    <p className="text-[11px] text-[var(--color-text-secondary)]">
+                      Feedback and questions submitted from the public listing share page
+                    </p>
+                  </div>
+                </div>
+
+                <span className="rounded bg-[var(--color-surface)] px-2.5 py-0.5 text-xs font-mono text-[var(--color-gold)] border border-[var(--color-border)]">
+                  {comments.length}
+                </span>
+              </div>
+
+              {loadingComments ? (
+                <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] py-3">
+                  <Loader2 className="size-3.5 animate-spin" />
+                  <span>Loading feedback...</span>
+                </div>
+              ) : comments.length === 0 ? (
+                <p className="text-xs text-[var(--color-text-secondary)] italic py-2">
+                  No feedback comments received yet. Share the link with your clients to receive direct input.
+                </p>
+              ) : (
+                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                  {comments.map((comment) => {
+                    let timeAgo = 'recently'
+                    try {
+                      timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })
+                    } catch {
+                      timeAgo = ''
+                    }
+
+                    return (
+                      <div
+                        key={comment.id}
+                        className="flex items-start justify-between gap-3 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+                      >
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-white">
+                              {comment.commenter_name}
+                            </span>
+                            <span className="text-[10px] text-[var(--color-text-secondary)]">
+                              {timeAgo}
+                            </span>
+                          </div>
+                          <p className="text-xs text-stone-300 whitespace-pre-wrap leading-relaxed">
+                            {comment.comment_text}
+                          </p>
+                        </div>
+
+                        {canManage ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => void handleDeleteComment(comment.id)}
+                            disabled={deletingCommentId === comment.id}
+                            className="h-7 w-7 p-0 text-stone-400 hover:text-red-400 hover:bg-red-950/20"
+                            title="Delete comment"
+                          >
+                            {deletingCommentId === comment.id ? (
+                              <Loader2 className="size-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="size-3.5" />
+                            )}
+                          </Button>
+                        ) : null}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Documents (BrokerMint) */}
+        {activeTab === 'docs' && (
+          <div className="space-y-6">
+            {listing.brokermint_transaction_id ? (
+              <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
+                <div className="flex items-start justify-between border-b border-[var(--color-border)] pb-4">
+                  <div>
+                    <h4 className="text-sm font-semibold tracking-wider text-white uppercase">
+                      BrokerMint Transaction Documents
+                    </h4>
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                      Curated Document Folder: <strong className="text-white">IABS, Listing Agreement, and disclosures</strong>
+                    </p>
+                  </div>
+                  <span className="font-mono text-xs text-[var(--color-gold)] bg-[#1a1a1a] px-2.5 py-1 rounded border border-[#2a2a2a]">
+                    ID: {listing.brokermint_transaction_id}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-1">
                   <a
                     href={`https://my.brokermint.com/#/transactions/${listing.brokermint_transaction_id}`}
                     target="_blank"
@@ -431,10 +812,7 @@ export function ListingDetailsPanel({
                   >
                     Open BrokerMint Transaction ↗
                   </a>
-                  <span className="text-xs text-[var(--color-text-secondary)]">
-                    (ID: <strong className="text-white font-mono">{listing.brokermint_transaction_id}</strong>)
-                  </span>
-                  
+
                   {canManage && listing.stage === 'docs_pending' && (
                     <Button
                       type="button"
@@ -447,398 +825,129 @@ export function ListingDetailsPanel({
                   )}
                 </div>
               </div>
-            ) : null}
-
-            {actionError ? (
-              <p className="mt-3 text-sm text-red-300" role="alert">
-                {actionError}
-              </p>
-            ) : null}
-          </div>
-
-          {canManage && canDeleteListing(listing.stage) && onDelete ? (
-            <div className="mt-4 flex items-center justify-between rounded-sm border border-red-500/20 bg-red-500/5 px-4 py-3">
-              <div>
-                <p className="text-sm font-medium text-[var(--color-white)]">Delete draft</p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
-                  Remove this unfinished listing from your drafts.
+            ) : (
+              <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 text-center text-xs text-[var(--color-text-secondary)]">
+                <FileText className="mx-auto size-8 text-stone-500 mb-2" />
+                <p className="font-medium text-white">No BrokerMint Transaction Connected Yet</p>
+                <p className="mt-1">
+                  A BrokerMint transaction and document checklist are automatically initiated once the NTREIS form is submitted.
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void handleDelete()}
-                disabled={isDeleting}
-                className="border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
-              >
-                <Trash2 className="mr-2 size-4" />
-                {isDeleting ? 'Deleting...' : 'Delete'}
-              </Button>
-            </div>
-          ) : null}
-        </div>
-
-        {/* Listing Photo & Media Library */}
-        <ListingImageLibrary listingId={listing.id} canManage={canManage} />
-
-        {/* Public Listing Share Link Card */}
-        <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-7 items-center justify-center rounded bg-[#241e15] text-[#CFB87C]">
-                <Globe className="size-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-semibold tracking-wider text-[var(--color-white)] uppercase">
-                  Public Listing Share Link
-                </h4>
-                <p className="text-[11px] text-[var(--color-text-secondary)]">
-                  Read-only presentation for clients & prospective buyers (no login required)
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
-                  shareStatus?.is_publicly_shared
-                    ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40'
-                    : 'bg-zinc-800/60 text-zinc-400 border border-zinc-700/40'
-                }`}
-              >
-                <span
-                  className={`size-1.5 rounded-full ${
-                    shareStatus?.is_publicly_shared ? 'bg-emerald-400' : 'bg-zinc-500'
-                  }`}
-                />
-                {shareStatus?.is_publicly_shared ? 'Publicly Active' : 'Private (Inactive)'}
-              </span>
-            </div>
+            )}
           </div>
+        )}
 
-          <div className="space-y-3">
-            <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-              Anyone with this link can view the pipeline milestone progress, property specifications,
-              high-res photos, and leave direct feedback. Sensitive documents, BrokerMint IDs, seller
-              contacts, and access codes are strictly excluded.
-            </p>
-
-            {shareError ? (
-              <p className="text-xs text-red-400" role="alert">
-                {shareError}
-              </p>
-            ) : null}
-
-            {loadingShareStatus ? (
-              <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] py-2">
-                <Loader2 className="size-3.5 animate-spin" />
-                <span>Checking share link status...</span>
-              </div>
-            ) : shareStatus?.token ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={`${window.location.origin}/share/${shareStatus.token}`}
-                    className="h-9 flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs text-stone-300 font-mono select-all focus:outline-none focus:border-[var(--color-gold)]"
-                  />
+        {/* Tab 5: Property Copy & Details */}
+        {activeTab === 'details' && (
+          <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-6">
+            <div>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                  AI Description
+                </Label>
+                {canManage ? (
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={handleCopyLink}
-                    className="h-9 border-[var(--color-gold-border)] bg-transparent text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)]"
+                    onClick={() => void handleGenerateDescription()}
+                    disabled={isGeneratingDescription}
+                    className="h-7 border-[var(--color-gold-border)] bg-transparent px-2.5 text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)] hover:text-[var(--color-gold)] disabled:opacity-50"
                   >
-                    {copiedLink ? (
+                    {isGeneratingDescription ? (
                       <>
-                        <Check className="mr-1.5 size-3.5 text-emerald-400" />
-                        Copied!
+                        <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : description.trim() ? (
+                      <>
+                        <Sparkles className="mr-1.5 size-3.5" />
+                        Regenerate
                       </>
                     ) : (
                       <>
-                        <Copy className="mr-1.5 size-3.5" />
-                        Copy Link
+                        <Sparkles className="mr-1.5 size-3.5" />
+                        Generate Description
                       </>
                     )}
                   </Button>
-
-                  <Button
-                    type="button"
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="h-9 border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[var(--color-surface)]"
-                  >
-                    <a
-                      href={`/share/${shareStatus.token}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5"
-                    >
-                      <ExternalLink className="size-3.5" />
-                      View Page
-                    </a>
-                  </Button>
-                </div>
-
-                {canManage ? (
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[var(--color-border)]">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => void handleToggleShare()}
-                      disabled={togglingShare}
-                      className={`h-8 text-xs ${
-                        shareStatus.is_publicly_shared
-                          ? 'border-amber-700/50 text-amber-300 hover:bg-amber-950/20'
-                          : 'border-emerald-700/50 text-emerald-300 hover:bg-emerald-950/20'
-                      }`}
-                    >
-                      {togglingShare ? (
-                        <>
-                          <Loader2 className="mr-1.5 size-3 animate-spin" />
-                          Updating...
-                        </>
-                      ) : shareStatus.is_publicly_shared ? (
-                        'Deactivate Public Link'
-                      ) : (
-                        'Activate Public Link'
-                      )}
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => void handleRegenerateToken()}
-                      disabled={togglingShare}
-                      className="h-8 text-[11px] text-[var(--color-text-secondary)] hover:text-red-300 hover:bg-red-950/10"
-                    >
-                      <RefreshCw className="mr-1.5 size-3" />
-                      Regenerate Secret Token
-                    </Button>
-                  </div>
                 ) : null}
               </div>
-            ) : canManage ? (
-              <div>
-                <Button
-                  type="button"
-                  onClick={() => void handleToggleShare()}
-                  disabled={togglingShare}
-                  className="h-9 rounded-sm bg-[var(--color-gold)] px-4 text-xs font-semibold text-black hover:bg-[#dcc487] disabled:opacity-60"
-                >
-                  {togglingShare ? (
-                    <>
-                      <Loader2 className="mr-1.5 size-3.5 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Globe className="mr-1.5 size-3.5" />
-                      Create Public Share Link
-                    </>
-                  )}
-                </Button>
-              </div>
-            ) : (
-              <p className="text-xs text-[var(--color-text-secondary)] italic">
-                No public share link has been created for this listing yet.
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Client & Public Feedback (Comments Moderation) Card */}
-        <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-7 items-center justify-center rounded bg-[#241e15] text-[#CFB87C]">
-                <MessageSquare className="size-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-semibold tracking-wider text-[var(--color-white)] uppercase">
-                  Client & Visitor Feedback
-                </h4>
-                <p className="text-[11px] text-[var(--color-text-secondary)]">
-                  Feedback and questions submitted from the public listing share page
+              {generateError ? (
+                <p className="mt-2 text-xs text-red-400" role="alert">
+                  {generateError}
                 </p>
-              </div>
+              ) : null}
+              <textarea
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                className="mt-2 min-h-28 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-white)] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+              />
             </div>
 
-            <span className="rounded bg-[var(--color-surface)] px-2.5 py-0.5 text-xs font-mono text-[var(--color-gold)] border border-[var(--color-border)]">
-              {comments.length}
-            </span>
-          </div>
+            {/* Raw Form Fields Collapsible Accordion */}
+            <div className="border-t border-[var(--color-border)] pt-4">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((open) => !open)}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-gold)] transition-colors"
+              >
+                {showAdvanced ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                <span>{showAdvanced ? 'Hide' : 'Show'} raw NTREIS form fields ({fieldRows.length})</span>
+              </button>
 
-          {loadingComments ? (
-            <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] py-3">
-              <Loader2 className="size-3.5 animate-spin" />
-              <span>Loading feedback...</span>
-            </div>
-          ) : comments.length === 0 ? (
-            <p className="text-xs text-[var(--color-text-secondary)] italic py-2">
-              No feedback comments received yet. Share the link with your clients to receive direct
-              input.
-            </p>
-          ) : (
-            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-              {comments.map((comment) => {
-                let timeAgo = 'recently'
-                try {
-                  timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })
-                } catch {
-                  timeAgo = ''
-                }
-
-                return (
-                  <div
-                    key={comment.id}
-                    className="flex items-start justify-between gap-3 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
-                  >
-                    <div className="space-y-1 min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-white">
-                          {comment.commenter_name}
-                        </span>
-                        <span className="text-[10px] text-[var(--color-text-secondary)]">
-                          {timeAgo}
-                        </span>
-                      </div>
-                      <p className="text-xs text-stone-300 whitespace-pre-wrap leading-relaxed">
-                        {comment.comment_text}
-                      </p>
-                    </div>
-
-                    {canManage ? (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => void handleDeleteComment(comment.id)}
-                        disabled={deletingCommentId === comment.id}
-                        className="h-7 w-7 p-0 text-stone-400 hover:text-red-400 hover:bg-red-950/20"
-                        title="Delete comment"
-                      >
-                        {deletingCommentId === comment.id ? (
-                          <Loader2 className="size-3 animate-spin" />
-                        ) : (
-                          <Trash2 className="size-3.5" />
-                        )}
-                      </Button>
-                    ) : null}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-          <div className="mb-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
-                AI Description
-              </Label>
-              {canManage ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => void handleGenerateDescription()}
-                  disabled={isGeneratingDescription}
-                  className="h-7 border-[var(--color-gold-border)] bg-transparent px-2.5 text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)] hover:text-[var(--color-gold)] disabled:opacity-50"
-                >
-                  {isGeneratingDescription ? (
-                    <>
-                      <Loader2 className="mr-1.5 size-3.5 animate-spin" />
-                      Generating...
-                    </>
-                  ) : description.trim() ? (
-                    <>
-                      <Sparkles className="mr-1.5 size-3.5" />
-                      Regenerate
-                    </>
+              {showAdvanced ? (
+                <div className="mt-4 grid gap-3 max-h-96 overflow-y-auto pr-1">
+                  {fieldRows.length === 0 ? (
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      No form data yet for this listing.
+                    </p>
                   ) : (
-                    <>
-                      <Sparkles className="mr-1.5 size-3.5" />
-                      Generate Description
-                    </>
+                    fieldRows.map((field, index) => (
+                      <div key={field.key}>
+                        <Label className="text-[11px] text-[var(--color-text-secondary)]">
+                          {field.key}
+                        </Label>
+                        <Input
+                          value={field.value}
+                          onChange={(event) =>
+                            setFieldRows((prev) =>
+                              prev.map((row, rowIndex) =>
+                                rowIndex === index
+                                  ? { ...row, value: event.target.value }
+                                  : row,
+                              ),
+                            )
+                          }
+                          className="mt-1 h-9 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] text-xs font-mono"
+                        />
+                      </div>
+                    ))
                   )}
-                </Button>
+                </div>
               ) : null}
             </div>
-            {generateError ? (
-              <p className="mt-2 text-xs text-red-400" role="alert">
-                {generateError}
-              </p>
-            ) : null}
-            <textarea
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              className="mt-2 min-h-24 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-white)] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
-            />
-          </div>
 
-          <button
-            type="button"
-            onClick={() => setShowAdvanced((open) => !open)}
-            className="text-xs text-[var(--color-text-secondary)] underline hover:text-[var(--color-gold)]"
-          >
-            {showAdvanced ? 'Hide' : 'Show'} raw form fields
-          </button>
-
-          {showAdvanced ? (
-            <div className="mt-3 grid gap-3">
-              {fieldRows.length === 0 ? (
-                <p className="text-sm text-[var(--color-text-secondary)]">
-                  No form data yet for this listing.
-                </p>
-              ) : (
-                fieldRows.map((field, index) => (
-                  <div key={field.key}>
-                    <Label className="text-[11px] text-[var(--color-text-secondary)]">
-                      {field.key}
-                    </Label>
-                    <Input
-                      value={field.value}
-                      onChange={(event) =>
-                        setFieldRows((prev) =>
-                          prev.map((row, rowIndex) =>
-                            rowIndex === index
-                              ? { ...row, value: event.target.value }
-                              : row,
-                          ),
-                        )
-                      }
-                      className="mt-1 h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)]"
-                    />
-                  </div>
-                ))
-              )}
+            <div className="flex items-center gap-3 border-t border-[var(--color-border)] pt-4">
+              <Button
+                type="button"
+                onClick={() => void handleSave()}
+                disabled={isSaving}
+                className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+              >
+                {isSaving ? 'Saving...' : 'Save changes'}
+              </Button>
+              {saveMessage ? (
+                <p className="text-sm text-emerald-300">{saveMessage}</p>
+              ) : null}
+              {saveError ? <p className="text-sm text-red-300">{saveError}</p> : null}
             </div>
-          ) : null}
-
-          <div className="mt-6 flex items-center gap-3">
-            <Button
-              type="button"
-              onClick={() => void handleSave()}
-              disabled={isSaving}
-              className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
-            >
-              {isSaving ? 'Saving...' : 'Save changes'}
-            </Button>
-            {saveMessage ? (
-              <p className="text-sm text-emerald-300">{saveMessage}</p>
-            ) : null}
-            {saveError ? <p className="text-sm text-red-300">{saveError}</p> : null}
           </div>
-        </div>
+        )}
       </div>
 
-      <aside className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+      {/* Right-hand Column: Pipeline Sidebar (Unchanged) */}
+      <aside className="h-fit sticky top-24 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
         <h4 className="mb-4 text-xs tracking-widest text-[var(--color-gold)] uppercase">
           Pipeline
         </h4>

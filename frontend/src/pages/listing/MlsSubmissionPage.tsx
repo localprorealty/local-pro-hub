@@ -174,7 +174,7 @@ function MlsSubmissionContent() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => window.open('https://ntreis.net', '_blank', 'noopener,noreferrer')}
+              onClick={() => window.open('https://ntrdd.mlsmatrix.com/Matrix/Input', '_blank', 'noopener,noreferrer')}
               className="shrink-0 rounded-sm border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[#1a1a1a]"
             >
               Open NTREIS Matrix
@@ -211,7 +211,7 @@ function MlsSubmissionContent() {
               Open{' '}
               <button
                 type="button"
-                onClick={() => window.open('https://ntreis.net', '_blank', 'noopener,noreferrer')}
+                onClick={() => window.open('https://ntrdd.mlsmatrix.com/Matrix/Input', '_blank', 'noopener,noreferrer')}
                 className="inline-flex items-center gap-1 text-[#CFB87C] hover:underline"
               >
                 NTREIS Matrix

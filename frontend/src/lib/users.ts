@@ -31,10 +31,10 @@ export const PROFILE_SELECT =
   `${PROFILE_BASE_SELECT}, brand_logo_url, brand_color_primary, brand_color_secondary`
 
 export type OwnProfileUpdate = {
-  full_name: string
-  phone: string
-  mls_id: string
-  brokermint_id: string
+  full_name?: string
+  phone?: string
+  mls_id?: string
+  brokermint_id?: string
   photographer_tier?: PhotographerTier | null
   heygen_avatar_id?: string | null
   heygen_voice_id?: string | null
@@ -123,14 +123,22 @@ export async function updateOwnProfile(
   payload: OwnProfileUpdate,
   role: UserRole | null,
 ): Promise<UserProfileRow> {
-  const update: Record<string, unknown> = {
-    full_name: payload.full_name.trim(),
-    phone: payload.phone,
-    mls_id: payload.mls_id,
-    brokermint_id: payload.brokermint_id.trim(),
+  const update: Record<string, unknown> = {}
+
+  if (payload.full_name !== undefined) {
+    update.full_name = payload.full_name.trim()
+  }
+  if (payload.phone !== undefined) {
+    update.phone = payload.phone
+  }
+  if (payload.mls_id !== undefined) {
+    update.mls_id = payload.mls_id
+  }
+  if (payload.brokermint_id !== undefined) {
+    update.brokermint_id = payload.brokermint_id.trim()
   }
 
-  if (role === 'photographer' && payload.photographer_tier) {
+  if (role === 'photographer' && payload.photographer_tier !== undefined) {
     update.photographer_tier = payload.photographer_tier
   }
 

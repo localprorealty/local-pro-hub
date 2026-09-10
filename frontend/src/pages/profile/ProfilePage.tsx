@@ -1,25 +1,32 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useSearchParams } from 'react-router-dom'
+import { Building2, Eye, EyeOff, Shield, User } from 'lucide-react'
 
 import { AdminShell } from '@/components/admin/AdminShell'
-import { ConfirmSaveDialog } from '@/components/profile/ConfirmSaveDialog'
-import { UserProfileForm, type ProfileFormValues } from '@/components/profile/UserProfileForm'
-import { ExternalVendorsSection } from '@/components/profile/ExternalVendorsSection'
 import { MissionShell } from '@/components/layout/MissionShell'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import type { UserRole } from '@/lib/auth'
-import { getSupabaseClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Eye, EyeOff } from 'lucide-react'
+import type { UserRole } from '@/lib/auth'
+import { getSupabaseClient } from '@/lib/supabase'
 import {
   adminPatchUser,
-  diffProfileFields,
   fetchUserProfile,
   updateOwnProfile,
   type UserProfileRow,
 } from '@/lib/users'
+
+import { GeneralProfileSection, type GeneralProfilePayload } from '@/components/profile/GeneralProfileSection'
+import { BrandIdentitySection, type BrandIdentityPayload } from '@/components/profile/BrandIdentitySection'
+import { HeyGenReplicaSection, type HeyGenPayload } from '@/components/profile/HeyGenReplicaSection'
+import {
+  PhotographerVendorsSection,
+  GmailDispatchSection,
+} from '@/components/profile/ExternalVendorsSection'
+
+export type ProfileTab = 'general' | 'vendors' | 'security'
 
 type ProfilePageProps = {
   role: UserRole
@@ -94,22 +101,23 @@ function ChangePasswordSection() {
   }
 
   return (
-    <div className="border-t border-[var(--color-border)] pt-8">
-      <div className="mb-6 space-y-1">
-        <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-white)]">
-          Security
-        </h3>
-        <p className="text-xs text-[var(--color-text-secondary)]">
-          Update your login password to keep your account secure.
-        </p>
+    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-6">
+      <div className="border-b border-[var(--color-border)]/60 pb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <Shield className="size-4 text-[var(--color-gold)]" />
+          <div>
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+              Account Password
+            </h4>
+            <p className="text-[11px] text-[var(--color-text-secondary)] mt-0.5">
+              Update your login password to keep your account secure.
+            </p>
+          </div>
+        </div>
       </div>
 
-      {error ? (
-        <p className="mb-4 text-xs text-red-300">{error}</p>
-      ) : null}
-      {success ? (
-        <p className="mb-4 text-xs text-emerald-300">{success}</p>
-      ) : null}
+      {error ? <p className="text-xs text-red-300">{error}</p> : null}
+      {success ? <p className="text-xs text-emerald-300">{success}</p> : null}
 
       <form onSubmit={handleUpdatePassword} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -210,13 +218,15 @@ function ChangePasswordSection() {
           </div>
         </div>
 
-        <Button
-          type="submit"
-          disabled={isUpdating}
-          className="mt-2 h-10 bg-[var(--color-gold)] font-semibold text-[var(--color-black)] hover:bg-[#c5a85c] disabled:opacity-50"
-        >
-          {isUpdating ? 'Updating password...' : 'Update Password'}
-        </Button>
+        <div className="pt-2">
+          <Button
+            type="submit"
+            disabled={isUpdating}
+            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[#c5a85c] disabled:opacity-50"
+          >
+            {isUpdating ? 'Updating password...' : 'Update Password'}
+          </Button>
+        </div>
       </form>
     </div>
   )
@@ -226,11 +236,20 @@ function ProfileContent({ role }: ProfilePageProps) {
   const [profile, setProfile] = useState<UserProfileRow | null>(null)
   const [email, setEmail] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [pendingValues, setPendingValues] = useState<ProfileFormValues | null>(null)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const activeTab: ProfileTab =
+    tabParam === 'vendors' || tabParam === 'security'
+      ? tabParam
+      : 'general'
+
+  const handleSelectTab = (tab: ProfileTab) => {
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set('tab', tab)
+    setSearchParams(nextParams, { replace: true })
+  }
 
   const loadProfile = useCallback(async () => {
     setIsLoading(true)
@@ -266,80 +285,49 @@ function ProfileContent({ role }: ProfilePageProps) {
     return () => window.clearTimeout(timeoutId)
   }, [loadProfile])
 
-  const pendingChanges = useMemo(() => {
-    if (!profile || !pendingValues) return []
-    const after: Record<string, string | null | undefined> = {
-      full_name: pendingValues.full_name,
-      phone: pendingValues.phone,
-      mls_id: pendingValues.mls_id,
-      brokermint_id: pendingValues.brokermint_id,
-      photographer_tier:
-        profile.role === 'photographer' ? pendingValues.photographer_tier : undefined,
-      heygen_avatar_id: pendingValues.heygen_avatar_id,
-      heygen_voice_id: pendingValues.heygen_voice_id,
-      brand_logo_url: pendingValues.brand_logo_url,
-      brand_color_primary: pendingValues.brand_color_primary,
-      brand_color_secondary: pendingValues.brand_color_secondary,
-    }
-    if (profile.role === 'admin') {
-      after.email = pendingValues.email
-    }
-    return diffProfileFields(profile, after)
-  }, [profile, pendingValues])
-
-  const handleRequestSave = (values: ProfileFormValues) => {
-    setPendingValues(values)
-    setConfirmOpen(true)
-  }
-
-  const handleConfirmSave = async () => {
-    if (!profile || !pendingValues) return
-    setIsSaving(true)
-    setError(null)
-    setSuccess(null)
-    try {
-      const profilePayload = {
-        full_name: pendingValues.full_name,
-        phone: pendingValues.phone,
-        mls_id: pendingValues.mls_id,
-        brokermint_id: pendingValues.brokermint_id,
-        photographer_tier:
-          profile.role === 'photographer' ? pendingValues.photographer_tier : null,
-        heygen_avatar_id: pendingValues.heygen_avatar_id,
-        heygen_voice_id: pendingValues.heygen_voice_id,
-        brand_logo_url: pendingValues.brand_logo_url || null,
-        brand_color_primary: pendingValues.brand_color_primary || null,
-        brand_color_secondary: pendingValues.brand_color_secondary || null,
-      }
-
-      const updated =
-        profile.role === 'admin'
-          ? await adminPatchUser(profile.id, {
-              email: pendingValues.email.trim(),
-              ...profilePayload,
-            })
-          : await updateOwnProfile(profile.id, profilePayload, profile.role)
-
-      setProfile(updated)
-      if (profile.role === 'admin' && pendingValues.email.trim() !== profile.email) {
-        setEmail(pendingValues.email.trim())
-      }
-      setSuccess('Profile updated successfully.')
-      setConfirmOpen(false)
-      setPendingValues(null)
-    } catch (saveErr) {
-      setError(saveErr instanceof Error ? saveErr.message : 'Save failed.')
-    } finally {
-      setIsSaving(false)
+  // Scoped Save Handlers
+  const handleSaveProfile = async (payload: GeneralProfilePayload) => {
+    if (!profile) return
+    const updated =
+      profile.role === 'admin'
+        ? await adminPatchUser(profile.id, payload)
+        : await updateOwnProfile(profile.id, payload, profile.role)
+    setProfile(updated)
+    if (payload.email && profile.role === 'admin') {
+      setEmail(payload.email)
     }
   }
+
+  const handleSaveBranding = async (payload: BrandIdentityPayload) => {
+    if (!profile) return
+    const updated =
+      profile.role === 'admin'
+        ? await adminPatchUser(profile.id, payload)
+        : await updateOwnProfile(profile.id, payload, profile.role)
+    setProfile(updated)
+  }
+
+  const handleSaveHeyGen = async (payload: HeyGenPayload) => {
+    if (!profile) return
+    const updated =
+      profile.role === 'admin'
+        ? await adminPatchUser(profile.id, payload)
+        : await updateOwnProfile(profile.id, payload, profile.role)
+    setProfile(updated)
+  }
+
+  const TABS: { id: ProfileTab; label: string; icon: typeof User }[] = [
+    { id: 'general', label: 'General Profile', icon: User },
+    { id: 'vendors', label: 'Vendors & Branding', icon: Building2 },
+    { id: 'security', label: 'Integrations & Security', icon: Shield },
+  ]
 
   const body = (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="max-w-xl"
+      className="max-w-3xl space-y-6"
     >
       {isLoading ? (
         <p className="text-sm text-[var(--color-text-secondary)]">Loading profile...</p>
@@ -347,32 +335,83 @@ function ProfileContent({ role }: ProfilePageProps) {
         <p className="text-sm text-red-300">{error}</p>
       ) : profile ? (
         <>
-          {error ? (
-            <p className="mb-4 text-sm text-red-300">{error}</p>
-          ) : null}
-          {success ? (
-            <p className="mb-4 text-sm text-emerald-300">{success}</p>
-          ) : null}
-          <div className="space-y-8">
-            <UserProfileForm
-              key={`${profile.id}-${profile.email}-${profile.mls_id}-${profile.full_name}-${profile.phone}`}
-              mode="self"
-              initial={profile}
-              onRequestSave={handleRequestSave}
-              isSaving={isSaving}
-            />
-            <ConfirmSaveDialog
-              open={confirmOpen}
-              onOpenChange={setConfirmOpen}
-              changes={pendingChanges}
-              onConfirm={() => void handleConfirmSave()}
-              isLoading={isSaving}
-            />
-            {profile.role === 'agent' || profile.role === 'admin' ? (
-              <ExternalVendorsSection />
-            ) : null}
-            <ChangePasswordSection />
+          {/* Tab Navigation Bar */}
+          <div className="flex border-b border-[var(--color-border)] gap-1 overflow-x-auto">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 -mb-px ${
+                    isActive
+                      ? 'border-[var(--color-gold)] text-[var(--color-gold)] bg-[var(--color-gold)]/5'
+                      : 'border-transparent text-[var(--color-text-secondary)] hover:text-white hover:border-zinc-700'
+                  }`}
+                >
+                  <Icon className="size-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
           </div>
+
+          {/* Tab 1: General Profile */}
+          {activeTab === 'general' && (
+            <GeneralProfileSection
+              initial={profile}
+              mode={role === 'admin' ? 'admin' : 'self'}
+              onSave={handleSaveProfile}
+            />
+          )}
+
+          {/* Tab 2: Vendors & Branding */}
+          {activeTab === 'vendors' && (
+            <div className="space-y-6">
+              {/* Section A: Preferred Photographer Vendors */}
+              {(profile.role === 'agent' || profile.role === 'admin') && (
+                <PhotographerVendorsSection />
+              )}
+
+              {/* Section B: Marketing Brand Identity */}
+              {(profile.role === 'agent' || profile.role === 'admin') ? (
+                <BrandIdentitySection
+                  initialLogoUrl={profile.brand_logo_url}
+                  initialPrimaryColor={profile.brand_color_primary}
+                  initialSecondaryColor={profile.brand_color_secondary}
+                  onSave={handleSaveBranding}
+                />
+              ) : (
+                <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[#101010] p-6 text-center text-xs text-[var(--color-text-secondary)]">
+                  Marketing brand customization is available for agents and administrators.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tab 3: Integrations & Security */}
+          {activeTab === 'security' && (
+            <div className="space-y-6">
+              {/* Card A: Gmail Order Dispatch */}
+              {(profile.role === 'agent' || profile.role === 'admin') && (
+                <GmailDispatchSection />
+              )}
+
+              {/* Card B: HeyGen Replica Settings */}
+              {(profile.role === 'agent' || profile.role === 'admin') && (
+                <HeyGenReplicaSection
+                  initialAvatarId={profile.heygen_avatar_id}
+                  initialVoiceId={profile.heygen_voice_id}
+                  onSave={handleSaveHeyGen}
+                />
+              )}
+
+              {/* Card C: Account Password */}
+              <ChangePasswordSection />
+            </div>
+          )}
         </>
       ) : null}
     </motion.div>

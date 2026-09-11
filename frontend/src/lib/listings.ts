@@ -182,6 +182,56 @@ export function getListingContinuePath(
   return `/listing/${listing.id}`
 }
 
+/**
+ * Determines whether a draft listing is unstarted (empty brand-new draft without
+ * address or saved form content), which should redirect directly to the input form.
+ * Listings with legitimately saved draft data should show the Listing Hub.
+ */
+export function isUnstartedDraft(
+  listing: Pick<Listing, 'stage'> & {
+    address_full?: string | null
+    form_data?: Record<string, unknown> | null
+  },
+): boolean {
+  if (listing.stage !== 'draft') return false
+
+  // If the listing already has a full address populated, it has real data
+  if (listing.address_full && listing.address_full.trim().length > 0) {
+    return false
+  }
+
+  const formData = listing.form_data
+  if (!formData || typeof formData !== 'object' || Object.keys(formData).length === 0) {
+    return true
+  }
+
+  // If the address step in the form was completed, it is not unstarted
+  if (formData.address_step_complete === true) {
+    return false
+  }
+
+  // Check if any identifying property or seller info has been saved
+  const hasSubstantiveData = Boolean(
+    (typeof formData.street_name === 'string' && formData.street_name.trim()) ||
+    (typeof formData.street_number === 'string' && formData.street_number.trim()) ||
+    (typeof formData.seller_name === 'string' && formData.seller_name.trim()) ||
+    (typeof formData.property_sub_type === 'string' && formData.property_sub_type.trim()) ||
+    (typeof formData.city === 'string' && formData.city.trim()) ||
+    (typeof formData.zip_code === 'string' && formData.zip_code.trim()) ||
+    (Array.isArray(formData.sellers) &&
+      formData.sellers.some(
+        (s) =>
+          s &&
+          typeof s === 'object' &&
+          (Boolean((s as Record<string, unknown>).name) ||
+            Boolean((s as Record<string, unknown>).email) ||
+            Boolean((s as Record<string, unknown>).phone)),
+      ))
+  )
+
+  return !hasSubstantiveData
+}
+
 export function getListingFormPath(id: string): string {
   return `/listing/${id}/form`
 }

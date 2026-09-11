@@ -13,6 +13,7 @@ import {
   advanceListingStage,
   deleteListing,
   getListingContinuePath,
+  isUnstartedDraft,
   type ListingRow,
   type ListingUpdatePayload,
 } from '@/lib/listings'
@@ -98,7 +99,7 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
         }
 
         const row = data as ListingRow
-        if (row.stage === 'draft' && session?.user?.id === row.agent_id) {
+        if (isUnstartedDraft(row) && session?.user?.id === row.agent_id) {
           navigate(getListingContinuePath(row), { replace: true })
           return
         }

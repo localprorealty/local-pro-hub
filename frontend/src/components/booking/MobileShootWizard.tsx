@@ -130,7 +130,7 @@ export function MobileShootWizard({
             type="button"
             onClick={() => setStep(1)}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-sm transition-all',
+              'flex flex-1 min-w-0 items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 text-[11px] sm:text-xs font-semibold rounded-sm transition-all',
               step === 1
                 ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
                 : step > 1
@@ -150,10 +150,10 @@ export function MobileShootWizard({
             >
               {step > 1 ? <Check className="size-3 stroke-[3]" /> : '1'}
             </span>
-            <span className="truncate">Photographer</span>
+            <span className="truncate min-w-0">Photographer</span>
           </button>
 
-          <ChevronRight className="size-3 text-zinc-600 shrink-0" />
+          <ChevronRight className="size-3 text-zinc-600 shrink-0 mx-0.5" />
 
           {/* Step 2: Date & Time */}
           <button
@@ -161,7 +161,7 @@ export function MobileShootWizard({
             disabled={!selectedPhotographer}
             onClick={() => selectedPhotographer && setStep(2)}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-sm transition-all',
+              'flex flex-1 min-w-0 items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 text-[11px] sm:text-xs font-semibold rounded-sm transition-all',
               step === 2
                 ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
                 : step > 2
@@ -183,10 +183,10 @@ export function MobileShootWizard({
             >
               {step > 2 ? <Check className="size-3 stroke-[3]" /> : '2'}
             </span>
-            <span className="truncate">Date & Time</span>
+            <span className="truncate min-w-0">Date & Time</span>
           </button>
 
-          <ChevronRight className="size-3 text-zinc-600 shrink-0" />
+          <ChevronRight className="size-3 text-zinc-600 shrink-0 mx-0.5" />
 
           {/* Step 3: Confirm */}
           <button
@@ -196,7 +196,7 @@ export function MobileShootWizard({
               selectedPhotographer && selectedDate && selectedTime && setStep(3)
             }
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-sm transition-all',
+              'flex flex-1 min-w-0 items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 text-[11px] sm:text-xs font-semibold rounded-sm transition-all',
               step === 3
                 ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
                 : selectedPhotographer && selectedDate && selectedTime
@@ -212,7 +212,7 @@ export function MobileShootWizard({
             >
               3
             </span>
-            <span className="truncate">Confirm</span>
+            <span className="truncate min-w-0">Confirm</span>
           </button>
         </div>
       </nav>
@@ -258,12 +258,12 @@ export function MobileShootWizard({
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-semibold text-white text-base">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-white text-base truncate">
                           {photographer.full_name}
                         </p>
                         {photographer.phone ? (
-                          <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
+                          <p className="mt-0.5 text-xs text-[var(--color-text-secondary)] truncate">
                             {photographer.phone}
                           </p>
                         ) : null}
@@ -278,11 +278,11 @@ export function MobileShootWizard({
                       </span>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between border-t border-[var(--color-border)]/50 pt-2.5">
-                      <span className="text-xs text-[var(--color-text-secondary)]">
+                    <div className="mt-3 flex items-center justify-between gap-2 border-t border-[var(--color-border)]/50 pt-2.5">
+                      <span className="text-[11px] sm:text-xs text-[var(--color-text-secondary)] truncate min-w-0">
                         Standard Real Estate Package
                       </span>
-                      <span className="text-xs font-bold tracking-widest text-[#CFB87C] uppercase flex items-center gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold tracking-wider text-[#CFB87C] uppercase flex items-center gap-1 shrink-0">
                         {selected ? (
                           <>
                             <Check className="size-3.5" /> Selected
@@ -302,10 +302,10 @@ export function MobileShootWizard({
               <Button
                 type="button"
                 onClick={() => setStep(2)}
-                className="w-full h-12 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-md"
+                className="w-full h-12 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-md px-4"
               >
-                <span>Continue to Date & Time with {selectedPhotographer.full_name}</span>
-                <ChevronRight className="size-4" />
+                <span>Continue to Date & Time</span>
+                <ChevronRight className="size-4 shrink-0" />
               </Button>
             )}
 
@@ -363,27 +363,27 @@ export function MobileShootWizard({
           {/* Date Picker Agenda Section */}
           <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3.5">
             {/* Week navigation header */}
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-semibold tracking-widest text-[#CFB87C] uppercase flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <p className="text-[11px] font-semibold tracking-wider text-[#CFB87C] uppercase flex items-center gap-1.5 shrink-0">
                 <CalendarIcon className="size-3.5" />
                 <span>Select Date</span>
               </p>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
                 <button
                   type="button"
                   onClick={() => onWeekChange(addDays(weekStart, -7))}
-                  className="rounded-sm p-1.5 text-[#CFB87C] hover:bg-[#CFB87C]/10 active:bg-[#CFB87C]/20 transition-colors"
+                  className="rounded-sm p-1 text-[#CFB87C] hover:bg-[#CFB87C]/10 active:bg-[#CFB87C]/20 transition-colors"
                   aria-label="Previous Week"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
-                <span className="font-[family-name:var(--font-display)] text-xs font-semibold text-white px-1">
+                <span className="font-[family-name:var(--font-display)] text-xs font-semibold text-white px-1 whitespace-nowrap">
                   {monthLabel}
                 </span>
                 <button
                   type="button"
                   onClick={() => onWeekChange(addDays(weekStart, 7))}
-                  className="rounded-sm p-1.5 text-[#CFB87C] hover:bg-[#CFB87C]/10 active:bg-[#CFB87C]/20 transition-colors"
+                  className="rounded-sm p-1 text-[#CFB87C] hover:bg-[#CFB87C]/10 active:bg-[#CFB87C]/20 transition-colors"
                   aria-label="Next Week"
                 >
                   <ChevronRight className="size-4" />
@@ -400,7 +400,7 @@ export function MobileShootWizard({
             ) : (
               <div
                 ref={dateStripRef}
-                className="flex gap-2 overflow-x-auto pb-2 pt-1 scrollbar-none snap-x snap-mandatory"
+                className="flex gap-2 overflow-x-auto pb-2 pt-1 scrollbar-none snap-x snap-mandatory w-full min-w-0"
               >
                 {daysInWeek.map((day) => {
                   const iso = toIsoDate(day)
@@ -514,7 +514,7 @@ export function MobileShootWizard({
               type="button"
               variant="outline"
               onClick={() => setStep(1)}
-              className="h-11 border-[var(--color-border)] bg-[#141414] text-white hover:bg-white/5 px-4"
+              className="h-11 border-[var(--color-border)] bg-[#141414] text-white hover:bg-white/5 px-4 shrink-0"
             >
               <ChevronLeft className="size-4 mr-1" />
               Back
@@ -523,10 +523,10 @@ export function MobileShootWizard({
               type="button"
               disabled={!selectedDate || !selectedTime}
               onClick={() => setStep(3)}
-              className="h-11 flex-1 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-md"
+              className="h-11 flex-1 min-w-0 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-md"
             >
-              <span>Review Booking</span>
-              <ChevronRight className="size-4" />
+              <span className="truncate">Review Booking</span>
+              <ChevronRight className="size-4 shrink-0" />
             </Button>
           </div>
 
@@ -571,8 +571,8 @@ export function MobileShootWizard({
             <div className="space-y-3 text-sm">
               <div className="flex items-start justify-between gap-2">
                 <span className="text-[var(--color-text-secondary)] text-xs">Photographer</span>
-                <div className="text-right">
-                  <p className="font-semibold text-white">{selectedPhotographer?.full_name}</p>
+                <div className="text-right min-w-0 flex-1">
+                  <p className="font-semibold text-white truncate">{selectedPhotographer?.full_name}</p>
                   <span
                     className={cn(
                       'inline-block rounded-sm px-1.5 py-0.2 text-[9px] font-bold tracking-widest uppercase mt-0.5',
@@ -586,8 +586,8 @@ export function MobileShootWizard({
 
               <div className="flex items-start justify-between gap-2 border-t border-[var(--color-border)]/40 pt-2.5">
                 <span className="text-[var(--color-text-secondary)] text-xs">Date & Time</span>
-                <div className="text-right">
-                  <p className="font-semibold text-white">
+                <div className="text-right min-w-0 flex-1">
+                  <p className="font-semibold text-white truncate">
                     {selectedDate ? formatShootDate(selectedDate) : 'Not selected'}
                   </p>
                   <p className="text-xs text-[#CFB87C] font-medium">
@@ -634,7 +634,7 @@ export function MobileShootWizard({
               variant="outline"
               disabled={isBooking}
               onClick={() => setStep(2)}
-              className="h-11 border-[var(--color-border)] bg-[#1a1a1a] text-white hover:bg-white/5 px-4"
+              className="h-11 border-[var(--color-border)] bg-[#1a1a1a] text-white hover:bg-white/5 px-4 shrink-0"
             >
               <ChevronLeft className="size-4 mr-1" />
               Back
@@ -643,7 +643,7 @@ export function MobileShootWizard({
               type="button"
               disabled={isBooking || !selectedPhotographer || !selectedDate || !selectedTime}
               onClick={() => void onConfirm()}
-              className="h-11 flex-1 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-lg"
+              className="h-11 flex-1 min-w-0 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-lg"
             >
               {isBooking ? (
                 <>
@@ -651,7 +651,7 @@ export function MobileShootWizard({
                   Sending Request...
                 </>
               ) : (
-                'Confirm Shoot Request →'
+                <span className="truncate">Confirm Shoot Request →</span>
               )}
             </Button>
           </div>

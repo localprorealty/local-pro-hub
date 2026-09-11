@@ -304,21 +304,21 @@ function PhotographyContent() {
       }
     >
       {/* Primary Tab Switcher */}
-      <div className="mb-6 flex border-b border-[var(--color-border)]">
+      <div className="mb-6 flex border-b border-[var(--color-border)] overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-full min-w-0">
         <button
           type="button"
           onClick={() => {
             setActiveTab('internal')
             setSearchParams({})
           }}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-2 border-b-2 px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold transition-colors shrink-0 whitespace-nowrap ${
             activeTab === 'internal'
               ? 'border-[#CFB87C] text-[#CFB87C]'
               : 'border-transparent text-[var(--color-text-secondary)] hover:text-white'
           }`}
         >
-          <Camera className="h-4 w-4" />
-          In-House Photographer
+          <Camera className="h-4 w-4 shrink-0" />
+          <span>In-House Photographer</span>
         </button>
         <button
           type="button"
@@ -326,14 +326,14 @@ function PhotographyContent() {
             setActiveTab('vendor')
             setSearchParams({ tab: 'vendor' })
           }}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-2 border-b-2 px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold transition-colors shrink-0 whitespace-nowrap ${
             activeTab === 'vendor'
               ? 'border-[#CFB87C] text-[#CFB87C]'
               : 'border-transparent text-[var(--color-text-secondary)] hover:text-white'
           }`}
         >
-          <Building2 className="h-4 w-4" />
-          My External Vendor
+          <Building2 className="h-4 w-4 shrink-0" />
+          <span>My External Vendor</span>
         </button>
       </div>
 

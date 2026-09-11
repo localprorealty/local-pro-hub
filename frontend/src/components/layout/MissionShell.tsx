@@ -97,10 +97,10 @@ export function MissionShell({
         </div>
       </header>
 
-      <div className="grid min-h-svh lg:grid-cols-[220px_1fr]">
+      <div className="grid min-h-svh lg:grid-cols-[220px_1fr] w-full min-w-0">
         <AgentSidebar role={role} />
 
-        <section className="flex min-h-svh flex-col bg-[#0a0a0a]">
+        <section className="flex min-h-svh flex-col bg-[#0a0a0a] w-full min-w-0">
           {headerSlot ? (
             headerSlot
           ) : hideDefaultHeader ? null : (
@@ -121,7 +121,7 @@ export function MissionShell({
               </div>
             </header>
           )}
-          <div className="flex-1 overflow-y-auto px-8 py-10">{children}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 w-full min-w-0">{children}</div>
         </section>
       </div>
     </main>

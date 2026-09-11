@@ -460,7 +460,7 @@ function AdminApprovalsContent() {
         </section>
 
         <section className="overflow-x-auto border border-[var(--color-border)] bg-[var(--color-surface-2)]">
-          <table className="min-w-full text-left">
+          <table className="w-full min-w-[640px] text-left">
             <thead className="border-b border-[var(--color-border)] bg-[var(--color-surface-3)]">
               <tr>
                 <th className="px-4 py-3 text-xs tracking-widest text-[var(--color-text-secondary)] uppercase">

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, DollarSign, Briefcase, Calendar, CheckCircle2, AlertCircle, FileDown } from 'lucide-react'
+import { FileText, DollarSign, Briefcase, Calendar, CheckCircle2, AlertCircle, FileDown, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { MissionShell } from '@/components/layout/MissionShell'
@@ -160,63 +160,113 @@ function OverviewContent() {
     closed_count: 0,
   }
 
+  const tabListRef = useRef<HTMLDivElement>(null)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+
+  const checkTabScroll = useCallback(() => {
+    const el = tabListRef.current
+    if (!el) return
+    const hasOverflow = el.scrollWidth > el.clientWidth + 2
+    setCanScrollLeft(el.scrollLeft > 5)
+    setCanScrollRight(hasOverflow && el.scrollLeft < el.scrollWidth - el.clientWidth - 5)
+  }, [])
+
+  useEffect(() => {
+    checkTabScroll()
+    const handleResize = () => checkTabScroll()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [checkTabScroll])
+
+  useEffect(() => {
+    const timer = setTimeout(checkTabScroll, 60)
+    return () => clearTimeout(timer)
+  }, [activeTab, checkTabScroll])
+
   const tabHeaderSlot = (
-    <div className="flex border-b border-[var(--color-border)]">
-      <button
-        type="button"
-        onClick={() => setActiveTab('history')}
-        className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
-          activeTab === 'history'
-            ? 'text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
-        }`}
+    <div className="relative">
+      <div
+        ref={tabListRef}
+        onScroll={checkTabScroll}
+        className="flex border-b border-[var(--color-border)] overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
-        Property History
-        {activeTab === 'history' && (
-          <motion.div
-            layoutId="activeTabUnderline"
-            className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
-          />
+        <button
+          type="button"
+          onClick={() => setActiveTab('history')}
+          className={`shrink-0 whitespace-nowrap px-4 py-3 sm:px-6 sm:py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
+            activeTab === 'history'
+              ? 'text-[var(--color-gold)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+          }`}
+        >
+          Property History
+          {activeTab === 'history' && (
+            <motion.div
+              layoutId="activeTabUnderline"
+              className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
+            />
+          )}
+        </button>
+        {FEATURE_REVENUE_DASHBOARD && (
+          <>
+            <button
+              type="button"
+              onClick={() => setActiveTab('earnings')}
+              className={`shrink-0 whitespace-nowrap px-4 py-3 sm:px-6 sm:py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
+                activeTab === 'earnings'
+                  ? 'text-[var(--color-gold)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+              }`}
+            >
+              My Earnings
+              {activeTab === 'earnings' && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
+                />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('revenue_share')}
+              className={`shrink-0 whitespace-nowrap px-4 py-3 sm:px-6 sm:py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
+                activeTab === 'revenue_share'
+                  ? 'text-[var(--color-gold)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+              }`}
+            >
+              Revenue Share
+              {activeTab === 'revenue_share' && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
+                />
+              )}
+            </button>
+          </>
         )}
-      </button>
-      {FEATURE_REVENUE_DASHBOARD && (
-        <>
-          <button
-            type="button"
-            onClick={() => setActiveTab('earnings')}
-            className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
-              activeTab === 'earnings'
-                ? 'text-[var(--color-gold)]'
-                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
-            }`}
-          >
-            My Earnings
-            {activeTab === 'earnings' && (
-              <motion.div
-                layoutId="activeTabUnderline"
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
-              />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('revenue_share')}
-            className={`px-6 py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
-              activeTab === 'revenue_share'
-                ? 'text-[var(--color-gold)]'
-                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
-            }`}
-          >
-            Revenue Share
-            {activeTab === 'revenue_share' && (
-              <motion.div
-                layoutId="activeTabUnderline"
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-gold)]"
-              />
-            )}
-          </button>
-        </>
-      )}
+      </div>
+
+      {/* Right-edge gradient fade & indicator on mobile (< lg) */}
+      {canScrollRight ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none lg:hidden absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 w-10 bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent transition-opacity duration-300"
+        >
+          <ChevronRight className="size-4 text-[var(--color-gold)] animate-pulse" />
+        </div>
+      ) : null}
+
+      {/* Left-edge gradient fade & indicator on mobile (< lg) */}
+      {canScrollLeft ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none lg:hidden absolute left-0 top-0 bottom-0 flex items-center justify-start pl-1 w-10 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent transition-opacity duration-300"
+        >
+          <ChevronLeft className="size-4 text-[var(--color-gold)]" />
+        </div>
+      ) : null}
     </div>
   )
 
@@ -377,7 +427,8 @@ function OverviewContent() {
                     <div className="space-y-4">
                       <h4 className="text-xs uppercase tracking-widest text-[var(--color-gold)] font-bold">Revenue Share Ledger</h4>
                       <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
-                        <table className="w-full text-left text-xs">
+                        <div className="overflow-x-auto">
+                          <table className="w-full min-w-[640px] text-left text-xs">
                           <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                             <tr>
                               <th className="px-6 py-4">Transaction / Type</th>
@@ -433,6 +484,7 @@ function OverviewContent() {
                             )}
                           </tbody>
                         </table>
+                        </div>
                       </div>
                     </div>
                   </>

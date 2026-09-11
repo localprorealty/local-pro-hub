@@ -161,7 +161,7 @@ function DashboardContent({ role }: DashboardPageProps) {
         </motion.div>
       ) : null}
 
-      <header className="hidden lg:flex items-start justify-between border-b border-[var(--color-border)] px-8 py-8">
+      <header className="hidden lg:flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between border-b border-[var(--color-border)] px-8 py-8">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
             Overview
@@ -186,7 +186,7 @@ function DashboardContent({ role }: DashboardPageProps) {
             })}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {role === 'agent' ? (
             <button
               type="button"
@@ -222,7 +222,7 @@ function DashboardContent({ role }: DashboardPageProps) {
           </div>
         ) : null}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-4 overflow-x-auto pb-1 text-xs">
+          <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto pb-1 text-xs [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {PIPELINE_TABS.map((tab) => {
               const isActive = activeTab === tab
               return (
@@ -230,7 +230,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                   key={tab}
                   type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`whitespace-nowrap pb-1 transition-colors ${
+                  className={`shrink-0 whitespace-nowrap pb-1 transition-colors ${
                     isActive
                       ? 'border-b-2 border-[var(--color-gold)] font-semibold text-[var(--color-gold)]'
                       : 'text-[var(--color-text-secondary)]'
@@ -245,7 +245,7 @@ function DashboardContent({ role }: DashboardPageProps) {
             <button
               type="button"
               onClick={() => navigate('/listing/new')}
-              className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--color-gold)] bg-[var(--color-gold)] px-2.5 py-1 text-[11px] font-bold text-black uppercase"
+              className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--color-gold)] bg-[var(--color-gold)] px-2.5 py-1 text-[11px] font-bold text-black uppercase hover:bg-[var(--color-gold)]/90 transition-colors"
             >
               <Plus className="size-3" />
               New

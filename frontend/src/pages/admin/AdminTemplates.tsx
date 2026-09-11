@@ -155,7 +155,7 @@ export default function AdminTemplatesPage() {
 
       <div className="rounded-md border border-[var(--color-border)] bg-[#111111] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-sm text-white">
+          <table className="w-full min-w-[640px] border-collapse text-left text-sm text-white">
             <thead>
               <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/50 text-[10px] font-semibold tracking-wider text-[var(--color-text-secondary)] uppercase">
                 <th className="px-6 py-4">Template Name</th>

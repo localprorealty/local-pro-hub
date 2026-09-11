@@ -417,7 +417,8 @@ function RevenueShareContent() {
 
                   {/* Ledger Table */}
                   <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
-                    <table className="w-full text-left text-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[700px] text-left text-xs">
                       <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                         <tr>
                           <th className="px-6 py-4">Agent</th>
@@ -478,6 +479,7 @@ function RevenueShareContent() {
                         )}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 </div>
               )}
@@ -486,7 +488,8 @@ function RevenueShareContent() {
               {activeTab === 'overrides' && FEATURE_SPONSOR_TREE && (
                 <div className="space-y-6">
                   <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
-                    <table className="w-full text-left text-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[760px] text-left text-xs">
                       <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                         <tr>
                           <th className="px-6 py-4">Agent</th>
@@ -628,6 +631,7 @@ function RevenueShareContent() {
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 </div>
               )}
@@ -636,7 +640,8 @@ function RevenueShareContent() {
               {activeTab === 'resolution' && FEATURE_SPONSOR_TREE && (
                 <div className="space-y-6">
                   <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
-                    <table className="w-full text-left text-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[700px] text-left text-xs">
                       <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                         <tr>
                           <th className="px-6 py-4">Agent Name</th>
@@ -713,6 +718,7 @@ function RevenueShareContent() {
                         )}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 </div>
               )}

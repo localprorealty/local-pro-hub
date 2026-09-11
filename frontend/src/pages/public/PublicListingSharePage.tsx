@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   Bed,
@@ -84,6 +84,73 @@ export function PublicListingSharePage() {
       isMounted = false
     }
   }, [token])
+
+  // Touch swipe gesture navigation for photo lightbox
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+  const touchEndX = useRef<number | null>(null)
+  const touchEndY = useRef<number | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    touchEndX.current = null
+    touchEndY.current = null
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX
+    touchEndY.current = e.touches[0].clientY
+  }
+
+  const handleTouchEnd = () => {
+    if (
+      touchStartX.current === null ||
+      touchStartY.current === null ||
+      touchEndX.current === null ||
+      touchEndY.current === null ||
+      !data?.photos?.length
+    ) {
+      return
+    }
+
+    const deltaX = touchEndX.current - touchStartX.current
+    const deltaY = touchEndY.current - touchStartY.current
+    const minHorizontalSwipeDistance = 40
+    const minVerticalCloseDistance = 70
+
+    // Horizontal swipe: |deltaX| > |deltaY|
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < -minHorizontalSwipeDistance) {
+        // Swiped Left -> Next Photo
+        setLightboxIndex((prev) =>
+          prev === null ? null : (prev + 1) % data.photos.length,
+        )
+      } else if (deltaX > minHorizontalSwipeDistance) {
+        // Swiped Right -> Previous Photo
+        setLightboxIndex((prev) =>
+          prev === null ? null : (prev - 1 + data.photos.length) % data.photos.length,
+        )
+      }
+    } else {
+      // Vertical swipe downward: deltaY > minVerticalCloseDistance -> Close Lightbox
+      if (deltaY > minVerticalCloseDistance) {
+        setLightboxIndex(null)
+      }
+    }
+
+    touchStartX.current = null
+    touchStartY.current = null
+    touchEndX.current = null
+    touchEndY.current = null
+  }
+
+  const scrollToAgentCard = () => {
+    const card = document.getElementById('agent-contact-card')
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   // Keyboard navigation for photo lightbox
   useEffect(() => {
@@ -662,7 +729,10 @@ export function PublicListingSharePage() {
           {/* Right Column: Listing Agent & Brokerage Card */}
           <div className="lg:col-span-4 space-y-6">
             {/* AGENT CONTACT CARD */}
-            <div className="sticky top-20 bg-[#141414] border border-[#262626] rounded-md p-6 space-y-5 shadow-xl">
+            <div
+              id="agent-contact-card"
+              className="sticky top-20 bg-[#141414] border border-[#262626] rounded-md p-6 space-y-5 shadow-xl"
+            >
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#CFB87C] block">
                 Listing Representation
               </span>
@@ -752,13 +822,17 @@ export function PublicListingSharePage() {
       {/* 5. PHOTO GALLERY FULLSCREEN LIGHTBOX MODAL */}
       {lightboxIndex !== null && data.photos[lightboxIndex] ? (
         <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 select-none touch-none"
           onClick={() => setLightboxIndex(null)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Lightbox Header */}
           <div
             className="flex items-center justify-between text-white py-2"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
           >
             <div className="text-xs text-[#a0a0a0]">
               <span className="font-semibold text-white">Photo {lightboxIndex + 1}</span> of{' '}
@@ -793,7 +867,7 @@ export function PublicListingSharePage() {
             <img
               src={data.photos[lightboxIndex].url}
               alt={data.photos[lightboxIndex].caption || 'Listing Photo'}
-              className="max-h-[80vh] max-w-full object-contain rounded select-none shadow-2xl"
+              className="max-h-[80vh] max-w-full object-contain rounded select-none shadow-2xl pointer-events-none"
             />
 
             <button
@@ -809,6 +883,7 @@ export function PublicListingSharePage() {
           <div
             className="text-center max-w-2xl mx-auto py-2"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
           >
             {data.photos[lightboxIndex].caption ? (
               <p className="text-sm text-stone-200 font-medium">
@@ -816,14 +891,15 @@ export function PublicListingSharePage() {
               </p>
             ) : null}
             <p className="text-[11px] text-[#666] mt-1">
-              Use Left / Right arrow keys to navigate, Esc to close
+              <span className="hidden sm:inline">Use Left / Right arrow keys to navigate, Esc to close</span>
+              <span className="sm:hidden">Swipe left / right to navigate • Swipe down or tap outside to close</span>
             </p>
           </div>
         </div>
       ) : null}
 
       {/* 6. FIXED BOTTOM BRANDED FOOTER */}
-      <footer className="border-t border-[#202020] bg-[#0c0c0c] py-8 text-center text-xs text-[#777] mt-16">
+      <footer className="border-t border-[#202020] bg-[#0c0c0c] py-8 pb-28 lg:pb-8 text-center text-xs text-[#777] mt-16">
         <div className="max-w-6xl mx-auto px-4 space-y-2">
           <p>© {new Date().getFullYear()} LocalPRO Realty. All rights reserved.</p>
           <p>5801 Headquarters Dr Ste 775, Plano, TX 75024 • Dallas-Fort Worth, Texas</p>
@@ -832,6 +908,68 @@ export function PublicListingSharePage() {
           </p>
         </div>
       </footer>
+
+      {/* 7. MOBILE STICKY BOTTOM AGENT ACTION BAR (< lg only) */}
+      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-[#262626] bg-[#121212]/95 backdrop-blur-md px-4 py-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.6)] pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))]">
+        <div className="max-w-md mx-auto flex items-center justify-between gap-3">
+          {/* Agent Mini Profile - Click to scroll to full card */}
+          <button
+            type="button"
+            onClick={scrollToAgentCard}
+            className="flex items-center gap-2.5 min-w-0 text-left cursor-pointer group"
+          >
+            {data.agent.avatar_url ? (
+              <img
+                src={data.agent.avatar_url}
+                alt={data.agent.name}
+                className="size-9 rounded-full object-cover border border-[#CFB87C] shrink-0 group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div className="size-9 rounded-full bg-[#241e15] border border-[#CFB87C] text-[#CFB87C] font-bold text-xs flex items-center justify-center shrink-0">
+                {data.agent.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-white truncate group-hover:text-[#CFB87C] transition-colors">
+                {data.agent.name}
+              </p>
+              <p className="text-[10px] text-[#888] truncate">Listing Agent</p>
+            </div>
+          </button>
+
+          {/* Direct Contact CTAs */}
+          <div className="flex items-center gap-2 shrink-0">
+            {data.agent.phone ? (
+              <a
+                href={`tel:${data.agent.phone}`}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-[#CFB87C] hover:bg-[#dcc487] text-black font-semibold text-xs tracking-wider uppercase transition-colors shadow"
+                title={`Call ${data.agent.phone}`}
+              >
+                <Phone className="size-3.5" />
+                <span>Call</span>
+              </a>
+            ) : null}
+
+            {data.agent.email ? (
+              <a
+                href={`mailto:${data.agent.email}?subject=Inquiry regarding ${encodeURIComponent(
+                  data.address_full,
+                )}`}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-[#202020] hover:bg-[#2a2a2a] text-white border border-[#333] font-semibold text-xs tracking-wider uppercase transition-colors shadow"
+                title="Email Agent"
+              >
+                <Mail className="size-3.5" />
+                <span>Email</span>
+              </a>
+            ) : null}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

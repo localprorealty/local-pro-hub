@@ -49,7 +49,7 @@ export function AiRefinementPanel({
 
   if (!activePage) {
     return (
-      <aside className="w-[280px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4 text-sm text-[var(--color-text-secondary)]">
+      <aside className="w-full xl:w-[280px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4 text-sm text-[var(--color-text-secondary)]">
         No text pages available for refinement on this asset.
       </aside>
     )
@@ -58,7 +58,7 @@ export function AiRefinementPanel({
   const pageHistory = history[activePage.key] ?? []
 
   return (
-    <aside className="w-[320px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4">
+    <aside className="w-full xl:w-[320px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4">
       <h3 className="text-sm font-semibold text-white">Text editor & AI refine</h3>
 
       <div className="mt-4">

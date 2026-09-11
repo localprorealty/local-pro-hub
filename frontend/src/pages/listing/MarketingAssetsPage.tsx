@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Download, Loader2 } from 'lucide-react'
+import { Download, Eye, Loader2, Sparkles } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -88,6 +88,14 @@ function MarketingAssetsContent() {
   const [undoStacks, setUndoStacks] = useState<Record<string, string[]>>({})
   const [refineError, setRefineError] = useState<string | null>(null)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [mobileViewMode, setMobileViewMode] = useState<'preview' | 'edit'>('preview')
+  const [containerWidth, setContainerWidth] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      return Math.max(0, window.innerWidth - 66)
+    }
+    return 0
+  })
+  const previewContainerRef = useRef<HTMLDivElement>(null)
 
   const [hasCheckedDraft, setHasCheckedDraft] = useState(false)
   const [isDraftRestored, setIsDraftRestored] = useState(false)
@@ -297,6 +305,59 @@ function MarketingAssetsContent() {
     'dining',
   ]).map((p) => p.preview)
   const fileSlug = slugifyAddress(listingContext?.address_full ?? 'listing')
+
+  useEffect(() => {
+    const el = previewContainerRef.current
+    if (!el) return
+
+    const updateWidth = () => {
+      const width = el.clientWidth
+      if (width > 0) {
+        setContainerWidth(width)
+      }
+    }
+
+    updateWidth()
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width
+        if (width > 0) {
+          setContainerWidth(width)
+        }
+      }
+    })
+
+    ro.observe(el)
+    window.addEventListener('resize', updateWidth)
+    window.addEventListener('orientationchange', updateWidth)
+
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', updateWidth)
+      window.removeEventListener('orientationchange', updateWidth)
+    }
+  }, [activeTab, mobileViewMode])
+
+  // Dynamic canvas scaling:
+  // - Flyer template: fixed width 816px, default desktop scale 0.55
+  // - Just Sold template: fixed width 1080px, default desktop scale 0.5
+  // - Listing Book template: max width 480px (pages are 900px / 1200px)
+  // On screens where available container width is smaller, scale down dynamically to fit 100% with 0px overflow.
+  const flyerScale = useMemo(() => {
+    if (containerWidth <= 0) return 0.55
+    return Math.min(0.55, containerWidth / 816)
+  }, [containerWidth])
+
+  const justSoldScale = useMemo(() => {
+    if (containerWidth <= 0) return 0.5
+    return Math.min(0.5, containerWidth / 1080)
+  }, [containerWidth])
+
+  const bookMaxWidth = useMemo(() => {
+    if (containerWidth <= 0) return 480
+    return Math.min(480, containerWidth)
+  }, [containerWidth])
 
   const bootstrapAssets = useCallback(async () => {
     if (!id || !listingContext) return
@@ -571,76 +632,139 @@ function MarketingAssetsContent() {
             </div>
           ) : null}
 
+          {/* Mobile Segmented Control: [ Preview | Edit Copy & AI ] */}
+          {refinementPages.length > 0 ? (
+            <div className="grid grid-cols-2 rounded-lg border border-[var(--color-border)] bg-[#111111] p-1 xl:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileViewMode('preview')}
+                className={`flex items-center justify-center gap-2 rounded-md py-2.5 text-xs font-semibold transition-all ${
+                  mobileViewMode === 'preview'
+                    ? 'bg-[#CFB87C] text-[#0a0a0a] shadow-sm'
+                    : 'text-[var(--color-text-secondary)] hover:text-white'
+                }`}
+              >
+                <Eye className="size-3.5" />
+                Preview
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileViewMode('edit')}
+                className={`flex items-center justify-center gap-2 rounded-md py-2.5 text-xs font-semibold transition-all ${
+                  mobileViewMode === 'edit'
+                    ? 'bg-[#CFB87C] text-[#0a0a0a] shadow-sm'
+                    : 'text-[var(--color-text-secondary)] hover:text-white'
+                }`}
+              >
+                <Sparkles className="size-3.5" />
+                Edit Copy & AI
+              </button>
+            </div>
+          ) : null}
+
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
-            <div className="min-w-0 flex-1 overflow-hidden rounded-md border border-[var(--color-border)] bg-[#111111]">
-              <div className="max-h-[min(70vh,960px)] overflow-y-auto p-4">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  className="min-w-0"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {activeTab === 'just_sold' ? (
-                    <JustSoldTemplate
-                      context={listingContext}
-                      agent={agentProfile}
-                      heroPhoto={heroPhoto}
-                    />
-                  ) : null}
+            <div
+              className={`min-w-0 flex-1 overflow-hidden rounded-md border border-[var(--color-border)] bg-[#111111] ${
+                refinementPages.length > 0 && mobileViewMode === 'edit'
+                  ? 'hidden xl:block'
+                  : 'block'
+              }`}
+            >
+              <div className="max-h-[min(70vh,960px)] overflow-y-auto overflow-x-hidden p-4">
+                <div ref={previewContainerRef} className="w-full min-w-0">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTab}
+                      className="min-w-0"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {activeTab === 'just_sold' ? (
+                        <JustSoldTemplate
+                          context={listingContext}
+                          agent={agentProfile}
+                          heroPhoto={heroPhoto}
+                          scale={justSoldScale}
+                        />
+                      ) : null}
 
-                  {activeTab === 'flyer' ? (
-                    <ListingFlyerTemplate
-                      context={listingContext}
-                      agent={agentProfile}
-                      heroPhoto={heroPhoto}
-                      interiorPhotos={interiorPhotos}
-                      description={flyerDescription}
-                    />
-                  ) : null}
+                      {activeTab === 'flyer' ? (
+                        <ListingFlyerTemplate
+                          context={listingContext}
+                          agent={agentProfile}
+                          heroPhoto={heroPhoto}
+                          interiorPhotos={interiorPhotos}
+                          description={flyerDescription}
+                          scale={flyerScale}
+                        />
+                      ) : null}
 
-                  {activeTab === 'book' && neighborhoodGuide ? (
-                    <div className="mx-auto flex w-full max-w-[480px] flex-col gap-8">
-                      <ListingBookTemplate
-                        context={listingContext}
-                        agent={agentProfile}
-                        photos={photos}
-                        neighborhoodGuide={neighborhoodGuide}
-                        propertyDescription={propertyDescription}
-                        agentBio={agentBio}
-                      />
-                    </div>
-                  ) : null}
-                </motion.div>
-              </AnimatePresence>
+                      {activeTab === 'book' && neighborhoodGuide ? (
+                        <div
+                          className="mx-auto flex w-full flex-col gap-8"
+                          style={{ maxWidth: bookMaxWidth }}
+                        >
+                          <ListingBookTemplate
+                            context={listingContext}
+                            agent={agentProfile}
+                            photos={photos}
+                            neighborhoodGuide={neighborhoodGuide}
+                            propertyDescription={propertyDescription}
+                            agentBio={agentBio}
+                            maxPreviewWidth={bookMaxWidth}
+                          />
+                        </div>
+                      ) : null}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
 
             {refinementPages.length > 0 ? (
-              <AiRefinementPanel
-                activeTab={activeTab}
-                pages={refinementPages}
-                activePageKey={activePageKey}
-                onActivePageChange={setActivePageKey}
-                onRefine={handleRefine}
-                refineError={refineError}
-                onRefineSuccess={() => setRefineError(null)}
-                history={refinementHistory}
-                onUndo={handleUndo}
-                isRefining={isRefining}
-              />
+              <div
+                className={`w-full xl:w-auto shrink-0 ${
+                  mobileViewMode === 'edit' ? 'block' : 'hidden xl:block'
+                }`}
+              >
+                <AiRefinementPanel
+                  activeTab={activeTab}
+                  pages={refinementPages}
+                  activePageKey={activePageKey}
+                  onActivePageChange={setActivePageKey}
+                  onRefine={handleRefine}
+                  refineError={refineError}
+                  onRefineSuccess={() => setRefineError(null)}
+                  history={refinementHistory}
+                  onUndo={handleUndo}
+                  isRefining={isRefining}
+                />
+              </div>
             ) : null}
           </div>
 
           {downloadError ? (
-            <p className="text-sm text-red-300" role="alert">
+            <p
+              className={`text-sm text-red-300 ${
+                refinementPages.length > 0 && mobileViewMode === 'edit'
+                  ? 'hidden xl:block'
+                  : 'block'
+              }`}
+              role="alert"
+            >
               {downloadError}
             </p>
           ) : null}
 
-          <div className="flex flex-wrap gap-3">
+          <div
+            className={`flex flex-wrap gap-3 ${
+              refinementPages.length > 0 && mobileViewMode === 'edit'
+                ? 'hidden xl:flex'
+                : 'flex'
+            }`}
+          >
             {activeTab === 'just_sold' ? (
               <Button
                 type="button"
@@ -671,6 +795,7 @@ function MarketingAssetsContent() {
                   onClick={() => void handleDownloadFlyerPdf()}
                   className="border-[var(--color-border)] bg-transparent text-white hover:bg-[#1a1a1a]"
                 >
+                  <Download className="mr-2 size-4" />
                   Download PDF
                 </Button>
               </>

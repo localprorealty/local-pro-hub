@@ -450,6 +450,100 @@ async def update_share_link(
     }
 
 
+@router.get("/listings/comments/unread")
+async def get_unread_comments(
+    agent_id: str = Depends(require_agent),
+):
+    """
+    Retrieve all unread visitor feedback/comments across all of this agent's listings.
+    """
+    client = get_service_client()
+
+    # Check if caller is an admin
+    u_res = client.table("users").select("role").eq("id", agent_id).maybe_single().execute()
+    user_row = u_res.data if u_res else None
+    is_admin = bool(user_row and user_row.get("role") == "admin")
+
+    # Fetch listings
+    query = client.table("listings").select("id, address_full")
+    if not is_admin:
+        query = query.eq("agent_id", agent_id)
+    listings_res = query.execute()
+    listings = listings_res.data or []
+    if not listings:
+        return {"count": 0, "unread": []}
+
+    listing_map = {l["id"]: (l.get("address_full") or "Unnamed listing") for l in listings}
+    listing_ids = list(listing_map.keys())
+
+    try:
+        res = (
+            client.table("listing_comments")
+            .select("id, listing_id, commenter_name, comment_text, created_at, read_at")
+            .in_("listing_id", listing_ids)
+            .is_("read_at", "null")
+            .order("created_at", desc=True)
+            .limit(20)
+            .execute()
+        )
+        comments = res.data or []
+    except Exception as err:
+        err_str = str(err)
+        if "42703" in err_str or "read_at" in err_str:
+            try:
+                res = (
+                    client.table("listing_comments")
+                    .select("id, listing_id, commenter_name, comment_text, created_at")
+                    .in_("listing_id", listing_ids)
+                    .order("created_at", desc=True)
+                    .limit(20)
+                    .execute()
+                )
+                comments = res.data or []
+            except Exception:
+                comments = []
+        else:
+            comments = []
+
+    unread_items = []
+    for c in comments:
+        unread_items.append({
+            "id": c["id"],
+            "listing_id": c["listing_id"],
+            "address_full": listing_map.get(c["listing_id"], "Listing"),
+            "commenter_name": c.get("commenter_name") or "Visitor",
+            "comment_text": c.get("comment_text") or "",
+            "created_at": c.get("created_at") or "",
+            "read_at": c.get("read_at"),
+        })
+
+    return {
+        "count": len(unread_items),
+        "unread": unread_items,
+    }
+
+
+@router.post("/listings/{listing_id}/comments/mark-read")
+async def mark_listing_comments_read(
+    listing_id: str,
+    agent_id: str = Depends(require_agent),
+):
+    """
+    Mark all unread comments for a given listing as read.
+    """
+    client = get_service_client()
+    _require_agent_listing(client, listing_id, agent_id)
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    try:
+        client.table("listing_comments").update({"read_at": now_iso}).eq("listing_id", listing_id).is_("read_at", "null").execute()
+    except Exception:
+        # Gracefully handle schema migration transition
+        pass
+
+    return {"status": "success", "listing_id": listing_id}
+
+
 @router.get("/listings/{listing_id}/comments")
 async def get_listing_comments(
     listing_id: str,
@@ -464,13 +558,26 @@ async def get_listing_comments(
     try:
         res = (
             client.table("listing_comments")
-            .select("id, listing_id, commenter_name, comment_text, created_at")
+            .select("id, listing_id, commenter_name, comment_text, created_at, read_at")
             .eq("listing_id", listing_id)
             .order("created_at", desc=True)
             .execute()
         )
         return res.data or []
-    except Exception:
+    except Exception as err:
+        err_str = str(err)
+        if "42703" in err_str or "read_at" in err_str:
+            try:
+                res = (
+                    client.table("listing_comments")
+                    .select("id, listing_id, commenter_name, comment_text, created_at")
+                    .eq("listing_id", listing_id)
+                    .order("created_at", desc=True)
+                    .execute()
+                )
+                return res.data or []
+            except Exception:
+                return []
         return []
 
 

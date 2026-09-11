@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ListingDetailsPanel } from '@/components/listings/ListingDetailsPanel'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import type { UserRole } from '@/lib/auth'
 import {
@@ -184,7 +185,10 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
             ) : null}
           </div>
         </div>
-        <ProfileMenu role={menuRole} />
+        <div className="flex items-center gap-3">
+          <NotificationBell />
+          <ProfileMenu role={menuRole} />
+        </div>
       </header>
 
       {bookingSuccess ? (

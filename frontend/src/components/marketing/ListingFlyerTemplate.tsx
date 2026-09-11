@@ -26,7 +26,6 @@ function FlyerBody({
   interiorPhotos,
   description,
 }: FlyerBodyProps) {
-  const displayDescription = description.slice(0, 600)
   const stats = [
     `${context.bedrooms_total} BED`,
     `${context.bathrooms_display} BATH`,
@@ -92,12 +91,12 @@ function FlyerBody({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 px-10 py-6">
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-10 py-6">
         <p
-          className="text-center text-sm leading-relaxed"
+          className="line-clamp-6 overflow-hidden text-center text-sm leading-relaxed text-ellipsis"
           style={{ ...EXPORT_BODY_TEXT, color: '#404040' }}
         >
-          {displayDescription ||
+          {description.trim() ||
             'A beautifully presented home in a sought-after North Texas neighborhood.'}
         </p>
       </div>

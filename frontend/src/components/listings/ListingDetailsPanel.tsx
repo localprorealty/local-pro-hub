@@ -32,6 +32,7 @@ import {
   updateListingShareStatus,
   fetchListingComments,
   deleteListingComment,
+  markListingCommentsRead,
   type ShareLinkStatus,
   type PublicComment,
 } from '@/lib/public-share'
@@ -282,6 +283,14 @@ export function ListingDetailsPanel({
     nextParams.set('tab', tab)
     setSearchParams(nextParams, { replace: true })
   }
+
+  useEffect(() => {
+    if (activeTab === 'share' && listing.id) {
+      void markListingCommentsRead(listing.id).then(() => {
+        window.dispatchEvent(new CustomEvent('comments-read'))
+      })
+    }
+  }, [activeTab, listing.id])
 
   const TABS: { id: ListingHubTab; label: string; icon: typeof Sparkles }[] = [
     { id: 'action', label: 'Stage Action', icon: Sparkles },

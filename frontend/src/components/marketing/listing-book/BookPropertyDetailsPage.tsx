@@ -14,6 +14,59 @@ type BookPropertyDetailsPageProps = {
 const PAGE_WIDTH = 900
 const PAGE_HEIGHT = 1200
 
+function splitIntoTwoParagraphs(text: string): string[] {
+  const trimmed = text.trim()
+  if (!trimmed) return []
+
+  const paragraphs = trimmed.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
+  if (paragraphs.length >= 2) {
+    if (paragraphs.length === 2) return paragraphs
+    return [paragraphs[0], paragraphs.slice(1).join('\n\n')]
+  }
+
+  // Single block of text: split at the sentence boundary closest to midpoint
+  const mid = Math.floor(trimmed.length / 2)
+  const sentenceEndRegex = /([.!?])\s+/g
+  let bestIndex = -1
+  let minDiff = Infinity
+  let match: RegExpExecArray | null
+
+  while ((match = sentenceEndRegex.exec(trimmed)) !== null) {
+    const splitPoint = match.index + match[1].length
+    const diff = Math.abs(splitPoint - mid)
+    if (diff < minDiff) {
+      minDiff = diff
+      bestIndex = splitPoint
+    }
+  }
+
+  if (bestIndex !== -1 && bestIndex > 0 && bestIndex < trimmed.length) {
+    const p1 = trimmed.slice(0, bestIndex).trim()
+    const p2 = trimmed.slice(bestIndex).trim()
+    if (p1 && p2) return [p1, p2]
+  }
+
+  // Fallback: split at nearest whitespace boundary near midpoint to avoid cutting words
+  const spaceRegex = /\s+/g
+  let bestSpaceIndex = -1
+  let minSpaceDiff = Infinity
+  while ((match = spaceRegex.exec(trimmed)) !== null) {
+    const diff = Math.abs(match.index - mid)
+    if (diff < minSpaceDiff) {
+      minSpaceDiff = diff
+      bestSpaceIndex = match.index
+    }
+  }
+
+  if (bestSpaceIndex !== -1) {
+    const p1 = trimmed.slice(0, bestSpaceIndex).trim()
+    const p2 = trimmed.slice(bestSpaceIndex).trim()
+    if (p1 && p2) return [p1, p2]
+  }
+
+  return [trimmed]
+}
+
 export function BookPropertyDetailsPage({
   context,
   description,
@@ -23,14 +76,7 @@ export function BookPropertyDetailsPage({
 }: BookPropertyDetailsPageProps) {
   const leftPhoto = edgePhotos[0]
   const rightPhoto = edgePhotos[1] ?? edgePhotos[0]
-  const paragraphs = description.split(/\n\n+/).filter(Boolean)
-  const body =
-    paragraphs.length >= 2
-      ? paragraphs
-      : [
-          description.slice(0, Math.ceil(description.length / 2)),
-          description.slice(Math.ceil(description.length / 2)),
-        ].filter(Boolean)
+  const body = splitIntoTwoParagraphs(description)
 
   const leftStats = [
     `${context.bedrooms_total} BEDROOMS`,
@@ -102,9 +148,9 @@ export function BookPropertyDetailsPage({
           </div>
         </div>
 
-        <div className="mt-8 space-y-4 text-sm leading-relaxed">
+        <div className="mt-8 max-h-[380px] space-y-4 overflow-hidden text-sm leading-relaxed">
           {body.map((para, index) => (
-            <p key={index} style={{ ...EXPORT_BODY_TEXT, color: '#404040' }}>
+            <p key={index} className="line-clamp-6 overflow-hidden text-ellipsis" style={{ ...EXPORT_BODY_TEXT, color: '#404040' }}>
               {para}
             </p>
           ))}

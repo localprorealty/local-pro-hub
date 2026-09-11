@@ -175,7 +175,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
-    <main className="relative min-h-svh text-[var(--color-white)]">
+    <main className="relative min-h-svh w-full min-w-0 max-w-full overflow-x-hidden text-[var(--color-white)]">
       {/* Mobile Sticky Top Bar (visible only below lg) */}
       <header className="sticky top-0 z-30 flex lg:hidden items-center justify-between border-b border-[var(--color-border)] bg-[#0a0a0a]/95 px-4 py-3 backdrop-blur-md">
         <div className="flex items-center gap-3 min-w-0">
@@ -225,14 +225,14 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
         </div>
       </header>
 
-      <div className="grid min-h-svh lg:grid-cols-[220px_1fr]">
+      <div className="grid min-h-svh lg:grid-cols-[220px_1fr] w-full min-w-0 max-w-full">
         <aside
           className={`sticky top-0 hidden lg:flex h-svh flex-col overflow-hidden border-r border-[var(--color-border)] ${shellPanelClass}`}
         >
           <AdminSidebarNav />
         </aside>
 
-        <section className="flex min-h-svh flex-col">
+        <section className="flex min-h-svh flex-col w-full min-w-0 max-w-full">
           <header className="hidden lg:flex items-start justify-between border-b border-[var(--color-border)] px-6 py-8 md:px-10">
             <div>
               <p className="mb-2 text-xs tracking-widest text-[var(--color-gold)] uppercase">
@@ -245,7 +245,7 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
               <ProfileMenu role="admin" />
             </div>
           </header>
-          <div className="flex-1 overflow-y-auto px-6 py-8 md:px-10">{children}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 md:px-10 w-full min-w-0 max-w-full">{children}</div>
         </section>
       </div>
     </main>

@@ -125,7 +125,7 @@ export default function AdminTemplatesPage() {
   const isAdmin = userRole === 'admin'
 
   const templatesContent = (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <p className="text-sm text-[var(--color-text-secondary)]">
           Access and manage standard legal documents and listing checklists used across the brokerage.
@@ -153,8 +153,8 @@ export default function AdminTemplatesPage() {
         </label>
       </div>
 
-      <div className="rounded-md border border-[var(--color-border)] bg-[#111111] overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="w-full max-w-full rounded-md border border-[var(--color-border)] bg-[#111111] overflow-hidden">
+        <div className="w-full overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse text-left text-sm text-white">
             <thead>
               <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/50 text-[10px] font-semibold tracking-wider text-[var(--color-text-secondary)] uppercase">

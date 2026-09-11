@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AlertCircle, CheckCircle2, Loader2, Menu } from 'lucide-react'
+import { AlertCircle, CheckCircle2, ChevronDown, Loader2, Mic, MicOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 import { ReviewSection } from '@/components/form/ReviewSection'
@@ -44,6 +44,7 @@ type NtreisFormBodyProps = {
   initialPreFilledKeys?: string[]
   onEditAddress: () => void
   onStageAdvanced?: () => void
+  headerHeight?: number
 }
 
 function formatSavedLabel(savedAt: Date | null): string {
@@ -64,6 +65,7 @@ export function NtreisFormBody({
   initialPreFilledKeys = [],
   onEditAddress,
   onStageAdvanced,
+  headerHeight = 57,
 }: NtreisFormBodyProps) {
   const [formData, setFormData] = useState<Record<string, unknown>>(() => {
     const base = { ...initialFormData, ...retsFormPatch }
@@ -85,6 +87,7 @@ export function NtreisFormBody({
     return base
   })
   const [activeSectionId, setActiveSectionId] = useState(1)
+  const [sectionSheetOpen, setSectionSheetOpen] = useState(false)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const [savedAt, setSavedAt] = useState<Date | null>(null)
   const [stageSubmitting, setStageSubmitting] = useState(false)
@@ -98,6 +101,15 @@ export function NtreisFormBody({
   }, [formData])
 
   const visibleSections = useMemo(() => getVisibleSections(formData), [formData])
+
+  const activeSection = useMemo(
+    () => visibleSections.find((s) => s.id === activeSectionId) ?? visibleSections[0],
+    [visibleSections, activeSectionId],
+  )
+  const activeIndex = useMemo(
+    () => Math.max(1, visibleSections.findIndex((s) => s.id === activeSectionId) + 1),
+    [visibleSections, activeSectionId],
+  )
 
   const sectionStatuses = useMemo(() => {
     const map: Record<number, SectionStatus> = {}
@@ -246,11 +258,54 @@ export function NtreisFormBody({
 
   const scrollToSection = (sectionId: number) => {
     setActiveSectionId(sectionId)
+    setSectionSheetOpen(false)
     const el = sectionRefs.current[sectionId]
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const topOffset = (headerHeight || 57) + 48
+      const elTop = el.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ top: Math.max(0, elTop - topOffset), behavior: 'smooth' })
     }
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleScroll = () => {
+      let currentId = visibleSections[0]?.id ?? 1
+      let minDistance = Infinity
+      const targetOffset = (headerHeight || 57) + 48
+
+      for (const section of visibleSections) {
+        const el = sectionRefs.current[section.id]
+        if (!el) continue
+        const rect = el.getBoundingClientRect()
+        const distance = Math.abs(rect.top - targetOffset)
+        if (rect.top <= targetOffset + 50 && rect.bottom >= targetOffset) {
+          currentId = section.id
+          break
+        } else if (distance < minDistance) {
+          minDistance = distance
+          currentId = section.id
+        }
+      }
+
+      setActiveSectionId(currentId)
+    }
+
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [visibleSections, headerHeight])
 
   const navigateSection = (direction: -1 | 1) => {
     const idx = visibleSections.findIndex((s) => s.id === activeSectionId)
@@ -310,35 +365,75 @@ export function NtreisFormBody({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col pb-[52px]">
+      {/* Mobile Sticky Section Indicator & Docked Voice Bar */}
+      <div
+        style={{ top: `${headerHeight}px` }}
+        className="sticky z-20 flex items-center gap-2 border-b border-[#2a2a2a] bg-[#0a0a0a]/95 px-3 py-2 backdrop-blur-md lg:hidden"
+      >
+        <Sheet open={sectionSheetOpen} onOpenChange={setSectionSheetOpen}>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className="flex min-w-0 flex-1 items-center justify-between gap-1.5 rounded-md border border-[#2a2a2a] bg-[#141414] px-2.5 py-1.5 text-left transition-colors hover:border-[#CFB87C]/50 hover:bg-[#1a1a1a] active:bg-[#222]"
+              aria-label={`Current section: ${activeSection?.name || 'Section'}. Tap to jump to another section.`}
+            >
+              <div className="flex min-w-0 items-center gap-1.5">
+                <span className="shrink-0 text-xs font-semibold text-[#CFB87C]">
+                  Section {activeIndex} of {visibleSections.length}:
+                </span>
+                <span className="truncate text-xs font-medium text-white">
+                  {activeSection?.name}
+                </span>
+              </div>
+              <ChevronDown className="size-3.5 shrink-0 text-[#888888]" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[300px] border-r border-[#2a2a2a] bg-[#111111] p-0">
+            <SheetHeader className="border-b border-[#2a2a2a] px-4 py-3">
+              <SheetTitle className="text-base text-[#CFB87C]">NTREIS Form Sections</SheetTitle>
+              <SheetDescription className="text-xs text-[#888888]">
+                Tap any section to jump directly to it.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="flex-1 overflow-y-auto p-4">{navPanel}</div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Docked Mobile Voice Button (Never occludes form inputs) */}
+        <button
+          type="button"
+          onClick={voice.onMicClick}
+          aria-label={voice.sessionActive ? 'Voice Fill active' : 'Voice Fill — all sections'}
+          title={voice.sessionActive ? 'Voice Fill active' : 'Voice Fill — all unfilled fields'}
+          className={cn(
+            'flex size-8 shrink-0 items-center justify-center rounded-md border transition-all',
+            voice.sessionActive
+              ? 'border-[#CFB87C] bg-[#CFB87C] text-black shadow-[0_0_12px_rgba(207,184,124,0.4)]'
+              : 'border-[#2a2a2a] bg-[#141414] text-[#CFB87C] hover:border-[#CFB87C]/50 hover:bg-[#1a1a1a]',
+          )}
+        >
+          {voice.state === 'processing' ? (
+            <Loader2 className="size-4 animate-spin text-current" />
+          ) : voice.sessionActive && voice.state !== 'listening' ? (
+            <MicOff className="size-4 text-current" />
+          ) : (
+            <Mic className="size-4 text-current" />
+          )}
+        </button>
+      </div>
+
       <div className="flex flex-1">
-        <aside className="sticky top-[57px] hidden h-[calc(100svh-57px-52px)] w-[260px] shrink-0 overflow-y-auto border-r border-[#2a2a2a] bg-[#111111] p-4 lg:block">
+        <aside
+          style={{
+            top: `${headerHeight}px`,
+            height: `calc(100svh - ${headerHeight}px - 52px)`,
+          }}
+          className="sticky hidden w-[260px] shrink-0 overflow-y-auto border-r border-[#2a2a2a] bg-[#111111] p-4 lg:block"
+        >
           {navPanel}
         </aside>
 
         <div className="min-w-0 flex-1 overflow-y-auto px-4 py-6 md:px-8">
-          <div className="mb-4 lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-[#2a2a2a] bg-[#1a1a1a] text-white"
-                >
-                  <Menu className="size-4" />
-                  Sections ({visibleSections.length})
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[280px]">
-                <SheetHeader>
-                  <SheetTitle className="text-[#CFB87C]">NTREIS Form</SheetTitle>
-                  <SheetDescription className="sr-only">
-                    Navigate between sections in the NTREIS listing form.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="mt-4 flex-1 overflow-y-auto">{navPanel}</div>
-              </SheetContent>
-            </Sheet>
-          </div>
-
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -378,11 +473,11 @@ export function NtreisFormBody({
         </div>
       </div>
 
-      <footer className="fixed right-0 bottom-0 left-0 z-30 flex h-[52px] items-center justify-between border-t border-[#2a2a2a] bg-[#0a0a0a] px-4 md:px-8">
-        <div className="flex items-center gap-2 text-xs text-[#888888]">
+      <footer className="fixed right-0 bottom-0 left-0 z-30 flex h-[52px] items-center justify-between border-t border-[#2a2a2a] bg-[#0a0a0a] px-3 sm:px-4 md:px-8">
+        <div className="flex shrink-0 items-center gap-1.5 text-xs text-[#888888]">
           <SaveIcon
             className={cn(
-              'size-3.5',
+              'size-3.5 shrink-0',
               saveStatus === 'error' && 'text-red-400',
               saveStatus === 'saving' && 'animate-spin text-[#888888]',
               saveStatus === 'saved' && 'text-[#CFB87C]',
@@ -390,19 +485,27 @@ export function NtreisFormBody({
           />
           <span
             className={cn(
+              'text-[11px] sm:text-xs',
               saveStatus === 'error' && 'text-red-400',
               saveStatus === 'saved' && 'text-[#CFB87C]',
             )}
           >
-            {saveLabel}
+            <span className="hidden sm:inline">{saveLabel}</span>
+            <span className="sm:hidden">
+              {saveStatus === 'saving'
+                ? 'Saving...'
+                : saveStatus === 'error'
+                  ? 'Error'
+                  : 'Saved'}
+            </span>
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="hidden text-xs text-[#888888] sm:inline">
+        <div className="hidden min-[390px]:flex items-center gap-2">
+          <span className="hidden text-xs text-[#888888] md:inline">
             {completeSectionCount} of {visibleSections.length} sections complete
           </span>
-          <div className="h-1 w-12 overflow-hidden rounded-full bg-[#2a2a2a]">
+          <div className="h-1 w-8 sm:w-12 overflow-hidden rounded-full bg-[#2a2a2a]">
             <div
               className="h-full bg-[#CFB87C] transition-all duration-300"
               style={{ width: `${progressPct}%` }}
@@ -410,21 +513,25 @@ export function NtreisFormBody({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Button
             type="button"
             variant="ghost"
+            size="sm"
             onClick={() => navigateSection(-1)}
-            className="text-xs text-[#888888] hover:text-white"
+            className="h-8 px-2 text-xs text-[#888888] hover:text-white sm:px-3"
           >
-            ← Previous
+            <span className="hidden sm:inline">← Previous</span>
+            <span className="sm:hidden">← Prev</span>
           </Button>
           <Button
             type="button"
+            size="sm"
             onClick={() => navigateSection(1)}
-            className="h-8 bg-[#CFB87C] text-xs font-bold text-black hover:bg-[#CFB87C]/90"
+            className="h-8 bg-[#CFB87C] px-2.5 text-xs font-bold text-black hover:bg-[#CFB87C]/90 sm:px-3"
           >
-            Next section →
+            <span className="hidden sm:inline">Next section →</span>
+            <span className="sm:hidden">Next →</span>
           </Button>
         </div>
       </footer>

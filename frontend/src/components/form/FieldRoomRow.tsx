@@ -32,9 +32,9 @@ export function FieldRoomRow({
   return (
     <div className="rounded-lg border border-[#2a2a2a] bg-[#111111]/50 p-4">
       <Label className={cn(fieldLabelClass, 'mb-3 block text-[#CFB87C]')}>{label}</Label>
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {showRoomName ? (
-          <div className="space-y-1 md:col-span-4">
+          <div className="col-span-2 space-y-1 md:col-span-4">
             <Label className={fieldLabelClass}>Room Name</Label>
             <Input
               value={value.room_name ?? ''}
@@ -44,7 +44,7 @@ export function FieldRoomRow({
             />
           </div>
         ) : null}
-        <div className="space-y-1">
+        <div className="col-span-2 space-y-1 md:col-span-1">
           <Label className={fieldLabelClass}>Level</Label>
           <Input
             value={value.level ?? ''}
@@ -52,7 +52,7 @@ export function FieldRoomRow({
             className={fieldInputClass}
           />
         </div>
-        <div className="space-y-1">
+        <div className="col-span-1 space-y-1 md:col-span-1">
           <Label className={fieldLabelClass}>Length (ft)</Label>
           <Input
             type="number"
@@ -61,7 +61,7 @@ export function FieldRoomRow({
             className={fieldInputClass}
           />
         </div>
-        <div className="space-y-1">
+        <div className="col-span-1 space-y-1 md:col-span-1">
           <Label className={fieldLabelClass}>Width (ft)</Label>
           <Input
             type="number"
@@ -71,7 +71,7 @@ export function FieldRoomRow({
           />
         </div>
         {features && features.length > 0 ? (
-          <div className="flex items-end md:col-span-1">
+          <div className="col-span-2 flex items-end md:col-span-1">
             <button
               type="button"
               onClick={() => setFeaturesOpen((o) => !o)}

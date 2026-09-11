@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
@@ -55,7 +55,25 @@ function ListingFormContent() {
   const [agentId, setAgentId] = useState<string | null>(null)
   const [retsFormPatch, setRetsFormPatch] = useState<Record<string, unknown>>({})
   const [preFilledKeys, setPreFilledKeys] = useState<Set<string>>(new Set())
+  const [headerHeight, setHeaderHeight] = useState<number>(57)
+  const headerRef = useRef<HTMLElement>(null)
   const listingIdRef = useRef<string | undefined>(id)
+
+  useLayoutEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+    const updateHeight = () => {
+      setHeaderHeight(Math.round(el.getBoundingClientRect().height))
+    }
+    updateHeight()
+    const ro = new ResizeObserver(updateHeight)
+    ro.observe(el)
+    window.addEventListener('resize', updateHeight)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', updateHeight)
+    }
+  }, [])
 
   useEffect(() => {
     listingIdRef.current = id
@@ -294,8 +312,11 @@ function ListingFormContent() {
 
   return (
     <main className="min-h-svh bg-[#0a0a0a]">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[#2a2a2a] bg-[#0a0a0a]/95 px-6 py-4 backdrop-blur-sm md:px-10">
-        <div className="flex items-center gap-3">
+      <header
+        ref={headerRef}
+        className="sticky top-0 z-20 flex items-center justify-between border-b border-[#2a2a2a] bg-[#0a0a0a]/95 px-3.5 py-2.5 backdrop-blur-sm sm:px-6 md:px-10 md:py-4"
+      >
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             to={`/listing/${listing.id}`}
             className="shrink-0 rounded-sm p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
@@ -305,21 +326,21 @@ function ListingFormContent() {
           </Link>
           <Link
             to="/dashboard"
-            className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[#CFB87C]"
+            className="font-[family-name:var(--font-display)] text-xl font-bold tracking-tighter text-[#CFB87C] sm:text-2xl"
           >
             LP
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
+        <div className="flex flex-wrap items-center gap-1.5 font-[family-name:var(--font-display)] text-xs text-white sm:gap-2 sm:text-sm">
           <span>New Listing</span>
           <span className="text-[#555555]">·</span>
-          <span className="rounded border border-[#CFB87C]/40 bg-[#CFB87C]/10 px-2 py-0.5 text-xs text-[#CFB87C]">
+          <span className="rounded border border-[#CFB87C]/40 bg-[#CFB87C]/10 px-1.5 py-0.5 text-[11px] text-[#CFB87C] sm:px-2 sm:text-xs">
             {TYPE_LABEL[listing.listing_type]}
           </span>
           <span className="text-[#555555]">·</span>
           <ListingIdBadge id={listing.id} />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {listing.stage === 'draft' && agentId ? (
             <DeleteDraftButton
               listingId={listing.id}
@@ -329,7 +350,7 @@ function ListingFormContent() {
             />
           ) : null}
           <p
-            className={`text-xs ${
+            className={`hidden text-xs sm:block ${
               saveStatus === 'error'
                 ? 'text-red-400'
                 : saveStatus === 'saving'
@@ -358,6 +379,7 @@ function ListingFormContent() {
           initialPreFilledKeys={[...preFilledKeys]}
           onEditAddress={() => setShowFormSections(false)}
           onStageAdvanced={() => navigate(`/listing/${listing.id}`)}
+          headerHeight={headerHeight}
         />
       )}
     </main>

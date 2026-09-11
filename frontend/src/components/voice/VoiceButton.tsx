@@ -8,14 +8,15 @@ type VoiceButtonProps = {
   state: VoiceState
   sessionActive: boolean
   onClick: () => void
+  className?: string
 }
 
-export function VoiceButton({ state, sessionActive, onClick }: VoiceButtonProps) {
+export function VoiceButton({ state, sessionActive, onClick, className }: VoiceButtonProps) {
   const listening = state === 'listening'
   const processing = state === 'processing'
 
   return (
-    <div className="fixed right-6 bottom-20 z-40">
+    <div className={cn('hidden lg:block fixed right-6 bottom-20 z-40', className)}>
       {listening ? (
         <>
           {[0, 1, 2].map((ring) => (

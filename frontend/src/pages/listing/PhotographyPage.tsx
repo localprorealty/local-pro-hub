@@ -13,9 +13,11 @@ import {
 } from 'lucide-react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
+import { MobileShootWizard } from '@/components/booking/MobileShootWizard'
 import { ShootWeekCalendar } from '@/components/booking/ShootWeekCalendar'
 import { VendorOrderEmailModal } from '@/components/booking/VendorOrderEmailModal'
 import { startOfWeek } from '@/lib/calendar-utils'
+import { cn } from '@/lib/utils'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ListingMissionHeader } from '@/components/listing/ListingMissionHeader'
 import { MissionShell } from '@/components/layout/MissionShell'
@@ -345,8 +347,43 @@ function PhotographyContent() {
       ) : null}
 
       {activeTab === 'internal' ? (
-        /* In-House Photographer Booking Flow */
-        <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
+        <>
+          {/* Mobile 3-Step Wizard (< lg only) */}
+          <div className="lg:hidden">
+            <MobileShootWizard
+              photographers={photographers}
+              selectedPhotographer={selectedPhotographer}
+              onSelectPhotographer={(p) => {
+                setSelectedPhotographer(p)
+                setSelectedDate(null)
+                setSelectedTime(null)
+              }}
+              preferredTier={preferredTier}
+              isSkipping={isSkipping}
+              onSkip={handleSkip}
+              weekStart={weekStart}
+              onWeekChange={setWeekStart}
+              blockedDates={blockedSet}
+              bookedDates={bookedDateSet}
+              bookedTimesForDay={bookedTimesForDay}
+              selectedDate={selectedDate}
+              onSelectDate={(iso) => {
+                setSelectedDate(iso)
+                setSelectedTime(null)
+              }}
+              selectedTime={selectedTime}
+              onSelectTime={setSelectedTime}
+              isLoadingAvailability={isLoadingAvailability}
+              accessNotes={accessNotes}
+              onChangeAccessNotes={setAccessNotes}
+              isBooking={isBooking}
+              onConfirm={handleConfirm}
+              listingAddress={listing.address_full ?? 'Unnamed listing'}
+            />
+          </div>
+
+          {/* Desktop In-House Photographer Booking Flow (>= lg only, untouched) */}
+          <div className="hidden lg:grid gap-8 lg:grid-cols-[380px_1fr]">
           <div className="space-y-6">
             <section>
               <p className="mb-3 text-[10px] tracking-widest text-[#CFB87C] uppercase">
@@ -563,9 +600,227 @@ function PhotographyContent() {
             )}
           </aside>
         </div>
+      </>
       ) : (
-        /* My External Vendor Flow */
-        <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
+        <>
+          {/* Mobile External Vendor Flow (< lg only) */}
+          <div className="lg:hidden space-y-5">
+            {vendors.length === 0 ? (
+              <div className="space-y-4">
+                <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[#161616] p-6 text-center space-y-3">
+                  <Building2 className="mx-auto h-8 w-8 text-[#CFB87C]/70" />
+                  <h4 className="text-sm font-semibold text-white">No External Vendors Saved</h4>
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                    Add your preferred photographer or media vendor to place orders directly or
+                    send order request emails with a single click.
+                  </p>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="mt-2 bg-[#CFB87C] text-black font-semibold hover:bg-[#dcc487]"
+                  >
+                    <Link to="/profile">Add Vendor in Profile Settings →</Link>
+                  </Button>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isSkipping}
+                  onClick={() => void handleSkip()}
+                  className="w-full rounded-sm border border-dashed border-red-500/30 hover:border-red-500/50 bg-red-950/10 hover:bg-red-950/20 p-4 text-left transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-white">Skip Photography</p>
+                    <span className="rounded-sm bg-red-900/30 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
+                      Bypass Stage
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                    Advance this listing to the next stage without booking photography.
+                  </p>
+                  <p className="mt-3 text-xs font-bold tracking-widest text-red-300 uppercase">
+                    {isSkipping ? 'Advancing Stage...' : 'Skip Photography →'}
+                  </p>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Vendor Selector on Mobile (if more than 1 vendor) */}
+                {vendors.length > 1 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                        Select Vendor
+                      </p>
+                      <Link
+                        to="/profile"
+                        className="text-xs text-[#CFB87C] hover:underline flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Manage in Profile
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                      {vendors.map((vendor) => {
+                        const isSelected = selectedVendor?.id === vendor.id
+                        return (
+                          <button
+                            key={vendor.id}
+                            type="button"
+                            onClick={() => setSelectedVendor(vendor)}
+                            className={cn(
+                              'px-3 py-2 rounded-sm text-xs font-medium shrink-0 border transition-all flex items-center gap-1.5',
+                              isSelected
+                                ? 'border-[#CFB87C] bg-[#CFB87C]/15 text-white font-semibold'
+                                : 'border-[var(--color-border)] bg-[#1a1a1a] text-[var(--color-text-secondary)] hover:text-white',
+                            )}
+                          >
+                            <span>{vendor.name}</span>
+                            {vendor.is_default && (
+                              <span className="text-[9px] uppercase font-bold text-[#CFB87C]">
+                                (Default)
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected Vendor Overview Card */}
+                {selectedVendor && (
+                  <div className="space-y-4">
+                    <div className="rounded-sm border border-[var(--color-border)] bg-[#141414] p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-white text-base">{selectedVendor.name}</h3>
+                        {selectedVendor.is_default && (
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-[#CFB87C]">
+                            Preferred Vendor
+                          </span>
+                        )}
+                      </div>
+                      {selectedVendor.website_url && (
+                        <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
+                          <Globe className="h-3.5 w-3.5 text-[#CFB87C] shrink-0" />
+                          <a
+                            href={selectedVendor.website_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline text-white truncate"
+                          >
+                            {selectedVendor.website_url}
+                          </a>
+                        </p>
+                      )}
+                      {selectedVendor.email && (
+                        <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
+                          <Mail className="h-3.5 w-3.5 shrink-0" />
+                          <span>{selectedVendor.email}</span>
+                        </p>
+                      )}
+                      {selectedVendor.phone && (
+                        <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
+                          <Phone className="h-3.5 w-3.5 shrink-0" />
+                          <span>{selectedVendor.phone}</span>
+                        </p>
+                      )}
+                      {selectedVendor.notes && (
+                        <div className="mt-2 pt-2 border-t border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] italic">
+                          Notes: {selectedVendor.notes}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Step 1: Order actions */}
+                    <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3">
+                      <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                        Step 1 — Place Your Order
+                      </p>
+
+                      <div className="grid gap-2.5">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={!selectedVendor.website_url}
+                          onClick={() => {
+                            if (selectedVendor.website_url) {
+                              window.open(selectedVendor.website_url, '_blank', 'noopener,noreferrer')
+                            }
+                          }}
+                          className="h-11 w-full border-[var(--color-border)] text-white hover:bg-white/5 flex items-center justify-center gap-2"
+                        >
+                          <Globe className="h-4 w-4 text-[#CFB87C]" />
+                          <span>Open Online Ordering Portal</span>
+                          <ExternalLink className="h-3.5 w-3.5 ml-1 opacity-70" />
+                        </Button>
+
+                        <Button
+                          type="button"
+                          onClick={() => setIsOrderModalOpen(true)}
+                          className="h-11 w-full bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2"
+                        >
+                          <Mail className="h-4 w-4" />
+                          <span>Send Direct Order Email...</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Step 2: Confirmation & Advance Stage */}
+                    <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3">
+                      <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                        Step 2 — Advance Listing
+                      </p>
+                      <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                        Once you have placed the order with {selectedVendor.name}, mark photography ordered to advance this listing to <strong className="text-white">Shoot Booked</strong>.
+                      </p>
+                      <Button
+                        type="button"
+                        disabled={isMarkingOrdered}
+                        onClick={() => void handleMarkVendorOrdered()}
+                        className="w-full h-11 bg-white/10 hover:bg-white/15 text-white font-semibold flex items-center justify-center gap-2"
+                      >
+                        {isMarkingOrdered ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Advancing stage...
+                          </>
+                        ) : (
+                          'Mark Photography Ordered →'
+                        )}
+                      </Button>
+                    </div>
+
+                    {/* Skip Photography option */}
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        disabled={isSkipping}
+                        onClick={() => void handleSkip()}
+                        className="w-full rounded-sm border border-dashed border-red-500/30 hover:border-red-500/50 bg-red-950/10 hover:bg-red-950/20 p-4 text-left transition-colors"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-semibold text-white">Skip Photography</p>
+                          <span className="rounded-sm bg-red-900/30 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
+                            Bypass Stage
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                          Advance this listing to the next stage without booking photography.
+                        </p>
+                        <p className="mt-3 text-xs font-bold tracking-widest text-red-300 uppercase">
+                          {isSkipping ? 'Advancing Stage...' : 'Skip Photography →'}
+                        </p>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop External Vendor Flow (>= lg only, untouched) */}
+          <div className="hidden lg:grid gap-8 lg:grid-cols-[380px_1fr]">
           <div className="space-y-6">
             <section>
               <div className="flex items-center justify-between mb-3">
@@ -808,6 +1063,7 @@ function PhotographyContent() {
             )}
           </aside>
         </div>
+      </>
       )}
 
       {/* Editable Order Email Modal */}

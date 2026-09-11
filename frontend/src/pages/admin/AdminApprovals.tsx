@@ -5,6 +5,7 @@ import { Check, ShieldAlert, Trash2, UserCheck, UserX } from 'lucide-react'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { UserRole } from '@/lib/auth'
 import { getSupabaseClient } from '@/lib/supabase'
 
@@ -44,6 +45,8 @@ function AdminApprovalsContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [isMutating, setIsMutating] = useState<Record<string, boolean>>({})
   const [error, setError] = useState<string | null>(null)
+  const [userToDelete, setUserToDelete] = useState<{ id: string; email: string } | null>(null)
+  const [isDeletingUser, setIsDeletingUser] = useState(false)
 
   const isSelf = useCallback(
     (userId: string) => Boolean(currentAdminId && userId === currentAdminId),
@@ -160,35 +163,32 @@ function AdminApprovalsContent() {
     [updateUser],
   )
 
-  const deleteUserPermanently = useCallback(
-    async (id: string, email: string) => {
-      const confirmed = window.confirm(
-        `Permanently delete ${email}? This removes their login entirely and frees the email for a new signup.`,
-      )
-      if (!confirmed) return
-
-      setIsMutating((prev) => ({ ...prev, [id]: true }))
-      setError(null)
-      try {
-        if (isSelf(id)) {
-          throw new Error('You cannot delete your own account.')
-        }
-
-        const { error: deleteError } = await getSupabaseClient().rpc('admin_delete_user', {
-          target_user_id: id,
-        })
-        if (deleteError) throw deleteError
-        await loadUsers()
-      } catch (deleteErr) {
-        const message =
-          deleteErr instanceof Error ? deleteErr.message : 'Delete failed.'
-        setError(message)
-      } finally {
-        setIsMutating((prev) => ({ ...prev, [id]: false }))
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return
+    const { id } = userToDelete
+    setIsDeletingUser(true)
+    setIsMutating((prev) => ({ ...prev, [id]: true }))
+    setError(null)
+    try {
+      if (isSelf(id)) {
+        throw new Error('You cannot delete your own account.')
       }
-    },
-    [isSelf, loadUsers],
-  )
+
+      const { error: deleteError } = await getSupabaseClient().rpc('admin_delete_user', {
+        target_user_id: id,
+      })
+      if (deleteError) throw deleteError
+      await loadUsers()
+    } catch (deleteErr) {
+      const message =
+        deleteErr instanceof Error ? deleteErr.message : 'Delete failed.'
+      setError(message)
+    } finally {
+      setIsMutating((prev) => ({ ...prev, [id]: false }))
+      setIsDeletingUser(false)
+      setUserToDelete(null)
+    }
+  }
 
   const bulkApproveSelected = useCallback(async () => {
     const ids = visibleUsers
@@ -445,7 +445,7 @@ function AdminApprovalsContent() {
 
                     <Button
                       type="button"
-                      onClick={() => void deleteUserPermanently(user.id, user.email)}
+                      onClick={() => setUserToDelete({ id: user.id, email: user.email })}
                       disabled={busy || !canDelete}
                       className="h-10 rounded-sm border border-red-500/40 bg-transparent px-4 text-red-300 hover:bg-red-500/10 disabled:opacity-50"
                     >
@@ -503,6 +503,17 @@ function AdminApprovalsContent() {
             </tbody>
           </table>
         </section>
+
+        <ConfirmDialog
+          open={Boolean(userToDelete)}
+          onOpenChange={(open) => !open && setUserToDelete(null)}
+          title="Delete user permanently?"
+          description={`Permanently delete ${userToDelete?.email ?? 'this user'}? This removes their login entirely and frees the email for a new signup.`}
+          confirmLabel="Delete permanently"
+          variant="destructive"
+          isLoading={isDeletingUser}
+          onConfirm={confirmDeleteUser}
+        />
       </motion.div>
     </AdminShell>
   )

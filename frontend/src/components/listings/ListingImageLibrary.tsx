@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
   deleteListingImage,
   fetchListingImages,
@@ -48,6 +49,8 @@ export function ListingImageLibrary({
   const [uploadQueue, setUploadQueue] = useState<UploadProgressItem[]>([])
   const [activeLightboxImage, setActiveLightboxImage] = useState<ListingImage | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [imageToDelete, setImageToDelete] = useState<ListingImage | null>(null)
+  const [isDeletingImage, setIsDeletingImage] = useState(false)
   const [editingCaptionId, setEditingCaptionId] = useState<string | null>(null)
   const [captionDraft, setCaptionDraft] = useState('')
 
@@ -222,17 +225,19 @@ export function ListingImageLibrary({
     }
   }
 
-  const handleDelete = async (image: ListingImage) => {
-    if (!canManage) return
-    const confirmed = window.confirm('Delete this image from the listing library?')
-    if (!confirmed) return
-
+  const confirmDeleteImage = async () => {
+    if (!canManage || !imageToDelete) return
+    setIsDeletingImage(true)
     try {
-      setImages((prev) => prev.filter((img) => img.id !== image.id))
-      await deleteListingImage(listingId, image.id)
+      const targetId = imageToDelete.id
+      setImages((prev) => prev.filter((img) => img.id !== targetId))
+      await deleteListingImage(listingId, targetId)
     } catch (err) {
       console.error('Failed to delete image:', err)
       void loadImages()
+    } finally {
+      setIsDeletingImage(false)
+      setImageToDelete(null)
     }
   }
 
@@ -422,7 +427,7 @@ export function ListingImageLibrary({
                     {canManage ? (
                       <button
                         type="button"
-                        onClick={() => void handleDelete(image)}
+                        onClick={() => setImageToDelete(image)}
                         title="Delete photo"
                         className="rounded bg-red-600/80 p-1.5 text-white hover:bg-red-600"
                       >
@@ -565,6 +570,17 @@ export function ListingImageLibrary({
           </div>
         </div>
       ) : null}
+      {/* Confirm Image Delete Dialog */}
+      <ConfirmDialog
+        open={Boolean(imageToDelete)}
+        onOpenChange={(open) => !open && setImageToDelete(null)}
+        title="Delete image?"
+        description="This image will be permanently removed from the listing library. This cannot be undone."
+        confirmLabel="Delete image"
+        variant="destructive"
+        isLoading={isDeletingImage}
+        onConfirm={confirmDeleteImage}
+      />
     </section>
   )
 }

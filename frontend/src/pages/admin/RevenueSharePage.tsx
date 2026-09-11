@@ -108,6 +108,7 @@ function RevenueShareContent() {
   // 1. Ledger State
   const [ledger, setLedger] = useState<SuggestedPayment[]>([])
   const [periodLabel, setPeriodLabel] = useState('')
+  const [periodLabelError, setPeriodLabelError] = useState<string | null>(null)
   const [notesByRecipient, setNotesByRecipient] = useState<Record<string, string>>({})
   const [payingState, setPayingState] = useState<Record<string, boolean>>({})
 
@@ -123,6 +124,7 @@ function RevenueShareContent() {
   // 3. Resolution Logs State
   const [logs, setLogs] = useState<ResolutionLog[]>([])
   const [selectedSponsors, setSelectedSponsors] = useState<Record<string, string>>({})
+  const [sponsorErrors, setSponsorErrors] = useState<Record<string, string>>({})
 
   // 4. Settings State
   const [settings, setSettings] = useState<GlobalSettings | null>(null)
@@ -191,9 +193,10 @@ function RevenueShareContent() {
   // 1. Mark Paid action
   const handleMarkPaid = async (payment: SuggestedPayment) => {
     if (!periodLabel.trim()) {
-      alert('Please specify a period label (e.g. Q3 2026) first.')
+      setPeriodLabelError('Please specify a period label (e.g. Q3 2026) first.')
       return
     }
+    setPeriodLabelError(null)
     
     const recId = payment.recipient_id
     setPayingState(prev => ({ ...prev, [recId]: true }))
@@ -252,9 +255,14 @@ function RevenueShareContent() {
   const handleResolveSponsor = async (user_id: string) => {
     const selectedSponsorId = selectedSponsors[user_id]
     if (!selectedSponsorId) {
-      alert('Please select a sponsor from the list.')
+      setSponsorErrors((prev) => ({ ...prev, [user_id]: 'Please select a sponsor from the list.' }))
       return
     }
+    setSponsorErrors((prev) => {
+      const next = { ...prev }
+      delete next[user_id]
+      return next
+    })
     setError(null)
     setSuccess(null)
     try {
@@ -387,15 +395,23 @@ function RevenueShareContent() {
                       <h4 className="text-xs uppercase tracking-widest text-[var(--color-gold)] font-bold">Payment Configuration</h4>
                       <p className="text-xs text-[var(--color-text-secondary)]">Specify the payout period for suggested ledger.</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <label htmlFor="period-label" className="text-xs uppercase text-gray-300 font-semibold">Period Label:</label>
-                      <Input
-                        id="period-label"
-                        className="w-48 bg-black border-[var(--color-border)] text-white text-xs"
-                        value={periodLabel}
-                        onChange={e => setPeriodLabel(e.target.value)}
-                        placeholder="e.g. Q3 2026"
-                      />
+                    <div className="flex flex-col items-start md:items-end gap-1">
+                      <div className="flex items-center gap-3">
+                        <label htmlFor="period-label" className="text-xs uppercase text-gray-300 font-semibold">Period Label:</label>
+                        <Input
+                          id="period-label"
+                          className="w-48 bg-black border-[var(--color-border)] text-white text-xs"
+                          value={periodLabel}
+                          onChange={e => {
+                            setPeriodLabel(e.target.value)
+                            if (periodLabelError) setPeriodLabelError(null)
+                          }}
+                          placeholder="e.g. Q3 2026"
+                        />
+                      </div>
+                      {periodLabelError && (
+                        <p className="text-[11px] text-red-400">{periodLabelError}</p>
+                      )}
                     </div>
                   </div>
 
@@ -657,19 +673,31 @@ function RevenueShareContent() {
                                 </span>
                               </td>
                               <td className="px-6 py-4">
-                                <select
-                                  aria-label="Assign Sponsor"
-                                  className="bg-black border border-[var(--color-border)] text-white text-xs h-8 px-2 max-w-[200px] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
-                                  value={selectedSponsors[log.user_id] || ''}
-                                  onChange={e => setSelectedSponsors(prev => ({ ...prev, [log.user_id]: e.target.value }))}
-                                >
-                                  <option value="">Select Real Agent...</option>
-                                  {overrides
-                                    .filter(x => x.user_id !== log.user_id)
-                                    .map(x => (
-                                      <option key={x.user_id} value={x.user_id}>{x.full_name}</option>
-                                    ))}
-                                </select>
+                                <div className="space-y-1">
+                                  <select
+                                    aria-label="Assign Sponsor"
+                                    className="bg-black border border-[var(--color-border)] text-white text-xs h-8 px-2 max-w-[200px] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+                                    value={selectedSponsors[log.user_id] || ''}
+                                    onChange={e => {
+                                      setSelectedSponsors(prev => ({ ...prev, [log.user_id]: e.target.value }))
+                                      setSponsorErrors(prev => {
+                                        const next = { ...prev }
+                                        delete next[log.user_id]
+                                        return next
+                                      })
+                                    }}
+                                  >
+                                    <option value="">Select Real Agent...</option>
+                                    {overrides
+                                      .filter(x => x.user_id !== log.user_id)
+                                      .map(x => (
+                                        <option key={x.user_id} value={x.user_id}>{x.full_name}</option>
+                                      ))}
+                                  </select>
+                                  {sponsorErrors[log.user_id] && (
+                                    <p className="text-[11px] text-red-400">{sponsorErrors[log.user_id]}</p>
+                                  )}
+                                </div>
                               </td>
                               <td className="px-6 py-4 text-right">
                                 <Button

@@ -23,6 +23,7 @@ import { formatDistanceToNow } from 'date-fns'
 export type ListingHubTab = 'action' | 'photos' | 'share' | 'docs' | 'details'
 
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { BookingNegotiationPanel } from '@/components/booking/BookingNegotiationPanel'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { ListingImageLibrary } from '@/components/listings/ListingImageLibrary'
@@ -98,6 +99,10 @@ export function ListingDetailsPanel({
   const [comments, setComments] = useState<PublicComment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null)
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
+  const [commentDeleteError, setCommentDeleteError] = useState<string | null>(null)
+  const [showDeleteDraftConfirm, setShowDeleteDraftConfirm] = useState(false)
 
   useEffect(() => {
     if (!listing.id) return
@@ -158,15 +163,8 @@ export function ListingDetailsPanel({
     }
   }
 
-  const handleRegenerateToken = async () => {
-    if (
-      !listing.id ||
-      !window.confirm(
-        'Regenerating this link will immediately invalidate any existing links you have shared with clients. Continue?',
-      )
-    ) {
-      return
-    }
+  const confirmRegenerateToken = async () => {
+    if (!listing.id) return
     setTogglingShare(true)
     setShareError(null)
     try {
@@ -187,16 +185,18 @@ export function ListingDetailsPanel({
     setTimeout(() => setCopiedLink(false), 2000)
   }
 
-  const handleDeleteComment = async (commentId: string) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) return
+  const confirmDeleteComment = async () => {
+    if (!commentToDelete) return
+    const commentId = commentToDelete
     setDeletingCommentId(commentId)
     try {
       await deleteListingComment(listing.id, commentId)
       setComments((prev) => prev.filter((c) => c.id !== commentId))
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete comment')
+      setCommentDeleteError(err instanceof Error ? err.message : 'Failed to delete comment')
     } finally {
       setDeletingCommentId(null)
+      setCommentToDelete(null)
     }
   }
 
@@ -254,13 +254,8 @@ export function ListingDetailsPanel({
     }
   }
 
-  const handleDelete = async () => {
+  const confirmDeleteDraft = async () => {
     if (!onDelete || !canDeleteListing(listing.stage)) return
-    const confirmed = window.confirm(
-      'Delete this draft listing? This cannot be undone.',
-    )
-    if (!confirmed) return
-
     setIsDeleting(true)
     setActionError(null)
     try {
@@ -498,7 +493,7 @@ export function ListingDetailsPanel({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => void handleDelete()}
+                  onClick={() => setShowDeleteDraftConfirm(true)}
                   disabled={isDeleting}
                   className="border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
                 >
@@ -668,7 +663,7 @@ export function ListingDetailsPanel({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => void handleRegenerateToken()}
+                          onClick={() => setShowRegenerateConfirm(true)}
                           disabled={togglingShare}
                           className="h-8 text-[11px] text-[var(--color-text-secondary)] hover:text-red-300 hover:bg-red-950/10"
                         >
@@ -772,7 +767,7 @@ export function ListingDetailsPanel({
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => void handleDeleteComment(comment.id)}
+                            onClick={() => setCommentToDelete(comment.id)}
                             disabled={deletingCommentId === comment.id}
                             className="h-7 w-7 p-0 text-stone-400 hover:text-red-400 hover:bg-red-950/20"
                             title="Delete comment"
@@ -983,6 +978,53 @@ export function ListingDetailsPanel({
           })}
         </ul>
       </aside>
+
+      {/* Confirm Regenerate Client Share Token Dialog (Gold variant) */}
+      <ConfirmDialog
+        open={showRegenerateConfirm}
+        onOpenChange={setShowRegenerateConfirm}
+        title="Regenerate client share link?"
+        description="Regenerating this link will immediately invalidate any existing links you have shared with clients. Anyone with the old link will no longer be able to access the page."
+        confirmLabel="Regenerate link"
+        variant="gold"
+        isLoading={togglingShare}
+        onConfirm={confirmRegenerateToken}
+      />
+
+      {/* Confirm Delete Comment Dialog (Destructive) */}
+      <ConfirmDialog
+        open={Boolean(commentToDelete)}
+        onOpenChange={(open) => !open && setCommentToDelete(null)}
+        title="Delete comment?"
+        description="Are you sure you want to delete this comment? This cannot be undone."
+        confirmLabel="Delete comment"
+        variant="destructive"
+        isLoading={Boolean(deletingCommentId)}
+        onConfirm={confirmDeleteComment}
+      />
+
+      {/* Comment Delete Error Notice (Single OK button) */}
+      <ConfirmDialog
+        open={Boolean(commentDeleteError)}
+        onOpenChange={(open) => !open && setCommentDeleteError(null)}
+        title="Comment deletion failed"
+        description={commentDeleteError}
+        confirmLabel="OK"
+        variant="gold"
+        singleButton
+      />
+
+      {/* Confirm Delete Draft Listing Dialog (Destructive) */}
+      <ConfirmDialog
+        open={showDeleteDraftConfirm}
+        onOpenChange={setShowDeleteDraftConfirm}
+        title="Delete draft listing?"
+        description="This draft listing will be permanently removed. This cannot be undone."
+        confirmLabel="Delete draft"
+        variant="destructive"
+        isLoading={isDeleting}
+        onConfirm={confirmDeleteDraft}
+      />
     </section>
   )
 }

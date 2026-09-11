@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Loader2, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteListing } from '@/lib/listings'
 import { cn } from '@/lib/utils'
 
@@ -20,15 +21,11 @@ export function DeleteDraftButton({
   variant = 'button',
   className,
 }: DeleteDraftButtonProps) {
+  const [showConfirm, setShowConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(
-      'Delete this draft listing? This cannot be undone.',
-    )
-    if (!confirmed) return
-
     setIsDeleting(true)
     setError(null)
     const ok = await deleteListing(listingId, agentId)
@@ -40,12 +37,12 @@ export function DeleteDraftButton({
     onDeleted?.()
   }
 
-  if (variant === 'icon') {
-    return (
-      <div className={className}>
+  return (
+    <div className={className}>
+      {variant === 'icon' ? (
         <button
           type="button"
-          onClick={() => void handleDelete()}
+          onClick={() => setShowConfirm(true)}
           disabled={isDeleting}
           title="Delete draft"
           aria-label="Delete draft listing"
@@ -59,27 +56,34 @@ export function DeleteDraftButton({
             <Trash2 className="size-4" />
           )}
         </button>
-        {error ? <p className="mt-1 text-xs text-red-400">{error}</p> : null}
-      </div>
-    )
-  }
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShowConfirm(true)}
+          disabled={isDeleting}
+          className="border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+        >
+          {isDeleting ? (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          ) : (
+            <Trash2 className="mr-2 size-4" />
+          )}
+          {isDeleting ? 'Deleting...' : 'Delete draft'}
+        </Button>
+      )}
 
-  return (
-    <div className={className}>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => void handleDelete()}
-        disabled={isDeleting}
-        className="border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
-      >
-        {isDeleting ? (
-          <Loader2 className="mr-2 size-4 animate-spin" />
-        ) : (
-          <Trash2 className="mr-2 size-4" />
-        )}
-        {isDeleting ? 'Deleting...' : 'Delete draft'}
-      </Button>
+      <ConfirmDialog
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        title="Delete draft listing?"
+        description="This draft listing will be permanently removed. This cannot be undone."
+        confirmLabel="Delete draft"
+        variant="destructive"
+        isLoading={isDeleting}
+        onConfirm={handleDelete}
+      />
+
       {error ? (
         <p className="mt-2 text-xs text-red-400" role="alert">
           {error}

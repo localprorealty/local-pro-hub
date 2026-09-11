@@ -4,6 +4,7 @@ import { FileText, DollarSign, Briefcase, Calendar, CheckCircle2, AlertCircle, F
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { MissionShell } from '@/components/layout/MissionShell'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { getMyHistory, type TransactionHistory } from '@/lib/brokermint'
 import CapProgressCard from '@/components/overview/CapProgressCard'
 import { api } from '@/lib/api'
@@ -59,6 +60,7 @@ function OverviewContent() {
   const [revData, setRevData] = useState<any>(null)
   const [isRevLoading, setIsRevLoading] = useState(false)
   const [policyLoading, setPolicyLoading] = useState(false)
+  const [docNoticeOpen, setDocNoticeOpen] = useState(false)
 
   useEffect(() => {
     if (activeTab !== 'revenue_share') return
@@ -88,7 +90,7 @@ function OverviewContent() {
       if (url) {
         window.open(url, '_blank')
       } else {
-        alert('Document is not currently uploaded by Admin. Please check back later.')
+        setDocNoticeOpen(true)
       }
     } catch (err) {
       console.error('Error opening document:', err)
@@ -635,6 +637,16 @@ function OverviewContent() {
           </motion.div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={docNoticeOpen}
+        onOpenChange={setDocNoticeOpen}
+        title="Document Unavailable"
+        description="This document has not been uploaded by Admin yet. Please check back later."
+        confirmLabel="OK"
+        variant="gold"
+        singleButton
+      />
     </MissionShell>
   )
 }

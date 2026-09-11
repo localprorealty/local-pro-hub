@@ -4,6 +4,7 @@ import { AdminShell } from '@/components/admin/AdminShell'
 import { MissionShell } from '@/components/layout/MissionShell'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile } from '@/lib/users'
 
@@ -28,6 +29,7 @@ export default function AdminTemplatesPage() {
   const [search, setSearch] = useState('')
   const [templates, setTemplates] = useState<TemplateItem[]>([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [templateToDelete, setTemplateToDelete] = useState<TemplateItem | null>(null)
   const [userRole, setUserRole] = useState<'agent' | 'admin'>('agent')
   const [newTemplate, setNewTemplate] = useState({
     name: '',
@@ -108,11 +110,11 @@ export default function AdminTemplatesPage() {
     setIsAddModalOpen(false)
   }
 
-  const handleDeleteTemplate = (id: string) => {
-    if (confirm('Are you sure you want to delete this template?')) {
-      const updated = templates.filter((t) => t.id !== id)
-      saveTemplates(updated)
-    }
+  const confirmDeleteTemplate = () => {
+    if (!templateToDelete) return
+    const updated = templates.filter((t) => t.id !== templateToDelete.id)
+    saveTemplates(updated)
+    setTemplateToDelete(null)
   }
 
   const filtered = templates.filter((t) =>
@@ -206,7 +208,7 @@ export default function AdminTemplatesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteTemplate(t.id)}
+                          onClick={() => setTemplateToDelete(t)}
                           className="text-red-500 hover:text-red-400 hover:bg-red-500/10 h-8 px-2.5"
                         >
                           <Trash2 className="size-3.5" />
@@ -324,6 +326,16 @@ export default function AdminTemplatesPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(templateToDelete)}
+        onOpenChange={(open) => !open && setTemplateToDelete(null)}
+        title="Delete template?"
+        description={`Are you sure you want to delete "${templateToDelete?.name}"? This template will no longer be available across the brokerage.`}
+        confirmLabel="Delete template"
+        variant="destructive"
+        onConfirm={confirmDeleteTemplate}
+      />
     </div>
   )
 

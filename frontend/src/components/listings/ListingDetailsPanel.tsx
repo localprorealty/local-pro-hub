@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Circle,
   CircleDot,
@@ -53,6 +55,7 @@ import {
   getMlsPath,
   getPhotographyPath,
   getNextStage,
+  stageIndex,
   type ListingRow,
   type ListingStage,
   type ListingUpdatePayload,
@@ -279,6 +282,31 @@ export function ListingDetailsPanel({
     setSearchParams(nextParams, { replace: true })
   }
 
+  // Tab horizontal scroll affordance state
+  const tabListRef = useRef<HTMLDivElement>(null)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+
+  const checkTabScroll = useCallback(() => {
+    const el = tabListRef.current
+    if (!el) return
+    const hasOverflow = el.scrollWidth > el.clientWidth + 2
+    setCanScrollLeft(el.scrollLeft > 5)
+    setCanScrollRight(hasOverflow && el.scrollLeft < el.scrollWidth - el.clientWidth - 5)
+  }, [])
+
+  useEffect(() => {
+    checkTabScroll()
+    const handleResize = () => checkTabScroll()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [checkTabScroll])
+
+  useEffect(() => {
+    const timer = setTimeout(checkTabScroll, 60)
+    return () => clearTimeout(timer)
+  }, [activeTab, checkTabScroll])
+
   useEffect(() => {
     if (activeTab === 'share' && listing.id) {
       void markListingCommentsRead(listing.id).then(() => {
@@ -295,87 +323,153 @@ export function ListingDetailsPanel({
     { id: 'details', label: 'Property Copy & Details', icon: FileText },
   ]
 
+  const currentStageIdx = stageIndex(listing.stage)
+
   return (
     <section className="grid gap-6 lg:grid-cols-[1fr_260px]">
-      <div className="space-y-6">
+      <div className="space-y-6 min-w-0">
         {/* Persistent Top Summary Card */}
-        <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <div>
+        <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 sm:p-5">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1">
               <p className="text-xs tracking-widest text-[var(--color-gold)] uppercase">
                 Listing Hub
               </p>
-              <h3 className="mt-1 text-xl font-semibold text-[var(--color-white)]">
+              <h3 className="mt-1 text-lg sm:text-xl font-semibold text-[var(--color-white)] break-words">
                 {listing.address_full ?? 'Unnamed listing'}
               </h3>
-              <div className="mt-1.5">
+              <div className="mt-1.5 flex items-center gap-2">
                 <ListingIdBadge id={listing.id} />
               </div>
             </div>
             <Button
               type="button"
               variant="outline"
-              className="rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
+              className="hidden sm:inline-flex shrink-0 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
               onClick={onClose}
             >
               Back to dashboard
             </Button>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 border-t border-[var(--color-border)]/40 pt-4">
             <div>
-              <p className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+              <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 Type
               </p>
-              <p className="text-sm font-medium text-[var(--color-white)]">
+              <p className="text-xs sm:text-sm font-medium text-[var(--color-white)] truncate">
                 {TYPE_LABEL[listing.listing_type]}
               </p>
             </div>
             <div>
-              <p className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+              <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 MLS
               </p>
-              <p className="text-sm font-medium text-[var(--color-white)]">
+              <p className="text-xs sm:text-sm font-medium text-[var(--color-white)]">
                 {listing.mls_number ?? 'N/A'}
               </p>
             </div>
             <div>
-              <p className="text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+              <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 List Price
               </p>
-              <p className="text-sm font-medium text-[var(--color-white)]">
+              <p className="text-xs sm:text-sm font-medium text-[var(--color-white)] truncate">
                 {listing.list_price ? `$${listing.list_price.toLocaleString()}` : 'N/A'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation Bar */}
-        <div className="flex border-b border-[var(--color-border)] gap-1 overflow-x-auto">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleSelectTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 -mb-px ${
-                  isActive
-                    ? 'border-[var(--color-gold)] text-[var(--color-gold)] bg-[var(--color-gold)]/5'
-                    : 'border-transparent text-[var(--color-text-secondary)] hover:text-white hover:border-zinc-700'
-                }`}
-              >
-                <Icon className="size-3.5" />
-                <span>{tab.label}</span>
-                {tab.id === 'share' && comments.length > 0 ? (
-                  <span className="rounded-full bg-[var(--color-gold)]/20 px-1.5 py-0.2 text-[10px] font-bold text-[var(--color-gold)] border border-[var(--color-gold)]/30">
-                    {comments.length}
-                  </span>
-                ) : null}
-              </button>
-            )
-          })}
+        {/* Mobile Compact Pipeline Stepper (< lg only) */}
+        <div className="lg:hidden rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            <span className="text-[11px] uppercase tracking-widest text-[var(--color-gold)] font-semibold">
+              Pipeline
+            </span>
+            <span className="text-xs font-semibold text-[var(--color-white)] flex items-center gap-1.5">
+              <span className="text-[var(--color-gold)] font-bold">●</span>
+              <span>{STAGE_LABEL[listing.stage]}</span>
+              <span className="text-[10px] text-[var(--color-text-secondary)] font-normal">
+                ({currentStageIdx + 1} of {PIPELINE_STAGES.length})
+              </span>
+            </span>
+          </div>
+
+          {/* Dots / Segment Bar */}
+          <div className="flex items-center gap-1.5 w-full">
+            {PIPELINE_STAGES.map((stage, idx) => {
+              const isPast = idx < currentStageIdx
+              const isCurrent = idx === currentStageIdx
+
+              return (
+                <div
+                  key={stage}
+                  title={STAGE_LABEL[stage]}
+                  className={`h-1.5 flex-1 rounded-full transition-all ${
+                    isCurrent
+                      ? 'bg-[var(--color-gold)] ring-2 ring-[var(--color-gold)]/40 shadow-[0_0_8px_var(--color-gold)]'
+                      : isPast
+                        ? 'bg-[var(--color-gold)]/70'
+                        : 'bg-[var(--color-surface-3)] border border-[var(--color-border)]'
+                  }`}
+                />
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Tab Navigation Bar Wrapper with Scroll Affordance */}
+        <div className="relative">
+          <div
+            ref={tabListRef}
+            onScroll={checkTabScroll}
+            className="flex border-b border-[var(--color-border)] gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 -mb-px shrink-0 ${
+                    isActive
+                      ? 'border-[var(--color-gold)] text-[var(--color-gold)] bg-[var(--color-gold)]/5'
+                      : 'border-transparent text-[var(--color-text-secondary)] hover:text-white hover:border-zinc-700'
+                  }`}
+                >
+                  <Icon className="size-3.5" />
+                  <span>{tab.label}</span>
+                  {tab.id === 'share' && comments.length > 0 ? (
+                    <span className="rounded-full bg-[var(--color-gold)]/20 px-1.5 py-0.2 text-[10px] font-bold text-[var(--color-gold)] border border-[var(--color-gold)]/30">
+                      {comments.length}
+                    </span>
+                  ) : null}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Right-edge gradient fade & indicator on mobile (< lg) */}
+          {canScrollRight ? (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none lg:hidden absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 w-10 bg-gradient-to-l from-[var(--color-surface)] via-[var(--color-surface)]/80 to-transparent transition-opacity duration-300"
+            >
+              <ChevronRight className="size-4 text-[var(--color-gold)] animate-pulse" />
+            </div>
+          ) : null}
+
+          {/* Left-edge gradient fade & indicator on mobile (< lg) */}
+          {canScrollLeft ? (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none lg:hidden absolute left-0 top-0 bottom-0 flex items-center justify-start pl-1 w-10 bg-gradient-to-r from-[var(--color-surface)] via-[var(--color-surface)]/80 to-transparent transition-opacity duration-300"
+            >
+              <ChevronLeft className="size-4 text-[var(--color-gold)]" />
+            </div>
+          ) : null}
         </div>
 
         {/* Tab 1: Stage Action */}
@@ -950,8 +1044,8 @@ export function ListingDetailsPanel({
         )}
       </div>
 
-      {/* Right-hand Column: Pipeline Sidebar (Unchanged) */}
-      <aside className="h-fit sticky top-24 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+      {/* Right-hand Column: Pipeline Sidebar (Desktop only) */}
+      <aside className="hidden lg:block h-fit sticky top-24 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
         <h4 className="mb-4 text-xs tracking-widest text-[var(--color-gold)] uppercase">
           Pipeline
         </h4>

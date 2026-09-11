@@ -159,8 +159,8 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
   }
 
   return (
-    <main className="relative min-h-svh px-6 py-8 md:px-8">
-      <header className="mb-8 flex items-start justify-between border-b border-[var(--color-border)] pb-6">
+    <main className="relative min-h-svh px-4 py-6 sm:px-6 sm:py-8 md:px-8">
+      <header className="mb-6 sm:mb-8 flex items-start justify-between border-b border-[var(--color-border)] pb-4 sm:pb-6">
         <div className="flex min-w-0 items-start gap-4">
           <Link
             to={backPath}

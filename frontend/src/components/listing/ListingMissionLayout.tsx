@@ -41,8 +41,8 @@ export function ListingMissionLayout({
     >
       {sidebar ? (
         <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-          {sidebar}
-          <div>{children}</div>
+          <div className="hidden lg:block">{sidebar}</div>
+          <div className="min-w-0">{children}</div>
         </div>
       ) : (
         children

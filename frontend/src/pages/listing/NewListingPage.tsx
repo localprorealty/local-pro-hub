@@ -81,7 +81,7 @@ function NewListingContent() {
   }
 
   const headerSlot = (
-    <header className="relative flex items-center justify-center border-b border-[#2a2a2a] px-8 py-6">
+    <header className="hidden lg:flex relative items-center justify-center border-b border-[#2a2a2a] px-8 py-6">
       <button
         type="button"
         onClick={() => navigate('/dashboard')}
@@ -97,7 +97,7 @@ function NewListingContent() {
   )
 
   return (
-    <MissionShell role="agent" headerSlot={headerSlot}>
+    <MissionShell role="agent" title="New Listing" backTo="/dashboard" headerSlot={headerSlot}>
       <div className="mx-auto flex max-w-5xl flex-col items-center">
         <motion.div
           className="grid w-full gap-6 md:grid-cols-3"

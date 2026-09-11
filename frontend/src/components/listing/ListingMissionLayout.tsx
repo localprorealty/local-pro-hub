@@ -27,6 +27,9 @@ export function ListingMissionLayout({
     <MissionShell
       role={role}
       email={email}
+      title={title}
+      subtitle={subtitle}
+      backTo={`/listing/${listingId}`}
       hideDefaultHeader
       headerSlot={
         <ListingMissionHeader

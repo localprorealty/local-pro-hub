@@ -286,6 +286,9 @@ function PhotographyContent() {
     <MissionShell
       role="agent"
       email={agentEmail}
+      title="Book Photography"
+      subtitle={listing.address_full ?? 'Unnamed listing'}
+      backTo={listingHubPath}
       hideDefaultHeader
       headerSlot={
         <ListingMissionHeader

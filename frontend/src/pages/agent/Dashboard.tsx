@@ -4,7 +4,7 @@ import { Plus, Search, X } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { AgentSidebar } from '@/components/layout/AgentSidebar'
+import { MissionShell } from '@/components/layout/MissionShell'
 import { PipelineListingCard } from '@/components/listings/PipelineListingCard'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
@@ -139,88 +139,130 @@ function DashboardContent({ role }: DashboardPageProps) {
     return counts
   }, [listings])
 
-  return (
-    <main className="relative min-h-svh">
-      <div className="grid min-h-svh lg:grid-cols-[220px_1fr]">
-        <AgentSidebar role={role} />
+  const headerSlot = (
+    <>
+      {liveBannerId ? (
+        <motion.div
+          initial={{ y: -60, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="flex items-center justify-between bg-[#CFB87C] px-6 py-3 text-sm font-bold text-black"
+        >
+          <span>
+            Listing is LIVE — {liveListing?.address_full ?? 'Your listing'}
+          </span>
+          <button
+            type="button"
+            onClick={() => setLiveBannerId(null)}
+            className="opacity-60 hover:opacity-100"
+            aria-label="Dismiss"
+          >
+            <X className="size-4" />
+          </button>
+        </motion.div>
+      ) : null}
 
-        <section className="flex min-h-svh flex-col">
-          {liveBannerId ? (
-            <motion.div
-              initial={{ y: -60, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="flex items-center justify-between bg-[#CFB87C] px-6 py-3 text-sm font-bold text-black"
-            >
-              <span>
-                Listing is LIVE — {liveListing?.address_full ?? 'Your listing'}
-              </span>
-              <button
-                type="button"
-                onClick={() => setLiveBannerId(null)}
-                className="opacity-60 hover:opacity-100"
-                aria-label="Dismiss"
-              >
-                <X className="size-4" />
-              </button>
-            </motion.div>
-          ) : null}
-
-          <header className="flex items-start justify-between border-b border-[var(--color-border)] px-8 py-8">
-            <div>
-              <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
-                Overview
-              </h1>
-              <div className="mt-4 flex flex-wrap gap-6">
-                {PIPELINE_TABS.map((tab) => {
-                  const isActive = activeTab === tab
-                  return (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => setActiveTab(tab)}
-                      className={`text-sm transition-colors ${
-                        isActive
-                          ? 'border-b border-[var(--color-gold)] pb-1 text-[var(--color-gold)]'
-                          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
-                      }`}
-                    >
-                      {tabLabel(tab)} ({tabCounts[tab]})
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              {role === 'agent' ? (
+      <header className="hidden lg:flex items-start justify-between border-b border-[var(--color-border)] px-8 py-8">
+        <div>
+          <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
+            Overview
+          </h1>
+          <div className="mt-4 flex flex-wrap gap-6">
+            {PIPELINE_TABS.map((tab) => {
+              const isActive = activeTab === tab
+              return (
                 <button
+                  key={tab}
                   type="button"
-                  onClick={() => navigate('/listing/new')}
-                  className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-gold)] bg-[var(--color-gold)] px-4 py-2 font-[family-name:var(--font-display)] text-xs font-bold tracking-wide text-black uppercase transition-opacity hover:opacity-90"
+                  onClick={() => setActiveTab(tab)}
+                  className={`text-sm transition-colors ${
+                    isActive
+                      ? 'border-b border-[var(--color-gold)] pb-1 text-[var(--color-gold)]'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+                  }`}
                 >
-                  <Plus className="size-4" />
-                  Start New Listing
+                  {tabLabel(tab)} ({tabCounts[tab]})
                 </button>
-              ) : null}
-              <label className="relative hidden sm:block">
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
-                <Input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search listings..."
-                  className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
-                />
-              </label>
-              <NotificationBell />
-              <ProfileMenu role={role} />
-            </div>
-          </header>
-
-          <div className="flex-1 overflow-y-auto px-8 py-10">
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              )
+            })}
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {role === 'agent' ? (
+            <button
+              type="button"
+              onClick={() => navigate('/listing/new')}
+              className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-gold)] bg-[var(--color-gold)] px-4 py-2 font-[family-name:var(--font-display)] text-xs font-bold tracking-wide text-black uppercase transition-opacity hover:opacity-90"
             >
+              <Plus className="size-4" />
+              Start New Listing
+            </button>
+          ) : null}
+          <label className="relative hidden sm:block">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search listings..."
+              className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
+            />
+          </label>
+          <NotificationBell />
+          <ProfileMenu role={role} />
+        </div>
+      </header>
+
+      {/* Mobile subheader: pipeline tabs and quick New button */}
+      <div className="flex lg:hidden flex-col gap-3 border-b border-[var(--color-border)] px-4 py-3 bg-[#0a0a0a]">
+        {liveBannerId ? (
+          <div className="flex items-center justify-between rounded bg-[#CFB87C] px-3 py-2 text-xs font-bold text-black">
+            <span>Listing is LIVE — {liveListing?.address_full ?? 'Your listing'}</span>
+            <button type="button" onClick={() => setLiveBannerId(null)} aria-label="Dismiss">
+              <X className="size-3.5" />
+            </button>
+          </div>
+        ) : null}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-4 overflow-x-auto pb-1 text-xs">
+            {PIPELINE_TABS.map((tab) => {
+              const isActive = activeTab === tab
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={`whitespace-nowrap pb-1 transition-colors ${
+                    isActive
+                      ? 'border-b-2 border-[var(--color-gold)] font-semibold text-[var(--color-gold)]'
+                      : 'text-[var(--color-text-secondary)]'
+                  }`}
+                >
+                  {tabLabel(tab)} ({tabCounts[tab]})
+                </button>
+              )
+            })}
+          </div>
+          {role === 'agent' ? (
+            <button
+              type="button"
+              onClick={() => navigate('/listing/new')}
+              className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--color-gold)] bg-[var(--color-gold)] px-2.5 py-1 text-[11px] font-bold text-black uppercase"
+            >
+              <Plus className="size-3" />
+              New
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </>
+  )
+
+  return (
+    <MissionShell role={role} title="Overview" headerSlot={headerSlot}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4 sm:hidden">
                 <label className="relative w-full">
                   <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
@@ -293,10 +335,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                 </div>
               )}
             </motion.div>
-          </div>
-        </section>
-      </div>
-    </main>
+    </MissionShell>
   )
 }
 

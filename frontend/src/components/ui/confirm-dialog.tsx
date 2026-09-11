@@ -46,7 +46,7 @@ export function ConfirmDialog({
 
   const actionClassName =
     variant === 'destructive'
-      ? 'rounded-sm bg-red-600 text-white hover:bg-red-700'
+      ? 'rounded-sm border border-red-500/40 bg-red-950/80 text-red-200 hover:bg-red-900 hover:border-red-500/60 hover:text-white transition-colors'
       : 'rounded-sm bg-[var(--color-gold)] text-[var(--color-black)] hover:bg-[#dcc487]'
 
   return (

@@ -15,7 +15,7 @@ When presenting alerts, asking for confirmation, or communicating errors/status 
 For destructive actions, irreversible operations, or state confirmations:
 - **Location**: `@/components/ui/confirm-dialog`
 - **Variants**:
-  - `variant="destructive"` (Red action button): For all delete actions (e.g. deleting listings, photos, comments, user accounts, document templates, or preferred vendors) and disconnect actions (e.g. disconnecting Gmail).
+  - `variant="destructive"` (Muted deep crimson action button with subtle border): For all delete actions (e.g. deleting listings, photos, comments, user accounts, document templates, or preferred vendors) and disconnect actions (e.g. disconnecting Gmail).
   - `variant="gold"` (LocalPRO Gold button): For non-destructive actions requiring user confirmation (e.g. regenerating public client share links or tokens, overriding settings).
 - **Single-Button Informational Mode**:
   - `singleButton={true}`, `variant="gold"`, `confirmLabel="OK"`: For system notices, missing document notices, or action failure notices that require explicit acknowledgement where a toast is unavailable or inappropriate.

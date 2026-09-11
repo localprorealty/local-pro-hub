@@ -62,8 +62,10 @@ export function BookNeighborhoodPage({
         </div>
       </div>
 
-      <div className="space-y-4 px-8 py-6 text-sm leading-relaxed">
-        <p style={{ ...EXPORT_BODY_TEXT, color: '#262626' }}>{guide.intro}</p>
+      <div className="max-h-[780px] space-y-4 overflow-hidden px-8 py-6 text-sm leading-relaxed">
+        <p className="line-clamp-3 overflow-hidden text-ellipsis" style={{ ...EXPORT_BODY_TEXT, color: '#262626' }}>
+          {guide.intro}
+        </p>
 
         <div
           className="grid grid-cols-2 gap-6 border-b border-neutral-200 py-4"
@@ -74,8 +76,8 @@ export function BookNeighborhoodPage({
               Commute Times
             </p>
             <ul className="space-y-1">
-              {guide.commute_times.map((item) => (
-                <li key={item.destination} style={EXPORT_BODY_TEXT}>
+              {guide.commute_times.slice(0, 3).map((item) => (
+                <li key={item.destination} className="truncate" style={EXPORT_BODY_TEXT}>
                   <span className="font-semibold">{item.destination}:</span> {item.time}
                 </li>
               ))}
@@ -85,11 +87,13 @@ export function BookNeighborhoodPage({
             <p className="mb-2 text-xs font-bold" style={EXPORT_LABEL_CAPS}>
               Boundaries
             </p>
-            <p style={EXPORT_BODY_TEXT}>{guide.boundaries}</p>
+            <p className="line-clamp-2 overflow-hidden text-ellipsis" style={EXPORT_BODY_TEXT}>
+              {guide.boundaries}
+            </p>
             <p className="mt-3 text-xs font-bold" style={EXPORT_LABEL_CAPS}>
               Nearby
             </p>
-            <p className="mt-1" style={EXPORT_BODY_TEXT}>
+            <p className="mt-1 line-clamp-2 overflow-hidden text-ellipsis" style={EXPORT_BODY_TEXT}>
               {guide.nearby_neighborhoods}
             </p>
           </div>
@@ -108,7 +112,7 @@ export function BookNeighborhoodPage({
             <p className="text-xs font-bold" style={{ ...EXPORT_LABEL_CAPS, color: brandColor }}>
               {heading}
             </p>
-            <p className="mt-1" style={EXPORT_BODY_TEXT}>
+            <p className="mt-1 line-clamp-2 overflow-hidden text-ellipsis" style={EXPORT_BODY_TEXT}>
               {text}
             </p>
           </div>

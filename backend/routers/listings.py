@@ -24,12 +24,20 @@ class MarketingRefineRequest(BaseModel):
     listing_context: dict[str, Any] = Field(default_factory=dict)
 
 
-NEIGHBORHOOD_PROMPT = """Write a real estate neighborhood guide for {city}, Texas.
-Format the response as JSON with these exact keys:
-intro, commute_times (array of objects with destination and time),
-boundaries, nearby_neighborhoods, what_to_expect, the_lifestyle,
-unexpected_appeal, the_market, youll_fall_in_love.
-Return only valid JSON. No markdown."""
+NEIGHBORHOOD_PROMPT = """Write a concise real estate neighborhood guide for {city}, Texas for a print page.
+
+Format as JSON with these keys:
+- intro: 1 welcoming sentence (~18 words, under 140 chars).
+- commute_times: array of 3 objects with keys 'destination' and 'time' (e.g. [{{"destination": "Downtown Dallas", "time": "30 mins"}}, ...]).
+- boundaries: 1 short sentence listing boundary roads or borders (under 80 chars).
+- nearby_neighborhoods: 3-4 comma-separated adjacent areas (under 80 chars).
+- what_to_expect: exactly 1 concise sentence (~15 words, under 110 chars).
+- the_lifestyle: exactly 1 concise sentence (~15 words, under 110 chars).
+- unexpected_appeal: exactly 1 concise sentence (~15 words, under 110 chars).
+- the_market: exactly 1 concise sentence (~15 words, under 110 chars).
+- youll_fall_in_love: exactly 1 concise sentence (~15 words, under 110 chars).
+
+Return ONLY raw JSON. No code block, no markdown, no other text."""
 
 DESCRIPTION_PROMPT = """You are a professional real estate copywriter specializing \
 in North Texas MLS listings. Write a compelling property description \
@@ -357,10 +365,88 @@ Rules:
 - Change only the contact fields the instruction asks for; keep the others unchanged.
 - Do not include property description or any other text.
 - Return a single line, no explanation."""
+    elif req.page_type in ("flyer", "flyer_description"):
+        prompt = f"""You are a real estate marketing copywriter.
+
+The agent wants to refine the property description for a single-page marketing flyer.
+
+Current text (which may be an oversized MLS description):
+{req.current_content}
+
+Property context:
+{req.listing_context}
+
+Agent's instruction:
+"{req.instruction}"
+
+Rules:
+- STRICT LENGTH REQUIREMENT: You MUST condense, trim, or rewrite the copy to approximately 70-80 words (strictly 450 to 550 characters, 5-6 printed lines).
+- NEVER preserve or anchor to the length of the current text. The current text may be too long and MUST be sized down to fit the flyer's fixed visual container.
+- Single cohesive, high-impact paragraph.
+- Upscale, compelling real estate marketing tone highlighting key features.
+- Do not add agent contact details unless explicitly requested.
+- Return ONLY the revised description paragraph. No preamble, no quotes, no markdown."""
+    elif req.page_type in ("property_details", "book_property_details"):
+        prompt = f"""You are a real estate marketing copywriter.
+
+The agent wants to refine the property description for their Listing Book property details page.
+
+Current text (which may be an unconstrained or lengthy MLS description):
+{req.current_content}
+
+Property context:
+{req.listing_context}
+
+Agent's instruction:
+"{req.instruction}"
+
+Rules:
+- STRICT FORMAT AND LENGTH: You MUST output exactly 2 balanced paragraphs separated by two newlines (\\n\\n).
+- NEVER preserve or anchor to the length of the current text. If the current text is too long or a single block, you MUST condense and split it into 2 balanced paragraphs.
+- Target capacity: approximately 90-110 words total (~45-55 words per paragraph, strictly under 750 characters total).
+- Must fit cleanly in the fixed book details column alongside property specifications without overflowing.
+- Upscale, inviting real estate tone highlighting flow, design, and livability.
+- Return ONLY the revised 2-paragraph description text. No preamble, no quotes, no markdown."""
+    elif req.page_type in ("agent_bio", "book_agent_bio"):
+        prompt = f"""You are a real estate copywriter.
+
+The agent wants to refine their biography for the Listing Book closing page.
+
+Current bio (which may be an overly long biography or resume):
+{req.current_content}
+
+Agent's instruction:
+"{req.instruction}"
+
+Rules:
+- STRICT LENGTH REQUIREMENT: You MUST output exactly 3-4 concise professional sentences (~50-70 words, strictly under 500 characters).
+- NEVER preserve or anchor to the length of the current bio. It must fit cleanly in the fixed agent bio column next to the headshot without overflowing.
+- Professional, warm, and credibility-building.
+- Return ONLY the revised biography text. No preamble, no quotes, no markdown."""
+    elif req.page_type in ("neighborhood", "book_neighborhood"):
+        prompt = f"""You are a real estate copywriter specializing in North Texas communities.
+
+The agent wants to refine a section of their Listing Book neighborhood guide:
+
+Current text (which may be too long or multi-sentence):
+{req.current_content}
+
+Property context:
+{req.listing_context}
+
+Agent's instruction:
+"{req.instruction}"
+
+Rules:
+- STRICT LENGTH REQUIREMENT: Always size the output to fit the target fixed grid cell without overflowing:
+  * If refining the intro: exactly 1 welcoming sentence (~18 words, strictly under 140 characters).
+  * If refining a section (what to expect, lifestyle, unexpected appeal, the market, you'll fall in love): exactly 1 concise, vivid sentence (~15 words, strictly under 110 characters).
+- NEVER preserve or anchor to the length of the current text. If the input is multi-sentence or overly verbose, aggressively condense it to a single punchy sentence.
+- Return ONLY the single revised sentence. No preamble, no quotes, no markdown."""
     else:
         prompt = f"""You are a real estate marketing copywriter.
 
-The agent wants to refine this content for their {req.page_type}:
+The agent wants to refine this marketing content for their {req.page_type}:
 
 Current content:
 {req.current_content}
@@ -372,16 +458,18 @@ Agent's instruction:
 "{req.instruction}"
 
 Rewrite the content following the instruction.
-Keep the same approximate length and format.
-Do not add agent contact details unless the instruction explicitly asks for them.
-Return only the revised content, no explanation."""
+Rules:
+- Keep the copy concise, punchy, and sized appropriately to fit fixed visual layouts.
+- Do not unnecessarily expand or inflate length.
+- Do not add agent contact details unless explicitly requested.
+- Return ONLY the revised content. No preamble, no quotes, no markdown."""
 
     try:
         response = groq_client.chat.completions.create(
             model=settings.groq_model,
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            max_tokens=1200,
+            temperature=0.4,
+            max_tokens=4000,
         )
     except Exception as exc:
         raise HTTPException(
@@ -434,7 +522,7 @@ async def generate_neighborhood_guide(
                 },
             ],
             temperature=0.5,
-            max_tokens=1500,
+            max_tokens=4000,
         )
     except Exception as exc:
         raise HTTPException(

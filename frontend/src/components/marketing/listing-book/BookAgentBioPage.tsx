@@ -55,7 +55,7 @@ export function BookAgentBioPage({
             </div>
           )}
           <p
-            className="text-sm leading-relaxed"
+            className="line-clamp-12 max-h-[480px] overflow-hidden text-sm leading-relaxed text-ellipsis"
             style={{ ...EXPORT_BODY_TEXT, color: '#404040' }}
           >
             {bio}

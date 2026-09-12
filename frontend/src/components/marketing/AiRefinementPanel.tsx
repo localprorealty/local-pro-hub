@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -16,8 +16,96 @@ export type RefinementPageOption = {
   key: string
   label: string
   pageType: MarketingPageType
+  threshold?: number
+  templateType?: 'flyer' | 'book'
   getContent: () => string
   applyContent: (content: string) => void
+}
+
+export type TemplateThresholdConfig = {
+  threshold: number
+  templateType: 'flyer' | 'book'
+}
+
+export const TEMPLATE_THRESHOLDS: Record<string, TemplateThresholdConfig> = {
+  flyer_description: {
+    threshold: 550,
+    templateType: 'flyer',
+  },
+  book_property_details: {
+    threshold: 750,
+    templateType: 'book',
+  },
+  book_neighborhood_intro: {
+    threshold: 140,
+    templateType: 'book',
+  },
+  book_what_to_expect: {
+    threshold: 110,
+    templateType: 'book',
+  },
+  book_the_lifestyle: {
+    threshold: 110,
+    templateType: 'book',
+  },
+  book_unexpected_appeal: {
+    threshold: 110,
+    templateType: 'book',
+  },
+  book_the_market: {
+    threshold: 110,
+    templateType: 'book',
+  },
+  book_youll_fall_in_love: {
+    threshold: 110,
+    templateType: 'book',
+  },
+  book_boundaries: {
+    threshold: 80,
+    templateType: 'book',
+  },
+  book_nearby_neighborhoods: {
+    threshold: 80,
+    templateType: 'book',
+  },
+  book_agent_bio: {
+    threshold: 500,
+    templateType: 'book',
+  },
+}
+
+export function getTemplateThresholdConfig(
+  page: RefinementPageOption,
+): TemplateThresholdConfig | null {
+  if (page.threshold !== undefined) {
+    return {
+      threshold: page.threshold,
+      templateType: page.templateType ?? (page.pageType === 'flyer' ? 'flyer' : 'book'),
+    }
+  }
+
+  if (TEMPLATE_THRESHOLDS[page.key]) {
+    return TEMPLATE_THRESHOLDS[page.key]
+  }
+
+  if (page.pageType === 'flyer') {
+    return { threshold: 550, templateType: 'flyer' }
+  }
+  if (page.pageType === 'property_details') {
+    return { threshold: 750, templateType: 'book' }
+  }
+  if (page.pageType === 'agent_bio') {
+    return { threshold: 500, templateType: 'book' }
+  }
+
+  return null
+}
+
+export function getThresholdWarningMessage(templateType: 'flyer' | 'book'): string {
+  if (templateType === 'flyer') {
+    return "This may extend beyond the flyer's visible space — the excess will be clipped when rendered. You can still save this text."
+  }
+  return "This may extend beyond the book page's visible space — the excess will be clipped when rendered. You can still save this text."
 }
 
 type AiRefinementPanelProps = {
@@ -56,6 +144,10 @@ export function AiRefinementPanel({
   }
 
   const pageHistory = history[activePage.key] ?? []
+  const currentContent = activePage.getContent() ?? ''
+  const charCount = currentContent.length
+  const thresholdConfig = getTemplateThresholdConfig(activePage)
+  const isOver = Boolean(thresholdConfig && charCount > thresholdConfig.threshold)
 
   return (
     <aside className="w-full xl:w-[320px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4">
@@ -88,12 +180,38 @@ export function AiRefinementPanel({
         </div>
         <textarea
           id="active-page-content"
-          value={activePage.getContent()}
+          value={currentContent}
           onChange={(event) => activePage.applyContent(event.target.value)}
           rows={6}
-          className="mt-1 w-full resize-y rounded-sm border border-[var(--color-border)] bg-[#0a0a0a] px-3 py-2 text-xs leading-relaxed text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
+          className={`mt-1 w-full resize-y rounded-sm border bg-[#0a0a0a] px-3 py-2 text-xs leading-relaxed text-white focus:outline focus:outline-2 focus:outline-[#CFB87C] ${
+            isOver ? 'border-amber-500/50' : 'border-[var(--color-border)]'
+          }`}
           placeholder="Enter or edit text..."
         />
+        <div className="mt-1.5 flex items-center justify-end text-xs">
+          <span
+            data-testid="char-counter"
+            className={`text-xs tabular-nums ${
+              isOver ? 'font-semibold text-amber-400' : 'text-[#888888]'
+            }`}
+          >
+            {thresholdConfig
+              ? `${charCount} / ${thresholdConfig.threshold} characters`
+              : `${charCount} characters`}
+          </span>
+        </div>
+
+        {isOver && thresholdConfig && (
+          <div
+            role="status"
+            className="mt-2 flex items-start gap-2 rounded-sm border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-200"
+          >
+            <AlertTriangle className="size-4 shrink-0 text-amber-400 mt-0.5" aria-hidden />
+            <p className="leading-relaxed">
+              {getThresholdWarningMessage(thresholdConfig.templateType)}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mt-5 border-t border-[var(--color-border)] pt-4">

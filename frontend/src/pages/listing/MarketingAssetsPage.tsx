@@ -399,6 +399,8 @@ function MarketingAssetsContent() {
           key: 'flyer_description',
           label: 'Property description',
           pageType: 'flyer',
+          threshold: 550,
+          templateType: 'flyer',
           getContent: () => flyerDescription,
           applyContent: (content) => {
             setFlyerDescription(content)

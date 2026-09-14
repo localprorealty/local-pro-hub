@@ -22,6 +22,7 @@ import {
 } from '@/lib/ntreis-sections'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile } from '@/lib/users'
+import { CHROME_WEBSTORE_URL } from '@/lib/constants'
 
 function MlsSubmissionContent() {
   const { id } = useParams<{ id: string }>()
@@ -161,12 +162,12 @@ function MlsSubmissionContent() {
                   <p className="text-xs text-emerald-400/80">V2.4.1 connected</p>
                 ) : (
                   <a
-                    href="https://chrome.google.com/webstore"
+                    href={CHROME_WEBSTORE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[#CFB87C] underline"
+                    className="text-xs text-[#CFB87C] underline hover:text-[#e4cf98]"
                   >
-                    Download from Chrome Web Store
+                    Get it from the Chrome Web Store
                   </a>
                 )}
               </div>

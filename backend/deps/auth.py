@@ -63,8 +63,8 @@ async def require_agent(
         raise HTTPException(status_code=401, detail="Missing authorization token.")
     token = authorization.removeprefix("Bearer ").strip()
     row = _profile_for_token(token)
-    if row.get("role") not in ("agent", "admin"):
-        raise HTTPException(status_code=403, detail="Agent access required.")
+    if row.get("role") not in ("agent", "admin", "transaction_coordinator"):
+        raise HTTPException(status_code=403, detail="Agent or TC access required.")
     return row["id"]
 
 

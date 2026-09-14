@@ -43,12 +43,18 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
   const [error, setError] = useState<string | null>(null)
 
   const backPath = backPathForRole(role)
-  const menuRole = role === 'admin' ? 'admin' : role === 'marketing' || role === 'photographer' ? role : 'agent'
+  const menuRole =
+    role === 'admin'
+      ? 'admin'
+      : role === 'marketing' || role === 'photographer' || role === 'transaction_coordinator'
+        ? role
+        : 'agent'
   const canManage =
-    role === 'agent' &&
     !!listing &&
     !!currentUserId &&
-    listing.agent_id === currentUserId
+    (role === 'transaction_coordinator' ||
+      role === 'admin' ||
+      (role === 'agent' && listing.agent_id === currentUserId))
 
   useEffect(() => {
     const state = location.state as { bookingSuccess?: string } | null
@@ -60,13 +66,30 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
 
   const reloadListing = useCallback(async () => {
     if (!listingId) return
-    const { data, error: queryError } = await getSupabaseClient()
+    let queryRes: { data: any; error: any } = await getSupabaseClient()
       .from('listings')
-      .select(LISTING_COLUMNS)
+      .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name, email), creator:users!created_by(full_name)`)
       .eq('id', listingId)
       .maybeSingle()
-    if (queryError) throw queryError
-    if (data) setListing(data as ListingRow)
+
+    if (queryRes.error) {
+      queryRes = await getSupabaseClient()
+        .from('listings')
+        .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name, email)`)
+        .eq('id', listingId)
+        .maybeSingle()
+    }
+
+    if (queryRes.error) {
+      queryRes = await getSupabaseClient()
+        .from('listings')
+        .select(LISTING_COLUMNS)
+        .eq('id', listingId)
+        .maybeSingle()
+    }
+
+    if (queryRes.error) throw queryRes.error
+    if (queryRes.data) setListing((queryRes.data as unknown) as ListingRow)
   }, [listingId])
 
   useEffect(() => {
@@ -84,21 +107,37 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
           setCurrentUserId(session.user.id)
         }
 
-        const { data, error: queryError } = await getSupabaseClient()
+        let queryRes: { data: any; error: any } = await getSupabaseClient()
           .from('listings')
-          .select(LISTING_COLUMNS)
+          .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name, email), creator:users!created_by(full_name)`)
           .eq('id', listingId)
           .maybeSingle()
 
-        if (queryError) throw queryError
+        if (queryRes.error) {
+          queryRes = await getSupabaseClient()
+            .from('listings')
+            .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name, email)`)
+            .eq('id', listingId)
+            .maybeSingle()
+        }
+
+        if (queryRes.error) {
+          queryRes = await getSupabaseClient()
+            .from('listings')
+            .select(LISTING_COLUMNS)
+            .eq('id', listingId)
+            .maybeSingle()
+        }
+
+        if (queryRes.error) throw queryRes.error
         if (!isMounted) return
-        if (!data) {
+        if (!queryRes.data) {
           setListing(null)
           setError('Listing not found.')
           return
         }
 
-        const row = data as ListingRow
+        const row = (queryRes.data as unknown) as ListingRow
         if (isUnstartedDraft(row) && session?.user?.id === row.agent_id) {
           navigate(getListingContinuePath(row), { replace: true })
           return
@@ -136,7 +175,14 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
       .single()
 
     if (updateError) throw updateError
-    if (data) setListing(data as ListingRow)
+    if (data) {
+      setListing((prev) => ({
+        ...(prev ?? {}),
+        ...(data as ListingRow),
+        agent: prev?.agent,
+        creator: prev?.creator,
+      }))
+    }
   }
 
   const handleAdvanceStage = async (id: string) => {

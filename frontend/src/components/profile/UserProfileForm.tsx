@@ -35,7 +35,7 @@ type UserProfileFormProps = {
 }
 
 const TIERS: PhotographerTier[] = ['basic', 'standard', 'elite']
-const ROLES: UserRole[] = ['agent', 'marketing', 'photographer', 'admin']
+const ROLES: UserRole[] = ['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator']
 const STATUSES: UserProfileStatus[] = ['pending', 'active', 'suspended']
 
 function isValidEmail(value: string): boolean {
@@ -195,7 +195,7 @@ export function UserProfileForm({
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
-                  {r}
+                  {r === 'transaction_coordinator' ? 'Transaction Coordinator' : r}
                 </option>
               ))}
             </select>

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 type DeleteDraftButtonProps = {
   listingId: string
   agentId: string
+  isStaff?: boolean
   onDeleted?: () => void
   variant?: 'icon' | 'button'
   className?: string
@@ -17,6 +18,7 @@ type DeleteDraftButtonProps = {
 export function DeleteDraftButton({
   listingId,
   agentId,
+  isStaff = false,
   onDeleted,
   variant = 'button',
   className,
@@ -28,9 +30,9 @@ export function DeleteDraftButton({
   const handleDelete = async () => {
     setIsDeleting(true)
     setError(null)
-    const ok = await deleteListing(listingId, agentId)
+    const ok = await deleteListing(listingId, agentId, isStaff)
     if (!ok) {
-      setError('Could not delete. Run migration 002_listings_delete_draft.sql in Supabase if needed.')
+      setError('Could not delete. Check permissions or try again.')
       setIsDeleting(false)
       return
     }

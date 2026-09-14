@@ -338,8 +338,28 @@ export function ListingDetailsPanel({
               <h3 className="mt-1 text-lg sm:text-xl font-semibold text-[var(--color-white)] break-words">
                 {listing.address_full ?? 'Unnamed listing'}
               </h3>
-              <div className="mt-1.5 flex items-center gap-2">
+              <div className="mt-1.5 flex flex-wrap items-center gap-2">
                 <ListingIdBadge id={listing.id} />
+                {(() => {
+                  const agentObj = Array.isArray(listing.agent) ? listing.agent[0] : listing.agent
+                  const agentName = agentObj?.full_name
+                  const creatorObj = Array.isArray(listing.creator) ? listing.creator[0] : listing.creator
+                  const creatorName = creatorObj?.full_name
+                  const isCreatedByOther = Boolean(
+                    (listing.created_by && listing.agent_id && listing.created_by !== listing.agent_id) ||
+                    (creatorName && agentName && creatorName !== agentName)
+                  )
+
+                  if (agentName || isCreatedByOther) {
+                    return (
+                      <span className="text-xs text-[var(--color-gold)] font-medium">
+                        {agentName ? `Agent: ${agentName}` : ''}
+                        {isCreatedByOther ? `${agentName ? ' · ' : ''}Created by TC${creatorName ? `: ${creatorName}` : ''}` : ''}
+                      </span>
+                    )
+                  }
+                  return null
+                })()}
               </div>
             </div>
             <Button

@@ -137,8 +137,8 @@ def _require_agent_listing(
     user_row = _single_row(
         client.table("users").select("role").eq("id", agent_id)
     )
-    is_admin = user_row and user_row.get("role") == "admin"
-    if not listing or (not is_admin and listing.get("agent_id") != agent_id):
+    is_staff = user_row and user_row.get("role") in ("admin", "transaction_coordinator")
+    if not listing or (not is_staff and listing.get("agent_id") != agent_id):
         raise HTTPException(status_code=403, detail="Not your listing")
     if expected_stage and listing.get("stage") != expected_stage:
         raise HTTPException(
@@ -146,6 +146,29 @@ def _require_agent_listing(
             detail=f"Listing must be in {expected_stage} stage",
         )
     return listing
+
+
+def _log_activity(
+    client: Any,
+    listing_id: str,
+    actor_id: str,
+    action: str,
+    details: dict[str, Any] | None = None,
+) -> None:
+    try:
+        client.table("listings").update({"updated_by": actor_id}).eq("id", listing_id).execute()
+    except Exception:
+        pass
+    try:
+        client.table("listing_activity_logs").insert({
+            "listing_id": listing_id,
+            "actor_id": actor_id,
+            "action": action,
+            "details": details or {},
+        }).execute()
+    except Exception:
+        pass
+
 
 
 ALLOWED_DESCRIPTION_STAGES = {
@@ -709,12 +732,13 @@ async def transition_listing(
         template_id = mapping.data["checklist_template_id"]
         
         # Fetch agent profile to get their brokermint_id
-        agent_profile = client.table("users").select("brokermint_id").eq("id", agent_id).single().execute()
+        listing_agent_id = str(listing.get("agent_id") or agent_id)
+        agent_profile = client.table("users").select("brokermint_id").eq("id", listing_agent_id).single().execute()
         agent_bm_id = agent_profile.data.get("brokermint_id") if agent_profile.data else None
         if not agent_bm_id:
             raise HTTPException(
                 status_code=400,
-                detail="Your agent profile is not synchronized with BrokerMint (missing BrokerMint ID)."
+                detail="The listing agent profile is not synchronized with BrokerMint (missing BrokerMint ID)."
             )
             
         # 3. Create real Contacts in BrokerMint for each seller (with idempotency guard)
@@ -950,20 +974,30 @@ async def transition_listing(
         await apply_bm_checklist_template(txn_id, template_id)
         
         # 8. Store Transaction ID
+        listing_agent_id = str(listing.get("agent_id") or agent_id)
         client.table("listings").update({
             "stage": target_stage,
             "brokermint_transaction_id": str(txn_id)
         }).eq("id", listing_id).execute()
         
         # 9. Trigger docs_pending notification
-        await _trigger_docs_pending_notification(client, listing_id, agent_id, listing, str(txn_id))
+        await _trigger_docs_pending_notification(client, listing_id, listing_agent_id, listing, str(txn_id))
         
     else:
         # Standard transition
+        listing_agent_id = str(listing.get("agent_id") or agent_id)
         client.table("listings").update({"stage": target_stage}).eq("id", listing_id).execute()
         if target_stage == "marketing":
-            await _trigger_marketing_notification(client, listing_id, agent_id, listing)
+            await _trigger_marketing_notification(client, listing_id, listing_agent_id, listing)
         
+    _log_activity(
+        client,
+        listing_id,
+        agent_id,
+        "stage_transition",
+        {"from_stage": listing.get("stage"), "to_stage": target_stage},
+    )
+
     if target_stage in ["mls_submitted", "live", "closed"]:
         try:
             client.table("marketing_drafts").delete().eq("listing_id", listing_id).execute()
@@ -980,8 +1014,8 @@ async def transition_listing(
 
 class AddMarketingAssetRequest(BaseModel):
     asset_id: str
-    asset_name: str
-    price_cents: int
+    asset_name: str = ""
+    price_cents: int = 0
     paid: bool = False
 
 
@@ -1016,14 +1050,10 @@ async def add_marketing_asset(
     return {"success": True, "marketing_statuses": marketing_statuses}
 
 
-class RemoveMarketingAssetRequest(BaseModel):
-    asset_id: str
-
-
-@router.post("/{listing_id}/marketing/remove-asset")
-async def remove_marketing_asset(
+@router.delete("/{listing_id}/marketing/status")
+async def delete_marketing_status(
     listing_id: str,
-    req: RemoveMarketingAssetRequest,
+    req: AddMarketingAssetRequest,
     agent_id: str = Depends(require_agent),
 ) -> dict[str, Any]:
     client = get_service_client()
@@ -1037,6 +1067,7 @@ async def remove_marketing_asset(
     # Save back to Supabase
     form_data["marketing_statuses"] = marketing_statuses
     client.table("listings").update({"form_data": form_data}).eq("id", listing_id).execute()
+    _log_activity(client, listing_id, agent_id, "marketing_status_deleted", {"asset_id": req.asset_id})
 
     return {"success": True, "marketing_statuses": marketing_statuses}
 
@@ -1052,7 +1083,8 @@ async def save_marketing_draft(
     agent_id: str = Depends(require_agent),
 ) -> dict[str, Any]:
     client = get_service_client()
-    _require_agent_listing(client, listing_id, agent_id)
+    listing = _require_agent_listing(client, listing_id, agent_id)
+    draft_agent_id = listing.get("agent_id") or agent_id
     
     try:
         existing = client.table("marketing_drafts").select("id").eq("listing_id", listing_id).maybe_single().execute()
@@ -1064,9 +1096,10 @@ async def save_marketing_draft(
         else:
             client.table("marketing_drafts").insert({
                 "listing_id": listing_id,
-                "agent_id": agent_id,
+                "agent_id": draft_agent_id,
                 "state": req.state
             }).execute()
+        _log_activity(client, listing_id, agent_id, "marketing_draft_saved")
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -1269,6 +1302,7 @@ async def upload_listing_image(
     try:
         res = client.table("listing_images").insert(record).execute()
         created = res.data[0] if res.data else record
+        _log_activity(client, listing_id, agent_id, "photo_uploaded", {"category": category, "is_hero": is_hero})
     except Exception as e:
         err_msg = str(e)
         if "PGRST205" in err_msg or "schema cache" in err_msg:
@@ -1320,6 +1354,7 @@ async def update_listing_image(
             .eq("listing_id", listing_id)
             .execute()
         )
+        _log_activity(client, listing_id, agent_id, "photo_updated", {"image_id": image_id})
         return {"success": True, "image": res.data[0] if res.data else None}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update image: {e}")
@@ -1343,6 +1378,7 @@ async def delete_listing_image(
         if storage_path:
             client.storage.from_("listing-images").remove([storage_path])
 
+        _log_activity(client, listing_id, agent_id, "photo_deleted", {"image_id": image_id})
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete image: {e}")

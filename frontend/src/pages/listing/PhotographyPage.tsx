@@ -283,10 +283,12 @@ function PhotographyContent() {
   }
 
   const listingHubPath = `/listing/${id}`
+  const shellRole =
+    agentProfile?.role === 'transaction_coordinator' ? 'transaction_coordinator' : 'agent'
 
   return (
     <MissionShell
-      role="agent"
+      role={shellRole}
       email={agentEmail}
       title="Book Photography"
       subtitle={listing.address_full ?? 'Unnamed listing'}

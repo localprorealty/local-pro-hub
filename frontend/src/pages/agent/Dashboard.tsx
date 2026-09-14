@@ -82,13 +82,27 @@ function DashboardContent({ role }: DashboardPageProps) {
       } = await getSupabaseClient().auth.getSession()
       if (session?.user?.id) setAgentId(session.user.id)
 
-      const { data, error: queryError } = await getSupabaseClient()
+      let queryRes: { data: any; error: any } = await getSupabaseClient()
         .from('listings')
-        .select(LISTING_COLUMNS)
+        .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name, email), creator:users!created_by(full_name)`)
         .order('updated_at', { ascending: false })
 
-      if (queryError) throw queryError
-      setListings((data ?? []) as ListingRow[])
+      if (queryRes.error) {
+        queryRes = await getSupabaseClient()
+          .from('listings')
+          .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name, email)`)
+          .order('updated_at', { ascending: false })
+      }
+
+      if (queryRes.error) {
+        queryRes = await getSupabaseClient()
+          .from('listings')
+          .select(LISTING_COLUMNS)
+          .order('updated_at', { ascending: false })
+      }
+
+      if (queryRes.error) throw queryRes.error
+      setListings(((queryRes.data ?? []) as unknown) as ListingRow[])
     } catch (loadError) {
       setError(
         loadError instanceof Error ? loadError.message : 'Unable to load listings.',
@@ -106,7 +120,9 @@ function DashboardContent({ role }: DashboardPageProps) {
     return listings.filter((listing) => {
       if (!matchesTab(listing, activeTab)) return false
 
-      const text = `${listing.address_full ?? ''} ${listing.mls_number ?? ''}`.toLowerCase()
+      const agentObj = Array.isArray(listing.agent) ? listing.agent[0] : listing.agent
+      const agentText = `${agentObj?.full_name ?? ''} ${agentObj?.email ?? ''}`
+      const text = `${listing.address_full ?? ''} ${listing.mls_number ?? ''} ${agentText}`.toLowerCase()
       const matchesSearch = search.trim()
         ? text.includes(search.trim().toLowerCase())
         : true
@@ -187,7 +203,7 @@ function DashboardContent({ role }: DashboardPageProps) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          {role === 'agent' ? (
+          {role === 'agent' || role === 'transaction_coordinator' ? (
             <button
               type="button"
               onClick={() => navigate('/listing/new')}
@@ -202,7 +218,11 @@ function DashboardContent({ role }: DashboardPageProps) {
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search listings..."
+              placeholder={
+                role === 'transaction_coordinator'
+                  ? 'Search address, MLS, or agent...'
+                  : 'Search listings...'
+              }
               className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
             />
           </label>
@@ -241,7 +261,7 @@ function DashboardContent({ role }: DashboardPageProps) {
               )
             })}
           </div>
-          {role === 'agent' ? (
+          {role === 'agent' || role === 'transaction_coordinator' ? (
             <button
               type="button"
               onClick={() => navigate('/listing/new')}
@@ -328,7 +348,8 @@ function DashboardContent({ role }: DashboardPageProps) {
                       index={index}
                       listingPath={getListingContinuePath(listing)}
                       ctaLabel={getListingCtaLabel(listing.stage)}
-                      agentId={role === 'agent' ? agentId : null}
+                      agentId={agentId}
+                      isStaff={role === 'transaction_coordinator'}
                       onDraftDeleted={() => void loadListings()}
                     />
                   ))}

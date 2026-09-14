@@ -19,7 +19,7 @@ type AdminUserRow = {
   created_at: string
 }
 
-const ROLE_OPTIONS: UserRole[] = ['agent', 'marketing', 'photographer', 'admin']
+const ROLE_OPTIONS: UserRole[] = ['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator']
 const APPROVAL_TABS = ['pending', 'active', 'suspended'] as const
 type ApprovalTab = (typeof APPROVAL_TABS)[number]
 
@@ -408,7 +408,7 @@ function AdminApprovalsContent() {
                       >
                         {ROLE_OPTIONS.map((role) => (
                           <option key={role} value={role}>
-                            {role}
+                            {role === 'transaction_coordinator' ? 'Transaction Coordinator' : role}
                           </option>
                         ))}
                       </select>

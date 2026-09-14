@@ -86,7 +86,9 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
       ? 'Marketing'
       : role === 'photographer'
         ? 'Photographer'
-        : 'Agent'
+        : role === 'transaction_coordinator'
+          ? 'Transaction Coordinator'
+          : 'Agent'
 
   const homePath = role === 'photographer' ? '/photographer/calendar' : '/dashboard'
 
@@ -134,6 +136,14 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
                 onClick={onNavigate}
               />
             </>
+          ) : role === 'transaction_coordinator' ? (
+            <SidebarNavLink
+              to="/dashboard"
+              end
+              icon={<Briefcase className="size-4" />}
+              label="Listing Pipelines"
+              onClick={onNavigate}
+            />
           ) : (
             <SidebarNavLink
               to={homePath}
@@ -143,7 +153,7 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
               onClick={onNavigate}
             />
           )}
-          {role === 'agent' ? (
+          {role === 'agent' || role === 'transaction_coordinator' ? (
             <SidebarNavLink
               to="/listing/new"
               icon={<Plus className="size-4" />}
@@ -151,7 +161,7 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
               onClick={onNavigate}
             />
           ) : null}
-          {role === 'agent' ? (
+          {role === 'agent' || role === 'transaction_coordinator' ? (
             <SidebarNavLink
               to="/templates"
               icon={<FileText className="size-4" />}

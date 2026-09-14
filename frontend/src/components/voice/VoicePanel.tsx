@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, Loader2, Mic, Radio, X } from 'lucide-react'
 
@@ -64,16 +65,77 @@ export function VoicePanel({
 }: VoicePanelProps) {
   const options = getDisplayOptions(field)
   const isMultiselect = field?.type === 'multiselect'
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+
+    const handleViewportChange = () => {
+      if (typeof window !== 'undefined' && window.visualViewport) {
+        const heightDiff = window.innerHeight - window.visualViewport.height
+        setIsKeyboardOpen(heightDiff > 140)
+      }
+    }
+
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement | null
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        setIsKeyboardOpen(true)
+      }
+    }
+
+    const handleFocusOut = () => {
+      setTimeout(() => {
+        const active = document.activeElement as HTMLElement | null
+        if (
+          !active ||
+          (active.tagName !== 'INPUT' &&
+            active.tagName !== 'TEXTAREA' &&
+            !active.isContentEditable)
+        ) {
+          handleViewportChange()
+        }
+      }, 120)
+    }
+
+    window.visualViewport?.addEventListener('resize', handleViewportChange)
+    window.visualViewport?.addEventListener('scroll', handleViewportChange)
+    window.addEventListener('focusin', handleFocusIn)
+    window.addEventListener('focusout', handleFocusOut)
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleViewportChange)
+      window.visualViewport?.removeEventListener('scroll', handleViewportChange)
+      window.removeEventListener('focusin', handleFocusIn)
+      window.removeEventListener('focusout', handleFocusOut)
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (isKeyboardOpen && panelRef.current) {
+      panelRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [isKeyboardOpen])
 
   return (
     <AnimatePresence>
       {open ? (
         <motion.div
+          ref={panelRef}
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-          className="fixed right-0 bottom-0 left-0 z-50 max-h-[480px] overflow-y-auto border-t border-[#CFB87C]/20 bg-[#0f0f0f] shadow-[0_-8px_40px_rgba(0,0,0,0.5)]"
+          className={cn(
+            'fixed right-0 bottom-0 left-0 z-50 overflow-y-auto border-t border-[#CFB87C]/20 bg-[#0f0f0f] shadow-[0_-8px_40px_rgba(0,0,0,0.5)] transition-[max-height] duration-200',
+            isKeyboardOpen ? 'max-h-[220px] sm:max-h-[260px]' : 'max-h-[480px]',
+          )}
         >
           <div className="flex h-10 items-center justify-between gap-3 border-b border-[#2a2a2a] px-5">
             <p className="min-w-0 truncate text-xs text-[#888888]">
@@ -122,7 +184,7 @@ export function VoicePanel({
             </div>
           </div>
 
-          <div className="space-y-4 px-5 py-5 pb-8">
+          <div className={cn('space-y-4 px-5 py-5 pb-8', isKeyboardOpen && 'space-y-2.5 px-4 py-2.5 pb-3')}>
             {infoMessage && !field ? (
               <p className="font-[family-name:var(--font-display)] text-lg text-white">
                 {infoMessage}
@@ -163,16 +225,26 @@ export function VoicePanel({
                 </div>
 
                 <div>
-                  <h2 className="font-[family-name:var(--font-display)] text-xl leading-snug font-semibold text-white">
+                  <h2
+                    className={cn(
+                      'font-[family-name:var(--font-display)] text-xl leading-snug font-semibold text-white',
+                      isKeyboardOpen && 'text-base leading-tight',
+                    )}
+                  >
                     {state === 'speaking' ? 'Asking question...' : question}
                   </h2>
-                  {subtitle && state !== 'speaking' ? (
+                  {subtitle && state !== 'speaking' && !isKeyboardOpen ? (
                     <p className="mt-1 text-sm text-[#888888]">{subtitle}</p>
                   ) : null}
                 </div>
 
                 {options.length > 0 ? (
-                  <div className="mt-3 flex max-h-32 flex-wrap gap-2 overflow-y-auto">
+                  <div
+                    className={cn(
+                      'mt-3 flex max-h-32 flex-wrap gap-2 overflow-y-auto',
+                      isKeyboardOpen && 'mt-1.5 max-h-20 gap-1.5',
+                    )}
+                  >
                     {options.map((option) => {
                       const selected = selectedOptions.includes(option)
                       return (
@@ -183,6 +255,7 @@ export function VoicePanel({
                           disabled={state === 'processing' || state === 'speaking'}
                           className={cn(
                             'rounded-full border px-3 py-1.5 text-sm transition-all select-none',
+                            isKeyboardOpen && 'px-2.5 py-1 text-xs',
                             selected
                               ? 'border-[#CFB87C] bg-[#CFB87C] font-semibold text-black'
                               : 'border-[#CFB87C]/40 bg-transparent text-white hover:border-[#CFB87C]',
@@ -201,14 +274,28 @@ export function VoicePanel({
                     type="button"
                     onClick={onConfirmMultiselect}
                     disabled={state === 'processing' || state === 'speaking'}
-                    className="mt-3 rounded-lg bg-[#CFB87C] px-6 py-2 text-sm font-bold text-black disabled:opacity-40"
+                    className={cn(
+                      'mt-3 rounded-lg bg-[#CFB87C] px-6 py-2 text-sm font-bold text-black disabled:opacity-40',
+                      isKeyboardOpen && 'mt-1.5 px-4 py-1.5 text-xs',
+                    )}
                   >
                     Done — {selectedOptions.length} selected →
                   </button>
                 ) : null}
 
-                <div className="rounded-lg border border-[#2a2a2a] bg-[#111111] px-4 py-3">
-                  <p className={cn('text-sm', transcript ? 'text-white' : 'text-[#555555]')}>
+                <div
+                  className={cn(
+                    'rounded-lg border border-[#2a2a2a] bg-[#111111] px-4 py-3',
+                    isKeyboardOpen && 'px-3 py-2',
+                  )}
+                >
+                  <p
+                    className={cn(
+                      'text-sm',
+                      transcript ? 'text-white' : 'text-[#555555]',
+                      isKeyboardOpen && 'text-xs',
+                    )}
+                  >
                     {transcript || 'Your answer will appear here...'}
                   </p>
                 </div>
@@ -234,8 +321,8 @@ export function VoicePanel({
                 ) : null}
 
                 {handsFree && (state === 'waiting' || state === 'listening') ? (
-                  <div className="mt-4">
-                    <div className="mb-3 flex items-center justify-center gap-2">
+                  <div className={cn('mt-4', isKeyboardOpen && 'mt-1.5')}>
+                    <div className="mb-2 flex items-center justify-center gap-2">
                       <Waveform energyLevel={energyLevel} active={state === 'listening'} />
                       <span className="text-sm text-[#CFB87C]">
                         {state === 'listening'
@@ -243,17 +330,19 @@ export function VoicePanel({
                           : 'Get ready to speak...'}
                       </span>
                     </div>
-                    <p className="text-center text-xs text-[#555555]">
-                      Hands-free — speak your answer
-                      {options.length > 0 ? ', or tap an option above' : ''}
-                    </p>
+                    {!isKeyboardOpen ? (
+                      <p className="text-center text-xs text-[#555555]">
+                        Hands-free — speak your answer
+                        {options.length > 0 ? ', or tap an option above' : ''}
+                      </p>
+                    ) : null}
                   </div>
                 ) : null}
 
                 {!handsFree && (state === 'waiting' || state === 'listening') ? (
-                  <div className="mt-4">
+                  <div className={cn('mt-4', isKeyboardOpen && 'mt-1.5')}>
                     {state === 'listening' ? (
-                      <div className="mb-3 flex items-center justify-center gap-2">
+                      <div className="mb-2 flex items-center justify-center gap-2">
                         <Waveform energyLevel={energyLevel} active />
                         <span className="text-sm text-[#CFB87C]">Recording...</span>
                       </div>
@@ -268,6 +357,7 @@ export function VoicePanel({
                       disabled={state !== 'waiting' && state !== 'listening'}
                       className={cn(
                         'flex w-full cursor-pointer flex-col items-center gap-2 rounded-xl border-2 py-5 transition-all select-none touch-none',
+                        isKeyboardOpen && 'flex-row justify-center gap-2 rounded-lg py-2',
                         state === 'listening'
                           ? 'border-[#CFB87C] bg-[#CFB87C] text-black'
                           : 'border-[#CFB87C]/50 bg-transparent text-white hover:border-[#CFB87C]',
@@ -276,21 +366,22 @@ export function VoicePanel({
                       <Mic
                         className={cn(
                           'size-8',
+                          isKeyboardOpen && 'size-4',
                           state === 'listening' ? 'text-black' : 'text-[#CFB87C]',
                         )}
                       />
-                      <span className="text-sm font-medium">
+                      <span className={cn('text-sm font-medium', isKeyboardOpen && 'text-xs')}>
                         {state === 'listening'
                           ? 'Release when done speaking'
                           : 'Hold to answer'}
                       </span>
                     </button>
 
-                    {isMultiselect && selectedOptions.length === 0 ? (
+                    {!isKeyboardOpen && isMultiselect && selectedOptions.length === 0 ? (
                       <p className="mt-2 text-center text-xs text-[#555555]">
                         Or tap options above to select
                       </p>
-                    ) : !isMultiselect && options.length > 0 ? (
+                    ) : !isKeyboardOpen && !isMultiselect && options.length > 0 ? (
                       <p className="mt-2 text-center text-xs text-[#555555]">
                         Or tap an option above
                       </p>

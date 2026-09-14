@@ -263,8 +263,8 @@ async def create_booking(
     user_row = _single_row(
         client.table("users").select("role").eq("id", agent_id)
     )
-    is_admin = user_row and user_row.get("role") == "admin"
-    if not listing or (not is_admin and listing["agent_id"] != agent_id):
+    is_staff = user_row and user_row.get("role") in ("admin", "transaction_coordinator")
+    if not listing or (not is_staff and listing["agent_id"] != agent_id):
         raise HTTPException(status_code=403, detail="Not your listing")
 
     photographer = _single_row(
@@ -358,8 +358,8 @@ async def get_listing_booking(
     user_row = _single_row(
         client.table("users").select("role").eq("id", agent_id)
     )
-    is_admin = user_row and user_row.get("role") == "admin"
-    if not listing or (not is_admin and listing["agent_id"] != agent_id):
+    is_staff = user_row and user_row.get("role") in ("admin", "transaction_coordinator")
+    if not listing or (not is_staff and listing["agent_id"] != agent_id):
         raise HTTPException(status_code=403, detail="Not your listing")
 
     rows = (
@@ -580,8 +580,8 @@ async def agent_respond(
     user_row = _single_row(
         client.table("users").select("role").eq("id", agent_id)
     )
-    is_admin = user_row and user_row.get("role") == "admin"
-    if not listing or (not is_admin and listing["agent_id"] != agent_id):
+    is_staff = user_row and user_row.get("role") in ("admin", "transaction_coordinator")
+    if not listing or (not is_staff and listing["agent_id"] != agent_id):
         raise HTTPException(status_code=403, detail="Not your listing")
     if booking["status"] != "alt_suggested":
         raise HTTPException(

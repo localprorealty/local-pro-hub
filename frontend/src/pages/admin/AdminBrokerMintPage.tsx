@@ -312,7 +312,7 @@ function AdminBrokerMintContent() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="space-y-8"
+            className="space-y-8 w-full min-w-0"
           >
             {/* Real-time Webhooks & Daily Reconciliation Status Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

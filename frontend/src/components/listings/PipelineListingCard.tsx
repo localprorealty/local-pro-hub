@@ -19,6 +19,7 @@ type PipelineListingCardProps = {
   listingPath: string
   ctaLabel?: string
   agentId?: string | null
+  isStaff?: boolean
   showViewForm?: boolean
   onDraftDeleted?: () => void
 }
@@ -29,12 +30,13 @@ export function PipelineListingCard({
   listingPath,
   ctaLabel = 'Continue',
   agentId,
+  isStaff = false,
   showViewForm = false,
   onDraftDeleted,
 }: PipelineListingCardProps) {
   const navigate = useNavigate()
   const showDelete =
-    canDeleteListing(listing.stage) && !!agentId && listing.agent_id === agentId
+    canDeleteListing(listing.stage) && (isStaff || (!!agentId && listing.agent_id === agentId))
   const specs = listingSpecsFromForm(listing.form_data)
   const activeIndex = stageIndex(listing.stage)
   const stageBadgeClass =
@@ -79,11 +81,28 @@ export function PipelineListingCard({
         {(() => {
           const agentObj = Array.isArray(listing.agent) ? listing.agent[0] : listing.agent
           const agentName = agentObj?.full_name
-          if (!agentName) return null
+          const creatorObj = Array.isArray(listing.creator) ? listing.creator[0] : listing.creator
+          const creatorName = creatorObj?.full_name
+          const isCreatedByOther = Boolean(
+            (listing.created_by && listing.agent_id && listing.created_by !== listing.agent_id) ||
+            (creatorName && agentName && creatorName !== agentName)
+          )
+          const showAgent = Boolean(agentName && (isStaff || showViewForm || (agentId && listing.agent_id !== agentId)))
+
+          if (!showAgent && !isCreatedByOther) return null
           return (
-            <p className="text-xs text-[var(--color-gold)] font-medium mt-1">
-              Agent: {agentName}
-            </p>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs mt-1">
+              {showAgent && (
+                <p className="text-xs text-[var(--color-gold)] font-medium">
+                  Agent: {agentName}
+                </p>
+              )}
+              {isCreatedByOther && (
+                <span className="text-[11px] text-[var(--color-text-secondary)]">
+                  {showAgent ? '· ' : ''}Created by TC{creatorName ? `: ${creatorName}` : ''}
+                </span>
+              )}
+            </div>
           )
         })()}
         <div className="mt-1 flex flex-wrap items-center gap-4 text-[11px] tracking-widest text-[var(--color-text-secondary)] uppercase">
@@ -148,6 +167,7 @@ export function PipelineListingCard({
               <DeleteDraftButton
                 listingId={listing.id}
                 agentId={agentId!}
+                isStaff={isStaff}
                 variant="icon"
                 onDeleted={onDraftDeleted}
               />

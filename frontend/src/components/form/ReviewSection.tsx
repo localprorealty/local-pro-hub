@@ -59,32 +59,34 @@ export function ReviewSection({
       )}
 
       <div className="overflow-hidden rounded-lg border border-[#2a2a2a]">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-[#111111] text-[10px] tracking-wider text-[#888888] uppercase">
-            <tr>
-              <th className="px-4 py-3 font-medium">Section</th>
-              <th className="px-4 py-3 font-medium">Required</th>
-              <th className="px-4 py-3 font-medium">Filled</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleSections.map((section) => {
-              const { requiredCount, filledCount } = getSectionRequiredCounts(section, formData)
-              const status = getSectionStatus(section, formData)
-              return (
-                <tr key={section.id} className="border-t border-[#2a2a2a]">
-                  <td className="px-4 py-3 text-white">{section.name}</td>
-                  <td className="px-4 py-3 text-[#888888]">{requiredCount}</td>
-                  <td className="px-4 py-3 text-[#888888]">{filledCount}</td>
-                  <td className="px-4 py-3">
-                    <StatusIcon status={status} />
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[460px] text-left text-sm">
+            <thead className="bg-[#111111] text-[10px] tracking-wider text-[#888888] uppercase">
+              <tr>
+                <th className="px-4 py-3 font-medium">Section</th>
+                <th className="px-4 py-3 font-medium">Required</th>
+                <th className="px-4 py-3 font-medium">Filled</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleSections.map((section) => {
+                const { requiredCount, filledCount } = getSectionRequiredCounts(section, formData)
+                const status = getSectionStatus(section, formData)
+                return (
+                  <tr key={section.id} className="border-t border-[#2a2a2a]">
+                    <td className="px-4 py-3 text-white">{section.name}</td>
+                    <td className="px-4 py-3 text-[#888888]">{requiredCount}</td>
+                    <td className="px-4 py-3 text-[#888888]">{filledCount}</td>
+                    <td className="px-4 py-3">
+                      <StatusIcon status={status} />
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Button

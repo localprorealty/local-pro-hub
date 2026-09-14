@@ -5,6 +5,7 @@ import { Check, ShieldAlert, Trash2, UserCheck, UserX } from 'lucide-react'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { UserRole } from '@/lib/auth'
 import { getSupabaseClient } from '@/lib/supabase'
 
@@ -18,7 +19,7 @@ type AdminUserRow = {
   created_at: string
 }
 
-const ROLE_OPTIONS: UserRole[] = ['agent', 'marketing', 'photographer', 'admin']
+const ROLE_OPTIONS: UserRole[] = ['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator']
 const APPROVAL_TABS = ['pending', 'active', 'suspended'] as const
 type ApprovalTab = (typeof APPROVAL_TABS)[number]
 
@@ -44,6 +45,8 @@ function AdminApprovalsContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [isMutating, setIsMutating] = useState<Record<string, boolean>>({})
   const [error, setError] = useState<string | null>(null)
+  const [userToDelete, setUserToDelete] = useState<{ id: string; email: string } | null>(null)
+  const [isDeletingUser, setIsDeletingUser] = useState(false)
 
   const isSelf = useCallback(
     (userId: string) => Boolean(currentAdminId && userId === currentAdminId),
@@ -160,35 +163,32 @@ function AdminApprovalsContent() {
     [updateUser],
   )
 
-  const deleteUserPermanently = useCallback(
-    async (id: string, email: string) => {
-      const confirmed = window.confirm(
-        `Permanently delete ${email}? This removes their login entirely and frees the email for a new signup.`,
-      )
-      if (!confirmed) return
-
-      setIsMutating((prev) => ({ ...prev, [id]: true }))
-      setError(null)
-      try {
-        if (isSelf(id)) {
-          throw new Error('You cannot delete your own account.')
-        }
-
-        const { error: deleteError } = await getSupabaseClient().rpc('admin_delete_user', {
-          target_user_id: id,
-        })
-        if (deleteError) throw deleteError
-        await loadUsers()
-      } catch (deleteErr) {
-        const message =
-          deleteErr instanceof Error ? deleteErr.message : 'Delete failed.'
-        setError(message)
-      } finally {
-        setIsMutating((prev) => ({ ...prev, [id]: false }))
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return
+    const { id } = userToDelete
+    setIsDeletingUser(true)
+    setIsMutating((prev) => ({ ...prev, [id]: true }))
+    setError(null)
+    try {
+      if (isSelf(id)) {
+        throw new Error('You cannot delete your own account.')
       }
-    },
-    [isSelf, loadUsers],
-  )
+
+      const { error: deleteError } = await getSupabaseClient().rpc('admin_delete_user', {
+        target_user_id: id,
+      })
+      if (deleteError) throw deleteError
+      await loadUsers()
+    } catch (deleteErr) {
+      const message =
+        deleteErr instanceof Error ? deleteErr.message : 'Delete failed.'
+      setError(message)
+    } finally {
+      setIsMutating((prev) => ({ ...prev, [id]: false }))
+      setIsDeletingUser(false)
+      setUserToDelete(null)
+    }
+  }
 
   const bulkApproveSelected = useCallback(async () => {
     const ids = visibleUsers
@@ -225,6 +225,7 @@ function AdminApprovalsContent() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
+        className="w-full min-w-0"
       >
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="border-l-2 border-[var(--color-gold)] bg-[var(--color-surface-2)] p-4">
@@ -253,7 +254,7 @@ function AdminApprovalsContent() {
           </div>
         </section>
 
-        <div className="mb-6 flex gap-3">
+        <div className="mb-6 flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {APPROVAL_TABS.map((tab) => {
             const isActive = activeTab === tab
             const count =
@@ -267,7 +268,7 @@ function AdminApprovalsContent() {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`inline-flex items-center gap-2 px-4 py-2 text-xs tracking-widest uppercase transition-colors ${
+                className={`shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-4 py-2 text-xs tracking-widest uppercase transition-colors ${
                   isActive
                     ? 'border-b-2 border-[var(--color-gold)] bg-[var(--color-surface-3)] text-[var(--color-gold)]'
                     : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
@@ -407,7 +408,7 @@ function AdminApprovalsContent() {
                       >
                         {ROLE_OPTIONS.map((role) => (
                           <option key={role} value={role}>
-                            {role}
+                            {role === 'transaction_coordinator' ? 'Transaction Coordinator' : role}
                           </option>
                         ))}
                       </select>
@@ -445,7 +446,7 @@ function AdminApprovalsContent() {
 
                     <Button
                       type="button"
-                      onClick={() => void deleteUserPermanently(user.id, user.email)}
+                      onClick={() => setUserToDelete({ id: user.id, email: user.email })}
                       disabled={busy || !canDelete}
                       className="h-10 rounded-sm border border-red-500/40 bg-transparent px-4 text-red-300 hover:bg-red-500/10 disabled:opacity-50"
                     >
@@ -459,8 +460,8 @@ function AdminApprovalsContent() {
           )}
         </section>
 
-        <section className="overflow-x-auto border border-[var(--color-border)] bg-[var(--color-surface-2)]">
-          <table className="min-w-full text-left">
+        <section className="w-full max-w-full overflow-x-auto border border-[var(--color-border)] bg-[var(--color-surface-2)]">
+          <table className="w-full min-w-[640px] text-left">
             <thead className="border-b border-[var(--color-border)] bg-[var(--color-surface-3)]">
               <tr>
                 <th className="px-4 py-3 text-xs tracking-widest text-[var(--color-text-secondary)] uppercase">
@@ -503,6 +504,17 @@ function AdminApprovalsContent() {
             </tbody>
           </table>
         </section>
+
+        <ConfirmDialog
+          open={Boolean(userToDelete)}
+          onOpenChange={(open) => !open && setUserToDelete(null)}
+          title="Delete user permanently?"
+          description={`Permanently delete ${userToDelete?.email ?? 'this user'}? This removes their login entirely and frees the email for a new signup.`}
+          confirmLabel="Delete permanently"
+          variant="destructive"
+          isLoading={isDeletingUser}
+          onConfirm={confirmDeleteUser}
+        />
       </motion.div>
     </AdminShell>
   )

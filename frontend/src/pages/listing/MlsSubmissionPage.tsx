@@ -144,10 +144,10 @@ function MlsSubmissionContent() {
               : 'border-amber-500/30 bg-amber-500/10'
           }`}
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex items-center gap-3">
               <span
-                className={`size-2.5 rounded-full ${
+                className={`size-2.5 rounded-full shrink-0 ${
                   extensionDetected ? 'bg-emerald-400' : 'bg-amber-400'
                 }`}
               />
@@ -175,7 +175,7 @@ function MlsSubmissionContent() {
               type="button"
               variant="outline"
               onClick={() => window.open('https://ntrdd.mlsmatrix.com/Matrix/Input', '_blank', 'noopener,noreferrer')}
-              className="shrink-0 rounded-sm border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[#1a1a1a]"
+              className="w-full sm:w-auto shrink-0 justify-center rounded-sm border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[#1a1a1a]"
             >
               Open NTREIS Matrix
               <ExternalLink className="ml-2 size-3.5" />
@@ -197,7 +197,7 @@ function MlsSubmissionContent() {
               {copiedListingId ? 'Copied!' : 'Copy Listing ID'}
             </button>
             <span className="text-xs text-[var(--color-text-secondary)]">
-              (ID: <strong className="text-white font-mono">{id}</strong>)
+              (ID: <strong className="text-white font-mono break-all">{id}</strong>)
             </span>
           </div>
         </div>

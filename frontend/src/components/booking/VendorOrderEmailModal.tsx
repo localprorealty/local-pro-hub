@@ -150,8 +150,8 @@ export function VendorOrderEmailModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-sm border border-[var(--color-border)] bg-[#161616] p-6 shadow-2xl my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-sm border border-[var(--color-border)] bg-[#161616] p-4 sm:p-6 shadow-2xl my-4 sm:my-8 max-h-[92vh] flex flex-col">
         <div className="flex items-start justify-between border-b border-[var(--color-border)] pb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#CFB87C]/10 text-[#CFB87C]">
@@ -243,10 +243,10 @@ export function VendorOrderEmailModal({
             </div>
             <textarea
               required
-              rows={12}
+              rows={8}
               value={bodyText}
               onChange={(e) => setBodyText(e.target.value)}
-              className="w-full rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] p-3 text-xs font-mono leading-relaxed text-white focus:outline focus:outline-1 focus:outline-[#CFB87C]"
+              className="w-full rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] p-3 text-xs font-mono leading-relaxed text-white focus:outline focus:outline-1 focus:outline-[#CFB87C] max-h-[260px] sm:max-h-[360px]"
             />
             <p className="mt-1 text-[11px] text-[var(--color-text-secondary)]">
               Whatever you type above is exactly what will be sent to the photographer.

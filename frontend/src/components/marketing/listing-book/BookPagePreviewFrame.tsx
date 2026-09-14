@@ -1,6 +1,7 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { useContext, type CSSProperties, type ReactNode } from 'react'
 
 import { MarketingPreviewFrame } from '@/components/marketing/MarketingPreviewFrame'
+import { BookPreviewWidthContext } from '@/components/marketing/listing-book/BookPreviewContext'
 import { bookPreviewScale } from '@/lib/marketing-preview'
 
 type BookPagePreviewFrameProps = {
@@ -22,13 +23,15 @@ export function BookPagePreviewFrame({
   style,
   children,
 }: BookPagePreviewFrameProps) {
+  const maxAllowedWidth = useContext(BookPreviewWidthContext)
+
   return (
     <MarketingPreviewFrame
       exportId={pageId}
       width={width}
       height={height}
       exportBg={exportBg}
-      previewScale={bookPreviewScale(width)}
+      previewScale={bookPreviewScale(width, maxAllowedWidth)}
       className={className}
       style={style}
     >

@@ -12,7 +12,12 @@
 export const AUTH_PROVIDER = 'supabase' as const
 
 export type PhotographerTier = 'elite' | 'standard' | 'basic'
-export type UserRole = 'agent' | 'admin' | 'photographer' | 'marketing'
+export type UserRole =
+  | 'agent'
+  | 'admin'
+  | 'photographer'
+  | 'marketing'
+  | 'transaction_coordinator'
 
 export type SignUpPayload = {
   email: string

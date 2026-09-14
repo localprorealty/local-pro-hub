@@ -20,6 +20,9 @@ import {
 
 type AgentSidebarProps = {
   role: Exclude<UserRole, 'admin'>
+  isDrawer?: boolean
+  onNavigate?: () => void
+  className?: string
 }
 
 function SidebarNavLink({
@@ -27,16 +30,19 @@ function SidebarNavLink({
   icon,
   label,
   end = false,
+  onClick,
 }: {
   to: string
   icon: ReactNode
   label: string
   end?: boolean
+  onClick?: () => void
 }) {
   return (
     <NavLink
       to={to}
       end={end}
+      onClick={onClick}
       className={({ isActive }) =>
         `flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-xs tracking-wide uppercase transition-colors ${
           isActive
@@ -74,22 +80,32 @@ function DisabledNavItem({
   )
 }
 
-export function AgentSidebar({ role }: AgentSidebarProps) {
+export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: AgentSidebarProps) {
   const roleLabel =
     role === 'marketing'
       ? 'Marketing'
       : role === 'photographer'
         ? 'Photographer'
-        : 'Agent'
+        : role === 'transaction_coordinator'
+          ? 'Transaction Coordinator'
+          : 'Agent'
 
   const homePath = role === 'photographer' ? '/photographer/calendar' : '/dashboard'
 
   return (
     <aside
-      className={`sticky top-0 flex h-svh flex-col overflow-hidden border-r border-[var(--color-border)] ${shellPanelClass}`}
+      className={
+        isDrawer
+          ? `flex h-full flex-col overflow-hidden bg-[#0a0a0a] ${className ?? ''}`
+          : `sticky top-0 hidden lg:flex h-svh flex-col overflow-hidden border-r border-[var(--color-border)] ${shellPanelClass} ${className ?? ''}`
+      }
     >
       <div className="shrink-0 px-6 py-6">
-        <NavLink to={homePath} className="block transition-opacity hover:opacity-90">
+        <NavLink
+          to={homePath}
+          onClick={onNavigate}
+          className="block transition-opacity hover:opacity-90"
+        >
           <p className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[var(--color-gold)]">
             LP
           </p>
@@ -110,34 +126,47 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
                 to="/overview"
                 icon={<LayoutDashboard className="size-4" />}
                 label="Overview"
+                onClick={onNavigate}
               />
               <SidebarNavLink
                 to="/dashboard"
                 end
                 icon={<Briefcase className="size-4" />}
                 label="Listing Pipelines"
+                onClick={onNavigate}
               />
             </>
+          ) : role === 'transaction_coordinator' ? (
+            <SidebarNavLink
+              to="/dashboard"
+              end
+              icon={<Briefcase className="size-4" />}
+              label="Listing Pipelines"
+              onClick={onNavigate}
+            />
           ) : (
             <SidebarNavLink
               to={homePath}
               end
               icon={role === 'photographer' ? <CalendarDays className="size-4" /> : <LayoutDashboard className="size-4" />}
               label={role === 'photographer' ? 'My Bookings' : 'Overview'}
+              onClick={onNavigate}
             />
           )}
-          {role === 'agent' ? (
+          {role === 'agent' || role === 'transaction_coordinator' ? (
             <SidebarNavLink
               to="/listing/new"
               icon={<Plus className="size-4" />}
               label="New Listing"
+              onClick={onNavigate}
             />
           ) : null}
-          {role === 'agent' ? (
+          {role === 'agent' || role === 'transaction_coordinator' ? (
             <SidebarNavLink
               to="/templates"
               icon={<FileText className="size-4" />}
               label="Templates"
+              onClick={onNavigate}
             />
           ) : null}
           {role === 'agent' && (
@@ -146,6 +175,7 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
                 to="/market-yourself"
                 icon={<Video className="size-4" />}
                 label="Market Yourself"
+                onClick={onNavigate}
               />
             ) : (
               <DisabledNavItem
@@ -158,6 +188,7 @@ export function AgentSidebar({ role }: AgentSidebarProps) {
             to="/profile"
             icon={<User className="size-4" />}
             label="Profile"
+            onClick={onNavigate}
           />
         </nav>
 

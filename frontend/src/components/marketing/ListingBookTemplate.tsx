@@ -11,6 +11,8 @@ import type {
   PhotoUpload,
 } from '@/lib/marketing-types'
 import { COLLAGE_SECTIONS } from '@/lib/marketing-types'
+import { BookPreviewWidthContext } from '@/components/marketing/listing-book/BookPreviewContext'
+import { BOOK_PREVIEW_MAX_WIDTH } from '@/lib/marketing-preview'
 
 type ListingBookTemplateProps = {
   context: ListingMarketingContext
@@ -19,6 +21,7 @@ type ListingBookTemplateProps = {
   neighborhoodGuide: NeighborhoodGuide
   propertyDescription: string
   agentBio: string
+  maxPreviewWidth?: number
 }
 
 function buildCollagePages(
@@ -45,6 +48,7 @@ export function ListingBookTemplate({
   neighborhoodGuide,
   propertyDescription,
   agentBio,
+  maxPreviewWidth = BOOK_PREVIEW_MAX_WIDTH,
 }: ListingBookTemplateProps) {
   const hero = getPhotosByCategories(photos, ['hero'])[0]?.preview ?? null
   const neighborhood =
@@ -55,29 +59,31 @@ export function ListingBookTemplate({
   const collagePages = buildCollagePages(photos)
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      <BookCoverPage context={context} heroPhoto={hero} agent={agent} />
-      <BookNeighborhoodPage
-        context={context}
-        guide={neighborhoodGuide}
-        neighborhoodPhoto={neighborhood}
-        agent={agent}
-      />
-      <BookPropertyDetailsPage
-        context={context}
-        description={propertyDescription}
-        edgePhotos={edgePhotos}
-        agent={agent}
-      />
-      {collagePages.map((page) => (
-        <PhotoCollagePage
-          key={page.pageId}
-          pageId={page.pageId}
-          photos={page.urls}
-          landscape={page.urls.length >= 2}
+    <BookPreviewWidthContext.Provider value={maxPreviewWidth}>
+      <div className="flex flex-col items-center gap-8">
+        <BookCoverPage context={context} heroPhoto={hero} agent={agent} />
+        <BookNeighborhoodPage
+          context={context}
+          guide={neighborhoodGuide}
+          neighborhoodPhoto={neighborhood}
+          agent={agent}
         />
-      ))}
-      <BookAgentBioPage agent={agent} bio={agentBio} />
-    </div>
+        <BookPropertyDetailsPage
+          context={context}
+          description={propertyDescription}
+          edgePhotos={edgePhotos}
+          agent={agent}
+        />
+        {collagePages.map((page) => (
+          <PhotoCollagePage
+            key={page.pageId}
+            pageId={page.pageId}
+            photos={page.urls}
+            landscape={page.urls.length >= 2}
+          />
+        ))}
+        <BookAgentBioPage agent={agent} bio={agentBio} />
+      </div>
+    </BookPreviewWidthContext.Provider>
   )
 }

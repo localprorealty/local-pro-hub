@@ -31,6 +31,8 @@ export interface PropertyAddress {
 export type Listing = {
   id: string
   agent_id: string
+  created_by?: string | null
+  updated_by?: string | null
   listing_type: ListingType
   stage: ListingStage
   address_full: string | null
@@ -47,11 +49,12 @@ export type Listing = {
 /** @deprecated Prefer `Listing` — kept for pipeline/dashboard compatibility */
 export type ListingRow = Listing & {
   agent_id?: string
-  agent?: { full_name: string } | null
+  agent?: { full_name: string; email?: string } | null
+  creator?: { full_name: string; email?: string } | null
 }
 
 export const LISTING_COLUMNS =
-  'id, listing_type, stage, address_full, mls_number, list_price, go_live_date, description_generated, form_data, created_at, updated_at, agent_id, brokermint_transaction_id'
+  'id, listing_type, stage, address_full, mls_number, list_price, go_live_date, description_generated, form_data, created_at, updated_at, agent_id, brokermint_transaction_id, created_by, updated_by'
 
 export const PIPELINE_STAGES: ListingStage[] = [
   'draft',
@@ -182,6 +185,56 @@ export function getListingContinuePath(
   return `/listing/${listing.id}`
 }
 
+/**
+ * Determines whether a draft listing is unstarted (empty brand-new draft without
+ * address or saved form content), which should redirect directly to the input form.
+ * Listings with legitimately saved draft data should show the Listing Hub.
+ */
+export function isUnstartedDraft(
+  listing: Pick<Listing, 'stage'> & {
+    address_full?: string | null
+    form_data?: Record<string, unknown> | null
+  },
+): boolean {
+  if (listing.stage !== 'draft') return false
+
+  // If the listing already has a full address populated, it has real data
+  if (listing.address_full && listing.address_full.trim().length > 0) {
+    return false
+  }
+
+  const formData = listing.form_data
+  if (!formData || typeof formData !== 'object' || Object.keys(formData).length === 0) {
+    return true
+  }
+
+  // If the address step in the form was completed, it is not unstarted
+  if (formData.address_step_complete === true) {
+    return false
+  }
+
+  // Check if any identifying property or seller info has been saved
+  const hasSubstantiveData = Boolean(
+    (typeof formData.street_name === 'string' && formData.street_name.trim()) ||
+    (typeof formData.street_number === 'string' && formData.street_number.trim()) ||
+    (typeof formData.seller_name === 'string' && formData.seller_name.trim()) ||
+    (typeof formData.property_sub_type === 'string' && formData.property_sub_type.trim()) ||
+    (typeof formData.city === 'string' && formData.city.trim()) ||
+    (typeof formData.zip_code === 'string' && formData.zip_code.trim()) ||
+    (Array.isArray(formData.sellers) &&
+      formData.sellers.some(
+        (s) =>
+          s &&
+          typeof s === 'object' &&
+          (Boolean((s as Record<string, unknown>).name) ||
+            Boolean((s as Record<string, unknown>).email) ||
+            Boolean((s as Record<string, unknown>).phone)),
+      ))
+  )
+
+  return !hasSubstantiveData
+}
+
 export function getListingFormPath(id: string): string {
   return `/listing/${id}/form`
 }
@@ -228,22 +281,72 @@ export function formatGoLiveDate(value: string | null): string {
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+export async function logListingActivity(
+  listingId: string,
+  action: string,
+  details: Record<string, unknown> = {},
+): Promise<void> {
+  try {
+    const { data: { user } } = await getSupabaseClient().auth.getUser()
+    if (!user) return
+    await getSupabaseClient()
+      .from('listing_activity_logs')
+      .insert({
+        listing_id: listingId,
+        actor_id: user.id,
+        action,
+        details,
+      })
+  } catch (err) {
+    console.warn('Failed to log listing activity:', err)
+  }
+}
+
 export async function createListing(
   agentId: string,
   listingType: ListingType,
+  createdBy?: string,
 ): Promise<{ id: string } | null> {
-  const { data, error } = await getSupabaseClient()
+  const payload: Record<string, unknown> = {
+    agent_id: agentId,
+    listing_type: listingType,
+    stage: 'draft',
+    form_data: {},
+  }
+  if (createdBy) {
+    payload.created_by = createdBy
+    payload.updated_by = createdBy
+  }
+
+  const supabase = getSupabaseClient()
+  let { data, error } = await supabase
     .from('listings')
-    .insert({
-      agent_id: agentId,
-      listing_type: listingType,
-      stage: 'draft',
-      form_data: {},
-    })
+    .insert(payload)
     .select('id')
     .single()
 
+  // Graceful fallback if created_by / updated_by column does not exist yet
+  if (error && createdBy) {
+    delete payload.created_by
+    delete payload.updated_by
+    const retry = await supabase
+      .from('listings')
+      .insert(payload)
+      .select('id')
+      .single()
+    data = retry.data
+    error = retry.error
+  }
+
   if (error || !data) return null
+
+  if (createdBy && createdBy !== agentId) {
+    await logListingActivity(data.id as string, 'listing_created_by_tc', {
+      created_by: createdBy,
+      agent_id: agentId,
+    })
+  }
+
   return { id: data.id as string }
 }
 
@@ -254,7 +357,19 @@ export async function getListing(id: string): Promise<Listing | null> {
     .eq('id', id)
     .maybeSingle()
 
-  if (error || !data) return null
+  if (error) {
+    const fallbackCols =
+      'id, listing_type, stage, address_full, mls_number, list_price, go_live_date, description_generated, form_data, created_at, updated_at, agent_id, brokermint_transaction_id'
+    const fallback = await getSupabaseClient()
+      .from('listings')
+      .select(fallbackCols)
+      .eq('id', id)
+      .maybeSingle()
+    if (fallback.error || !fallback.data) return null
+    return fallback.data as Listing
+  }
+
+  if (!data) return null
   return data as Listing
 }
 
@@ -287,6 +402,7 @@ export async function advanceListingStage(
 export async function deleteListing(
   id: string,
   agentId: string,
+  isStaff: boolean = false,
 ): Promise<boolean> {
   const supabase = getSupabaseClient()
 
@@ -297,12 +413,18 @@ export async function deleteListing(
     .eq('listing_id', id)
 
   // 2. Delete the listing itself
-  const { error } = await supabase
+  let query = supabase
     .from('listings')
     .delete()
     .eq('id', id)
-    .eq('agent_id', agentId)
     .eq('stage', 'draft')
+
+  // If not staff/TC, enforce that the listing belongs to the calling agent
+  if (!isStaff) {
+    query = query.eq('agent_id', agentId)
+  }
+
+  const { error } = await query
 
   return !error
 }
@@ -310,6 +432,7 @@ export async function deleteListing(
 export async function updateListingFormData(
   id: string,
   patch: Record<string, unknown>,
+  updatedBy?: string,
 ): Promise<boolean> {
   const existing = await getListing(id)
   if (!existing) return false
@@ -323,11 +446,23 @@ export async function updateListingFormData(
   if (patch.listing_type) {
     updatePayload.listing_type = patch.listing_type
   }
+  if (updatedBy) {
+    updatePayload.updated_by = updatedBy
+  }
 
-  const { error } = await getSupabaseClient()
+  let { error } = await getSupabaseClient()
     .from('listings')
     .update(updatePayload)
     .eq('id', id)
+
+  if (error && updatedBy) {
+    delete updatePayload.updated_by
+    const retry = await getSupabaseClient()
+      .from('listings')
+      .update(updatePayload)
+      .eq('id', id)
+    error = retry.error
+  }
 
   return !error
 }

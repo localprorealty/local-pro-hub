@@ -45,14 +45,22 @@ function AdminPipelineContent() {
       setIsLoading(true)
       setError(null)
       try {
-        const { data, error: queryError } = await getSupabaseClient()
+        let queryRes: { data: any; error: any } = await getSupabaseClient()
           .from('listings')
-          .select(`${LISTING_COLUMNS}, agent:users(full_name)`)
+          .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name), creator:users!created_by(full_name)`)
           .order('updated_at', { ascending: false })
 
-        if (queryError) throw queryError
+        if (queryRes.error) {
+          // Fallback in case creator foreign key is not defined
+          queryRes = await getSupabaseClient()
+            .from('listings')
+            .select(`${LISTING_COLUMNS}, agent:users!agent_id(full_name)`)
+            .order('updated_at', { ascending: false })
+        }
+
+        if (queryRes.error) throw queryRes.error
         if (!isMounted) return
-        setListings((data ?? []) as unknown as ListingRow[])
+        setListings((queryRes.data ?? []) as unknown as ListingRow[])
       } catch (loadError) {
         if (!isMounted) return
         setError(

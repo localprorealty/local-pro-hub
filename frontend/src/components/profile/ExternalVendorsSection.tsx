@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -44,6 +45,8 @@ export function PhotographerVendorsSection() {
   const [vendorPhone, setVendorPhone] = useState('')
   const [vendorNotes, setVendorNotes] = useState('')
   const [isSavingVendor, setIsSavingVendor] = useState(false)
+  const [vendorToDelete, setVendorToDelete] = useState<AgentVendor | null>(null)
+  const [isDeletingVendor, setIsDeletingVendor] = useState(false)
 
   const loadVendors = useCallback(async () => {
     setIsLoading(true)
@@ -111,13 +114,17 @@ export function PhotographerVendorsSection() {
     }
   }
 
-  const handleDeleteVendor = async (id: string) => {
-    if (!window.confirm('Remove this preferred photographer?')) return
+  const confirmDeleteVendor = async () => {
+    if (!vendorToDelete) return
+    setIsDeletingVendor(true)
     try {
-      await deleteAgentVendor(id)
+      await deleteAgentVendor(vendorToDelete.id)
       await loadVendors()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete vendor')
+    } finally {
+      setIsDeletingVendor(false)
+      setVendorToDelete(null)
     }
   }
 
@@ -294,7 +301,7 @@ export function PhotographerVendorsSection() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => void handleDeleteVendor(v.id)}
+                    onClick={() => setVendorToDelete(v)}
                     className="h-7 px-2 text-[11px] text-red-400 hover:bg-red-500/10"
                   >
                     <Trash2 className="size-3.5" />
@@ -316,6 +323,17 @@ export function PhotographerVendorsSection() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(vendorToDelete)}
+        onOpenChange={(open) => !open && setVendorToDelete(null)}
+        title="Remove preferred photographer?"
+        description={`Remove ${vendorToDelete?.name ?? 'this photographer'} from your preferred vendors?`}
+        confirmLabel="Remove photographer"
+        variant="destructive"
+        isLoading={isDeletingVendor}
+        onConfirm={confirmDeleteVendor}
+      />
     </div>
   )
 }
@@ -332,6 +350,7 @@ export function GmailDispatchSection() {
   const [gmailError, setGmailError] = useState<string | null>(null)
   const [gmailSuccess, setGmailSuccess] = useState<string | null>(null)
   const [showTooltip, setShowTooltip] = useState(false)
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false)
 
   const loadGmailStatus = useCallback(async () => {
     setIsLoading(true)
@@ -379,8 +398,7 @@ export function GmailDispatchSection() {
     }
   }
 
-  const handleDisconnectGmail = async () => {
-    if (!window.confirm('Disconnect your Gmail App Password?')) return
+  const confirmDisconnectGmail = async () => {
     setIsSavingGmail(true)
     setGmailError(null)
     setGmailSuccess(null)
@@ -490,7 +508,7 @@ export function GmailDispatchSection() {
               variant="outline"
               size="sm"
               disabled={isSavingGmail}
-              onClick={() => void handleDisconnectGmail()}
+              onClick={() => setShowDisconnectConfirm(true)}
               className="h-8 text-xs text-red-300 border-red-500/30 hover:bg-red-500/10"
             >
               {isSavingGmail ? 'Disconnecting...' : 'Disconnect Gmail'}
@@ -550,6 +568,17 @@ export function GmailDispatchSection() {
           </div>
         </form>
       )}
+
+      <ConfirmDialog
+        open={showDisconnectConfirm}
+        onOpenChange={setShowDisconnectConfirm}
+        title="Disconnect Gmail?"
+        description="Disconnect your Gmail App Password? Order emails will be sent via LocalPRO Hub instead of your personal Gmail account."
+        confirmLabel="Disconnect Gmail"
+        variant="destructive"
+        isLoading={isSavingGmail}
+        onConfirm={confirmDisconnectGmail}
+      />
     </div>
   )
 }

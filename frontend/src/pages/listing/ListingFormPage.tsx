@@ -53,6 +53,7 @@ function ListingFormContent() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [agentMlsId, setAgentMlsId] = useState<string | null>(null)
   const [agentId, setAgentId] = useState<string | null>(null)
+  const [isStaff, setIsStaff] = useState(false)
   const [retsFormPatch, setRetsFormPatch] = useState<Record<string, unknown>>({})
   const [preFilledKeys, setPreFilledKeys] = useState<Set<string>>(new Set())
   const listingIdRef = useRef<string | undefined>(id)
@@ -176,7 +177,9 @@ function ListingFormContent() {
         if (!isMounted) return
 
         const isAdmin = profile?.role === 'admin'
-        if (!row || (!isAdmin && row.agent_id !== userId)) {
+        const staff = profile?.role === 'admin' || profile?.role === 'transaction_coordinator'
+        setIsStaff(staff)
+        if (!row || (!staff && row.agent_id !== userId)) {
           navigate(isAdmin ? '/admin/pipeline' : '/dashboard', { replace: true })
           return
         }
@@ -324,18 +327,18 @@ function ListingFormContent() {
             <DeleteDraftButton
               listingId={listing.id}
               agentId={agentId}
+              isStaff={isStaff}
               variant="icon"
               onDeleted={() => navigate('/dashboard', { replace: true })}
             />
           ) : null}
           <p
-            className={`text-xs ${
-              saveStatus === 'error'
+            className={`text-xs ${saveStatus === 'error'
                 ? 'text-red-400'
                 : saveStatus === 'saving'
                   ? 'text-[#888888]'
                   : 'text-[#CFB87C]'
-            }`}
+              }`}
           >
             {saveIndicator}
           </p>

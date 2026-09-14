@@ -45,7 +45,7 @@ class AdminPatchUserBody(BaseModel):
     phone: str | None = None
     mls_id: str | None = Field(default=None, pattern=r"^\d{7}$")
     brokermint_id: str | None = None
-    role: str | None = Field(default=None, pattern=r"^(agent|admin|photographer|marketing)$")
+    role: str | None = Field(default=None, pattern=r"^(agent|admin|photographer|marketing|transaction_coordinator)$")
     status: str | None = Field(default=None, pattern=r"^(pending|active|suspended)$")
     photographer_tier: str | None = Field(
         default=None,
@@ -71,7 +71,7 @@ class AdminCreateUserBody(BaseModel):
     phone: str
     mls_id: str = Field(pattern=r"^\d{7}$")
     brokermint_id: str
-    role: str = Field(pattern=r"^(agent|admin|photographer|marketing)$")
+    role: str = Field(pattern=r"^(agent|admin|photographer|marketing|transaction_coordinator)$")
     status: str = Field(pattern=r"^(pending|active|suspended)$")
     photographer_tier: str = Field(pattern=r"^(elite|standard|basic)$")
 

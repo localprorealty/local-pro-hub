@@ -674,10 +674,10 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                   }
                   className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]"
                 >
-                  {(['agent', 'marketing', 'photographer', 'admin'] as UserRole[]).map(
+                  {(['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator'] as UserRole[]).map(
                     (r) => (
                       <option key={r} value={r}>
-                        {r}
+                        {r === 'transaction_coordinator' ? 'transaction coordinator' : r}
                       </option>
                     ),
                   )}
@@ -763,10 +763,10 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
                     }
                     className="mt-1 h-10 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]"
                   >
-                    {(['agent', 'marketing', 'photographer', 'admin'] as UserRole[]).map(
+                    {(['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator'] as UserRole[]).map(
                       (r) => (
                         <option key={r} value={r}>
-                          {r}
+                          {r === 'transaction_coordinator' ? 'transaction coordinator' : r}
                         </option>
                       ),
                     )}

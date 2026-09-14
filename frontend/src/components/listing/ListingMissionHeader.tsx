@@ -26,7 +26,7 @@ export function ListingMissionHeader({
   email,
 }: ListingMissionHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[#0a0a0a]/95 px-8 py-5 backdrop-blur">
+    <header className="hidden lg:flex sticky top-0 z-20 items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[#0a0a0a]/95 px-8 py-5 backdrop-blur">
       <div className="flex min-w-0 items-center gap-4">
         <Link
           to={backTo}

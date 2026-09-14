@@ -185,7 +185,13 @@ function App() {
 
   const dashboardRole = useMemo<Exclude<UserRole, 'admin'>>(() => {
     const role = authState.profile?.role
-    if (role === 'marketing' || role === 'photographer') return role
+    if (
+      role === 'marketing' ||
+      role === 'photographer' ||
+      role === 'transaction_coordinator'
+    ) {
+      return role
+    }
     return 'agent'
   }, [authState.profile?.role])
 
@@ -195,7 +201,8 @@ function App() {
       role === 'admin' ||
       role === 'agent' ||
       role === 'marketing' ||
-      role === 'photographer'
+      role === 'photographer' ||
+      role === 'transaction_coordinator'
     ) {
       return role
     }
@@ -351,7 +358,7 @@ function App() {
             element={
               <ProtectedRoute
                 state={authState}
-                allowedRoles={['agent', 'marketing', 'photographer', 'admin']}
+                allowedRoles={['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator']}
               >
                 <ProfilePage role={listingDetailRole} />
               </ProtectedRoute>
@@ -372,7 +379,7 @@ function App() {
           <Route
             path="/templates"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <AdminTemplatesPage />
               </ProtectedRoute>
             }
@@ -380,7 +387,7 @@ function App() {
           <Route
             path="/listing/new"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <NewListingPage />
               </ProtectedRoute>
             }
@@ -388,7 +395,7 @@ function App() {
           <Route
             path="/listing/new/:id"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <NewListingRedirect />
               </ProtectedRoute>
             }
@@ -396,7 +403,7 @@ function App() {
           <Route
             path="/listing/:id/form"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <ListingFormPage />
               </ProtectedRoute>
             }
@@ -404,7 +411,7 @@ function App() {
           <Route
             path="/listing/:id/photography"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <PhotographyPage />
               </ProtectedRoute>
             }
@@ -412,7 +419,7 @@ function App() {
           <Route
             path="/listing/:id/go-live"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <GoLivePage />
               </ProtectedRoute>
             }
@@ -420,7 +427,7 @@ function App() {
           <Route
             path="/listing/:id/marketing"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <MarketingPage />
               </ProtectedRoute>
             }
@@ -428,7 +435,7 @@ function App() {
           <Route
             path="/listing/:id/marketing-assets"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <MarketingAssetsPage />
               </ProtectedRoute>
             }
@@ -436,7 +443,7 @@ function App() {
           <Route
             path="/listing/:id/mls"
             element={
-              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin']}>
+              <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
                 <MlsSubmissionPage />
               </ProtectedRoute>
             }
@@ -446,7 +453,7 @@ function App() {
             element={
               <ProtectedRoute
                 state={authState}
-                allowedRoles={['agent', 'marketing', 'photographer', 'admin']}
+                allowedRoles={['agent', 'marketing', 'photographer', 'admin', 'transaction_coordinator']}
               >
                 <ListingDetailPage role={listingDetailRole} />
               </ProtectedRoute>
@@ -465,7 +472,7 @@ function App() {
             element={
               <ProtectedRoute
                 state={authState}
-                allowedRoles={['agent', 'marketing', 'photographer']}
+                allowedRoles={['agent', 'marketing', 'photographer', 'transaction_coordinator']}
               >
                 <DashboardPage role={dashboardRole} />
               </ProtectedRoute>

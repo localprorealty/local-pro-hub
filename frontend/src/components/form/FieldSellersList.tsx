@@ -47,10 +47,10 @@ export function FieldSellersList({
     <div className="space-y-4 md:col-span-2">
       <div className="flex items-center justify-between">
         <div>
-          <Label className={cn(fieldLabelClass, 'text-[#CFB87C]')}>
+          <Label className={cn(fieldLabelClass, 'text-[var(--color-gold)]')}>
             Sellers <span className="text-red-400">*</span>
           </Label>
-          <p className="text-[11px] text-[#666666]">
+          <p className="text-[11px] text-[var(--color-text-muted)]">
             At least one seller is required. Add additional sellers if the property has multiple owners.
           </p>
         </div>
@@ -62,15 +62,15 @@ export function FieldSellersList({
           return (
             <div
               key={index}
-              className="rounded-lg border border-[#2a2a2a] bg-[#111111]/70 p-4 space-y-3 transition-colors hover:border-[#3a3a3a]"
+              className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/70 p-4 space-y-3 transition-colors hover:border-[var(--color-border-hover)]"
             >
-              <div className="flex items-center justify-between border-b border-[#222222] pb-2">
+              <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="font-[family-name:var(--font-display)] text-xs font-semibold text-white tracking-wide">
+                  <span className="font-[family-name:var(--font-display)] text-xs font-semibold text-[var(--color-text)] tracking-wide">
                     Seller {index + 1}
                   </span>
                   {isFirst && isPreFilled ? (
-                    <span className="rounded bg-[#CFB87C]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[#CFB87C] uppercase">
+                    <span className="rounded bg-[var(--color-gold)]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[var(--color-gold)] uppercase">
                       from NTREIS
                     </span>
                   ) : null}
@@ -145,7 +145,7 @@ export function FieldSellersList({
           type="button"
           variant="outline"
           onClick={handleAddSeller}
-          className="border-dashed border-[#3a3a3a] bg-transparent text-[#CFB87C] hover:border-[#CFB87C] hover:bg-[#CFB87C]/10 text-xs font-medium"
+          className="border-dashed border-[var(--color-border)] bg-transparent text-[var(--color-gold)] hover:border-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 text-xs font-medium"
         >
           <Plus className="mr-1.5 size-3.5" />
           Add another seller

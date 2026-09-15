@@ -210,7 +210,7 @@ function DashboardContent({ role }: DashboardPageProps) {
               className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-gold)] bg-[var(--color-gold)] px-4 py-2 font-[family-name:var(--font-display)] text-xs font-bold tracking-wide text-black uppercase transition-opacity hover:opacity-90"
             >
               <Plus className="size-4" />
-              Start New Listing
+              Start A Transaction
             </button>
           ) : null}
           <label className="relative hidden sm:block">

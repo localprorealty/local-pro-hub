@@ -47,16 +47,16 @@ export function ConfirmDialog({
   const actionClassName =
     variant === 'destructive'
       ? 'rounded-sm border border-red-500/40 bg-red-950/80 text-red-200 hover:bg-red-900 hover:border-red-500/60 hover:text-white transition-colors'
-      : 'rounded-sm bg-[var(--color-gold)] text-[var(--color-black)] hover:bg-[#dcc487]'
+      : 'rounded-sm bg-[var(--color-gold)] text-black hover:bg-[var(--color-gold)]/90'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
-        className="max-w-md border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-white)] sm:max-w-md"
+        className="max-w-md border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] sm:max-w-md"
         data-size="default"
       >
         <AlertDialogHeader className="text-left">
-          <AlertDialogTitle className="font-[family-name:var(--font-display)] text-lg text-[var(--color-white)]">
+          <AlertDialogTitle className="font-[family-name:var(--font-display)] text-lg text-[var(--color-text)]">
             {title}
           </AlertDialogTitle>
           {description && (
@@ -70,7 +70,7 @@ export function ConfirmDialog({
           {!singleButton && (
             <AlertDialogCancel
               disabled={isLoading}
-              className="rounded-sm border border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-surface-3)]"
+              className="rounded-sm border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
             >
               {cancelLabel}
             </AlertDialogCancel>

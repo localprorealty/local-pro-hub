@@ -82,7 +82,7 @@ export function FieldText({
           {required ? <span className="text-red-400"> *</span> : null}
         </Label>
         {isPreFilled ? (
-          <span className="rounded bg-[#CFB87C]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[#CFB87C] uppercase">
+          <span className="rounded bg-[var(--color-gold)]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[var(--color-gold)] uppercase">
             from NTREIS
           </span>
         ) : null}
@@ -97,12 +97,12 @@ export function FieldText({
             readOnly={readOnly}
             rows={rows}
             className={cn(
-              'w-full resize-y rounded-lg border border-[#333333] bg-[#111111] px-3 py-2 text-sm text-white outline-none focus-visible:border-[#CFB87C] focus-visible:ring-3 focus-visible:ring-[#CFB87C]/50',
+              'w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-text)] outline-none focus-visible:border-[var(--color-gold)] focus-visible:ring-3 focus-visible:ring-[var(--color-gold)]/50',
               fieldBorderClass(required, value, isPreFilled),
             )}
           />
           {maxLength ? (
-            <span className="absolute right-2 bottom-2 text-[10px] text-[#555555]">
+            <span className="absolute right-2 bottom-2 text-[10px] text-[var(--color-text-muted)]">
               {charCount}/{maxLength}
             </span>
           ) : null}
@@ -110,7 +110,7 @@ export function FieldText({
       ) : (
         <div className={cn('relative', type === 'currency' && 'flex items-center')}>
           {type === 'currency' ? (
-            <span className="pointer-events-none absolute left-3 text-sm text-[#888888]">$</span>
+            <span className="pointer-events-none absolute left-3 text-sm text-[var(--color-text-secondary)]">$</span>
           ) : null}
           <Input
             type={type === 'number' ? 'number' : 'text'}
@@ -129,7 +129,7 @@ export function FieldText({
           />
         </div>
       )}
-      {helpText ? <p className="text-[11px] text-[#666666]">{helpText}</p> : null}
+      {helpText ? <p className="text-[11px] text-[var(--color-text-muted)]">{helpText}</p> : null}
     </div>
   )
 }

@@ -361,29 +361,29 @@ export function NtreisFormBody({
     return (
         <div className="flex min-h-0 flex-1 flex-col pb-[52px]">
             {/* Mobile Sticky Section Indicator & Docked Voice Bar */}
-            <div className="sticky top-[80px] z-20 flex items-center gap-2 border-b border-[#2a2a2a] bg-[#0a0a0a]/95 px-3 py-2 backdrop-blur-md lg:hidden">
+            <div className="sticky top-[80px] z-20 flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-bg-base)]/95 px-3 py-2 backdrop-blur-md lg:hidden">
                 <Sheet open={sectionSheetOpen} onOpenChange={setSectionSheetOpen}>
                     <SheetTrigger asChild>
                         <button
                             type="button"
-                            className="flex min-w-0 flex-1 items-center justify-between gap-1.5 rounded-md border border-[#2a2a2a] bg-[#141414] px-2.5 py-1.5 text-left transition-colors hover:border-[#CFB87C]/50 hover:bg-[#1a1a1a] active:bg-[#222]"
+                            className="flex min-w-0 flex-1 items-center justify-between gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2.5 py-1.5 text-left transition-colors hover:border-[var(--color-gold)]/50 hover:bg-[var(--color-surface)] active:bg-[var(--color-surface-elevated)]"
                             aria-label={`Current section: ${activeSection?.name || 'Section'}. Tap to jump to another section.`}
                         >
                             <div className="flex min-w-0 items-center gap-1.5">
-                                <span className="shrink-0 text-xs font-semibold text-[#CFB87C]">
+                                <span className="shrink-0 text-xs font-semibold text-[var(--color-gold)]">
                                     Section {activeIndex} of {visibleSections.length}:
                                 </span>
-                                <span className="truncate text-xs font-medium text-white">
+                                <span className="truncate text-xs font-medium text-[var(--color-text)]">
                                     {activeSection?.name}
                                 </span>
                             </div>
-                            <ChevronDown className="size-3.5 shrink-0 text-[#888888]" />
+                            <ChevronDown className="size-3.5 shrink-0 text-[var(--color-text-secondary)]" />
                         </button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="w-[300px] border-r border-[#2a2a2a] bg-[#111111] p-0">
-                        <SheetHeader className="border-b border-[#2a2a2a] px-4 py-3">
-                            <SheetTitle className="text-base text-[#CFB87C]">NTREIS Form Sections</SheetTitle>
-                            <SheetDescription className="text-xs text-[#888888]">
+                    <SheetContent side="left" className="w-[300px] border-r border-[var(--color-border)] bg-[var(--color-surface-2)] p-0">
+                        <SheetHeader className="border-b border-[var(--color-border)] px-4 py-3">
+                            <SheetTitle className="text-base text-[var(--color-gold)]">NTREIS Form Sections</SheetTitle>
+                            <SheetDescription className="text-xs text-[var(--color-text-secondary)]">
                                 Tap any section to jump directly to it.
                             </SheetDescription>
                         </SheetHeader>
@@ -400,8 +400,8 @@ export function NtreisFormBody({
                     className={cn(
                         'flex size-8 shrink-0 items-center justify-center rounded-md border transition-all',
                         voice.sessionActive
-                            ? 'border-[#CFB87C] bg-[#CFB87C] text-black shadow-[0_0_12px_rgba(207,184,124,0.4)]'
-                            : 'border-[#2a2a2a] bg-[#141414] text-[#CFB87C] hover:border-[#CFB87C]/50 hover:bg-[#1a1a1a]',
+                            ? 'border-[var(--color-gold)] bg-[var(--color-gold)] text-black shadow-[0_0_12px_rgba(207,184,124,0.4)]'
+                            : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-gold)] hover:border-[var(--color-gold)]/50 hover:bg-[var(--color-surface)]',
                     )}
                 >
                     {voice.state === 'processing' ? (
@@ -415,7 +415,7 @@ export function NtreisFormBody({
             </div>
 
             <div className="flex flex-1">
-                <aside className="sticky top-[57px] hidden h-[calc(100svh-57px-52px)] w-[260px] shrink-0 overflow-y-auto border-r border-[#2a2a2a] bg-[#111111] p-4 lg:block">
+                <aside className="sticky top-[57px] hidden h-[calc(100svh-57px-52px)] w-[260px] shrink-0 overflow-y-auto border-r border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 lg:block">
                     {navPanel}
                 </aside>
 
@@ -459,21 +459,21 @@ export function NtreisFormBody({
                 </div>
             </div>
 
-            <footer className="fixed right-0 bottom-0 left-0 z-30 flex h-[52px] items-center justify-between border-t border-[#2a2a2a] bg-[#0a0a0a] px-3 sm:px-4 md:px-8">
-                <div className="flex shrink-0 items-center gap-1.5 text-xs text-[#888888]">
+            <footer className="fixed right-0 bottom-0 left-0 z-30 flex h-[52px] items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-base)] px-3 sm:px-4 md:px-8">
+                <div className="flex shrink-0 items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
                     <SaveIcon
                         className={cn(
                             'size-3.5 shrink-0',
                             saveStatus === 'error' && 'text-red-400',
-                            saveStatus === 'saving' && 'animate-spin text-[#888888]',
-                            saveStatus === 'saved' && 'text-[#CFB87C]',
+                            saveStatus === 'saving' && 'animate-spin text-[var(--color-text-secondary)]',
+                            saveStatus === 'saved' && 'text-[var(--color-gold)]',
                         )}
                     />
                     <span
                         className={cn(
                             'text-[11px] sm:text-xs',
                             saveStatus === 'error' && 'text-red-400',
-                            saveStatus === 'saved' && 'text-[#CFB87C]',
+                            saveStatus === 'saved' && 'text-[var(--color-gold)]',
                         )}
                     >
                         <span className="hidden sm:inline">{saveLabel}</span>
@@ -488,12 +488,12 @@ export function NtreisFormBody({
                 </div>
 
                 <div className="hidden min-[390px]:flex items-center gap-2">
-                    <span className="hidden text-xs text-[#888888] md:inline">
+                    <span className="hidden text-xs text-[var(--color-text-secondary)] md:inline">
                         {completeSectionCount} of {visibleSections.length} sections complete
                     </span>
-                    <div className="h-1 w-8 sm:w-12 overflow-hidden rounded-full bg-[#2a2a2a]">
+                    <div className="h-1 w-8 sm:w-12 overflow-hidden rounded-full bg-[var(--color-border)]">
                         <div
-                            className="h-full bg-[#CFB87C] transition-all duration-300"
+                            className="h-full bg-[var(--color-gold)] transition-all duration-300"
                             style={{ width: `${progressPct}%` }}
                         />
                     </div>
@@ -505,7 +505,7 @@ export function NtreisFormBody({
                         variant="ghost"
                         size="sm"
                         onClick={() => navigateSection(-1)}
-                        className="h-8 px-2 text-xs text-[#888888] hover:text-white sm:px-3"
+                        className="h-8 px-2 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text)] sm:px-3"
                     >
                         <span className="hidden sm:inline">← Previous</span>
                         <span className="sm:hidden">← Prev</span>
@@ -514,7 +514,7 @@ export function NtreisFormBody({
                         type="button"
                         size="sm"
                         onClick={() => navigateSection(1)}
-                        className="h-8 bg-[#CFB87C] px-2.5 text-xs font-bold text-black hover:bg-[#CFB87C]/90 sm:px-3"
+                        className="h-8 bg-[var(--color-gold)] px-2.5 text-xs font-bold text-black hover:bg-[var(--color-gold)]/90 sm:px-3"
                     >
                         <span className="hidden sm:inline">Next section →</span>
                         <span className="sm:hidden">Next →</span>

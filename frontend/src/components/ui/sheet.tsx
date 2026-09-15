@@ -50,7 +50,7 @@ const SheetContent = React.forwardRef<
       ref={ref}
       data-slot="sheet-content"
       className={cn(
-        'fixed z-50 flex h-full flex-col gap-4 border-[#2a2a2a] bg-[#111111] p-6 shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-300',
+        'fixed z-50 flex h-full flex-col gap-4 border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-300',
         side === 'left' &&
           'inset-y-0 left-0 h-full w-[280px] border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
         side === 'right' &&
@@ -60,7 +60,7 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm text-[#888888] transition-colors hover:text-white">
+      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]">
         <XIcon className="size-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -86,7 +86,7 @@ function SheetTitle({
   return (
     <DialogPrimitive.Title
       data-slot="sheet-title"
-      className={cn('font-semibold text-white', className)}
+      className={cn('font-semibold text-[var(--color-text)]', className)}
       {...props}
     />
   )
@@ -99,7 +99,7 @@ function SheetDescription({
   return (
     <DialogPrimitive.Description
       data-slot="sheet-description"
-      className={cn('text-sm text-[#888888]', className)}
+      className={cn('text-sm text-[var(--color-text-secondary)]', className)}
       {...props}
     />
   )

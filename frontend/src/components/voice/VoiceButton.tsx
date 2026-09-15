@@ -22,7 +22,7 @@ export function VoiceButton({ state, sessionActive, onClick, className }: VoiceB
           {[0, 1, 2].map((ring) => (
             <motion.span
               key={ring}
-              className="pointer-events-none absolute inset-0 rounded-full border border-[#CFB87C]/50"
+              className="pointer-events-none absolute inset-0 rounded-full border border-[var(--color-gold)]/50"
               initial={{ scale: 1, opacity: 0.6 }}
               animate={{ scale: 1.8 + ring * 0.3, opacity: 0 }}
               transition={{
@@ -42,8 +42,8 @@ export function VoiceButton({ state, sessionActive, onClick, className }: VoiceB
         aria-label={sessionActive ? 'Voice Fill active' : 'Voice Fill — all sections'}
         title={sessionActive ? 'Voice Fill active' : 'Voice Fill — all unfilled fields'}
         className={cn(
-          'relative flex size-14 items-center justify-center rounded-full bg-[#CFB87C] text-black shadow-[0_0_24px_rgba(207,184,124,0.45)] transition-transform hover:scale-105',
-          sessionActive && 'ring-2 ring-[#CFB87C]/60 ring-offset-2 ring-offset-[#0a0a0a]',
+          'relative flex size-14 items-center justify-center rounded-full bg-[var(--color-gold)] text-black shadow-[0_0_24px_rgba(207,184,124,0.45)] transition-transform hover:scale-105',
+          sessionActive && 'ring-2 ring-[var(--color-gold)]/60 ring-offset-2 ring-offset-[var(--color-bg-base)]',
         )}
       >
         {processing ? (

@@ -22,13 +22,14 @@ export type UserProfileRow = {
   brand_logo_url?: string | null
   brand_color_primary?: string | null
   brand_color_secondary?: string | null
+  theme_preference?: 'dark' | 'light' | null
 }
 
 export const PROFILE_BASE_SELECT =
   'id, email, full_name, phone, mls_id, brokermint_id, role, status, photographer_tier, created_at, approved_at, heygen_avatar_id, heygen_voice_id, heygen_talking_photo_id, heygen_avatar_type, can_view_revenue'
 
 export const PROFILE_SELECT =
-  `${PROFILE_BASE_SELECT}, brand_logo_url, brand_color_primary, brand_color_secondary`
+  `${PROFILE_BASE_SELECT}, brand_logo_url, brand_color_primary, brand_color_secondary, theme_preference`
 
 export type OwnProfileUpdate = {
   full_name?: string
@@ -74,8 +75,8 @@ export async function fetchUserProfile(userId: string): Promise<UserProfileRow |
     .maybeSingle()
 
   if (error) {
-    // If branding columns not yet added to schema, fallback to base select
-    if (error.code === '42703' || error.message?.includes('brand_')) {
+    // If branding or theme columns not yet added to schema, fallback to base select
+    if (error.code === '42703' || error.message?.includes('brand_') || error.message?.includes('theme_')) {
       const fallback = await getSupabaseClient()
         .from('users')
         .select(PROFILE_BASE_SELECT)
@@ -103,7 +104,7 @@ export async function fetchUsersByRole(
 
   const { data, error } = await query
   if (error) {
-    if (error.code === '42703' || error.message?.includes('brand_')) {
+    if (error.code === '42703' || error.message?.includes('brand_') || error.message?.includes('theme_')) {
       let fb = getSupabaseClient()
         .from('users')
         .select(PROFILE_BASE_SELECT)
@@ -116,6 +117,42 @@ export async function fetchUsersByRole(
     throw error
   }
   return (data ?? []) as UserProfileRow[]
+}
+
+/** Update user theme preference in DB with backend API & Supabase fallback */
+export async function updateUserThemePreference(theme: 'dark' | 'light'): Promise<void> {
+  const session = await getSupabaseClient().auth.getSession()
+  const token = session.data.session?.access_token
+  const userId = session.data.session?.user?.id
+
+  // 1. Try backend endpoint
+  if (token) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/me/theme`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ theme }),
+      })
+      if (res.ok) return
+    } catch {
+      // Ignore network errors, proceed to Supabase client fallback
+    }
+  }
+
+  // 2. Direct Supabase client fallback
+  if (userId) {
+    try {
+      await getSupabaseClient()
+        .from('users')
+        .update({ theme_preference: theme })
+        .eq('id', userId)
+    } catch {
+      // Graceful notice if migration is pending in SQL editor
+    }
+  }
 }
 
 export async function updateOwnProfile(

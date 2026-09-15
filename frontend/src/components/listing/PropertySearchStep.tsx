@@ -199,15 +199,15 @@ export function PropertySearchStep({
         transition={{ duration: 0.4 }}
         className="w-full max-w-2xl text-center"
       >
-        <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight text-white md:text-5xl">
+        <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight text-[var(--color-text)] md:text-5xl">
           Find the property
         </h1>
-        <p className="mx-auto mt-4 max-w-lg text-base text-[#888888]">
+        <p className="mx-auto mt-4 max-w-lg text-base text-[var(--color-text-secondary)]">
           Enter details to pull property characteristics automatically.
         </p>
 
         {/* Tab Switcher */}
-        <div className="mx-auto mt-8 flex max-w-xs justify-center rounded-full bg-[#111111] p-1 border border-[#222222]">
+        <div className="mx-auto mt-8 flex max-w-xs justify-center rounded-full bg-[var(--color-surface-2)] p-1 border border-[var(--color-border)]">
           <button
             type="button"
             onClick={() => {
@@ -217,8 +217,8 @@ export function PropertySearchStep({
             className={cn(
               'flex-1 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide transition-all duration-200',
               activeTab === 'ntreis'
-                ? 'bg-[#CFB87C] text-black shadow-lg'
-                : 'text-[#888888] hover:text-white',
+                ? 'bg-[var(--color-gold)] text-[var(--color-primary-foreground)] shadow-lg'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
             )}
           >
             NTREIS Search
@@ -232,8 +232,8 @@ export function PropertySearchStep({
             className={cn(
               'flex-1 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide transition-all duration-200',
               activeTab === 'pdf'
-                ? 'bg-[#CFB87C] text-black shadow-lg'
-                : 'text-[#888888] hover:text-white',
+                ? 'bg-[var(--color-gold)] text-[var(--color-primary-foreground)] shadow-lg'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
             )}
           >
             Upload Tax PDF
@@ -248,8 +248,8 @@ export function PropertySearchStep({
               </Label>
               <div
                 className={cn(
-                  'flex items-center gap-2 rounded-full border bg-[#0a0a0a] px-2 py-2 pl-5 transition-colors',
-                  'border-[#CFB87C]/60 focus-within:border-[#CFB87C]',
+                  'flex items-center gap-2 rounded-full border bg-[var(--color-surface)] px-2 py-2 pl-5 transition-colors',
+                  'border-[var(--color-gold-border)] focus-within:border-[var(--color-gold)]',
                 )}
               >
                 <Input
@@ -262,7 +262,7 @@ export function PropertySearchStep({
                   }}
                   disabled={loading || isSubmitting}
                   placeholder="123 Main Street, Frisco TX  or  MLS# 20439821"
-                  className="h-11 flex-1 border-0 bg-transparent text-base text-white shadow-none placeholder:text-[#555555] focus-visible:ring-0"
+                  className="h-11 flex-1 border-0 bg-transparent text-base text-[var(--color-text)] shadow-none placeholder:text-[var(--color-text-tertiary)] focus-visible:ring-0"
                 />
                 <Button
                   type="button"
@@ -274,8 +274,8 @@ export function PropertySearchStep({
                   className={cn(
                     'size-11 shrink-0 rounded-full',
                     listening
-                      ? 'bg-[#CFB87C] text-black hover:bg-[#CFB87C]/90'
-                      : 'text-[#CFB87C] hover:bg-[#CFB87C]/10',
+                      ? 'bg-[var(--color-gold)] text-[var(--color-primary-foreground)] hover:bg-[var(--color-gold-hover)]'
+                      : 'text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)]',
                   )}
                 >
                   <Mic className="size-5" />
@@ -284,7 +284,7 @@ export function PropertySearchStep({
                   type="button"
                   onClick={() => void runSearch()}
                   disabled={loading || isSubmitting || !query.trim()}
-                  className="size-11 shrink-0 rounded-full bg-[#CFB87C] text-black hover:bg-[#CFB87C]/90"
+                  className="size-11 shrink-0 rounded-full bg-[var(--color-gold)] text-[var(--color-primary-foreground)] hover:bg-[var(--color-gold-hover)]"
                   aria-label="Search NTREIS"
                 >
                   {loading || isSubmitting ? (
@@ -296,7 +296,7 @@ export function PropertySearchStep({
               </div>
             </div>
 
-            <p className="mt-5 text-sm text-[#666666]">
+            <p className="mt-5 text-sm text-[var(--color-text-tertiary)]">
               We&apos;ll pull all property details from NTREIS automatically.
             </p>
           </>
@@ -304,9 +304,9 @@ export function PropertySearchStep({
           <div className="mx-auto mt-10 max-w-xl">
             <div
               className={cn(
-                'flex flex-col items-center justify-center rounded-2xl border-2 border-dashed bg-[#0a0a0a] p-8 text-center transition-colors',
-                'border-[#333333] hover:border-[#CFB87C]/50',
-                uploading && 'opacity-65 border-[#CFB87C]/30'
+                'flex flex-col items-center justify-center rounded-2xl border-2 border-dashed bg-[var(--color-surface-2)] p-8 text-center transition-colors',
+                'border-[var(--color-border)] hover:border-[var(--color-gold-border)]',
+                uploading && 'opacity-65 border-[var(--color-gold-border)]'
               )}
             >
               <input
@@ -324,7 +324,7 @@ export function PropertySearchStep({
                   (uploading || isSubmitting) && 'pointer-events-none'
                 )}
               >
-                <div className="flex size-14 items-center justify-center rounded-full bg-[#111111] border border-[#222222] text-[#CFB87C]">
+                <div className="flex size-14 items-center justify-center rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-gold)]">
                   {uploading ? (
                     <Loader2 className="size-7 animate-spin" />
                   ) : (
@@ -332,17 +332,17 @@ export function PropertySearchStep({
                   )}
                 </div>
                 <div>
-                  <p className="text-base font-semibold text-white">
+                  <p className="text-base font-semibold text-[var(--color-text)]">
                     {uploading ? 'Parsing report...' : 'Upload Realist Tax PDF'}
                   </p>
-                  <p className="mt-1 text-xs text-[#888888]">
+                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
                     {uploading ? 'Extracting property details using AI...' : 'Drag and drop or click to browse'}
                   </p>
                 </div>
               </label>
             </div>
             
-            <p className="mt-5 text-sm text-[#666666]">
+            <p className="mt-5 text-sm text-[var(--color-text-tertiary)]">
               Download the property details PDF from Realist, upload it here, and we&apos;ll auto-fill the entire form.
             </p>
           </div>
@@ -350,7 +350,7 @@ export function PropertySearchStep({
 
         {matches && matches.length > 0 ? (
           <div className="mx-auto mt-8 max-w-xl text-left">
-            <p className="mb-3 text-sm text-[#888888]">Multiple matches — select one:</p>
+            <p className="mb-3 text-sm text-[var(--color-text-secondary)]">Multiple matches — select one:</p>
             <ul className="space-y-2">
               {matches.map((match) => (
                 <li key={match.raw.ListingId ?? match.label}>
@@ -358,7 +358,7 @@ export function PropertySearchStep({
                     type="button"
                     onClick={() => applyMatch(match)}
                     disabled={isSubmitting}
-                    className="w-full rounded-lg border border-[#333333] bg-[#111111] px-4 py-3 text-left text-sm text-white transition-colors hover:border-[#CFB87C]/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#CFB87C]"
+                    className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-left text-sm text-[var(--color-text)] transition-colors hover:border-[var(--color-gold-border)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold)]"
                   >
                     {formatMatchLabel(match)}
                   </button>
@@ -376,14 +376,14 @@ export function PropertySearchStep({
 
         {notFound ? (
           <div className="mt-6 space-y-3">
-            <p className="text-sm text-[#888888]">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               Property not in MLS yet. Let&apos;s fill it together.
             </p>
             <Button
               type="button"
               onClick={onSkip}
               disabled={isSubmitting}
-              className="h-11 rounded-lg bg-[#CFB87C] px-8 font-[family-name:var(--font-display)] text-sm font-bold text-black hover:bg-[#CFB87C]/90"
+              className="h-11 rounded-lg bg-[var(--color-gold)] px-8 font-[family-name:var(--font-display)] text-sm font-bold text-[var(--color-primary-foreground)] hover:bg-[var(--color-gold-hover)]"
             >
               Open the form →
             </Button>
@@ -393,13 +393,13 @@ export function PropertySearchStep({
             type="button"
             onClick={onSkip}
             disabled={isSubmitting}
-            className="mt-10 text-sm text-[#666666] underline-offset-4 hover:text-[#CFB87C] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#CFB87C]"
+            className="mt-10 text-sm text-[var(--color-text-tertiary)] underline-offset-4 hover:text-[var(--color-gold)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold)]"
           >
             Skip search — fill manually
           </button>
         )}
 
-        <div className="mt-16 space-y-1 text-left font-mono text-[10px] tracking-wider text-[#333333] md:text-center">
+        <div className="mt-16 space-y-1 text-left font-mono text-[10px] tracking-wider text-[var(--color-text-tertiary)] md:text-center">
           <p>SYSTEM: LOCALPRO HUB</p>
           <p>DATABASE: NTREIS REAL-TIME SYNC</p>
           <p>AUTH: AGENT_VERIFIED_SECURE</p>

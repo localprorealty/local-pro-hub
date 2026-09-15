@@ -64,22 +64,22 @@ export function NtreisFieldRenderer({
   if (field.key === '_address_summary') {
     return (
       <div className="space-y-2 md:col-span-2">
-        <p className="font-[family-name:var(--font-display)] text-[11px] tracking-wider text-[#888888] uppercase">
+        <p className="font-[family-name:var(--font-display)] text-[11px] tracking-wider text-[var(--color-text-secondary)] uppercase">
           Property Address
         </p>
-        <div className="rounded-lg border border-[#2a2a2a] bg-[#111111] px-4 py-3">
-          <p className="text-sm text-white">{addressSummary || 'No address entered'}</p>
+        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3">
+          <p className="text-sm text-[var(--color-text)]">{addressSummary || 'No address entered'}</p>
           {onEditAddress ? (
             <button
               type="button"
               onClick={onEditAddress}
-              className="mt-2 text-xs text-[#CFB87C] hover:underline"
+              className="mt-2 text-xs text-[var(--color-gold)] hover:underline"
             >
               Edit address
             </button>
           ) : null}
           {field.helpText ? (
-            <p className="mt-1 text-[11px] text-[#666666]">{field.helpText}</p>
+            <p className="mt-1 text-[11px] text-[var(--color-text-muted)]">{field.helpText}</p>
           ) : null}
         </div>
       </div>

@@ -107,7 +107,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"from\": \"LocalPRO Hub Alerts <alerts@localprorealty.com>\",\n  \"to\": [\"tricia@localprorealty.com\", \"adarsh@localprorealty.com\"],\n  \"subject\": \"[ALERT] BrokerMint Daily Reconciliation Sync Failed\",\n  \"html\": \"<h2>BrokerMint Daily Reconciliation Sync Failed</h2><p>The automated 2:00 AM CST reconciliation sync encountered an error or failed to trigger successfully.</p><p><strong>Status Code:</strong> \" + ($json.statusCode || 'N/A') + \"</p><p><strong>Response Details:</strong><br/><pre>\" + JSON.stringify($json.body || $json, null, 2) + \"</pre></p><p>Please log in to the LocalPRO Hub Admin Portal (<a href='https://app.localprorealty.com/admin/brokermint'>Admin → BrokerMint</a>) to inspect sync health or trigger a manual sync.</p>\"\n}",
+        "jsonBody": "={\n  \"from\": \"LocalPRO Hub Alerts <alerts@localprorealty.com>\",\n  \"to\": [\"tricia@localprorealty.com\", \"adarsh@localprorealty.com\"],\n  \"subject\": \"[ALERT] BrokerMint Daily Reconciliation Sync Failed\",\n  \"html\": \"<h2>BrokerMint Daily Reconciliation Sync Failed</h2><p>The automated 2:00 AM CST reconciliation sync encountered an error or failed to trigger successfully.</p><p><strong>Status Code:</strong> \" + ($json.statusCode || 'N/A') + \"</p><p><strong>Response Details:</strong><br/><pre>\" + JSON.stringify($json.body || $json, null, 2) + \"</pre></p><p>Please log in to the LocalPRO Hub Admin Portal (<a href='https://hub.localprorealty.com/admin/brokermint'>Admin → BrokerMint</a>) to inspect sync health or trigger a manual sync.</p>\"\n}",
         "options": {}
       },
       "id": "bm-cron-0004",

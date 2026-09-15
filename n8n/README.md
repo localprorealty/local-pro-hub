@@ -505,7 +505,7 @@ curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-listin
     "property_address": "123 Test St, Dallas, TX",
     "agent_name": "Andrew Wetzel",
     "recipients": ["andrew@theandrews.group"],
-    "listing_url": "https://localprohub.netlify.app/listing/test-12345"
+    "listing_url": "https://hub.localprorealty.com/listing/test-12345"
   }'
 ```
 * **What to check:** Check the recipient's inbox (e.g., `andrew@theandrews.group`) for a real listing registration email.
@@ -523,7 +523,7 @@ curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-market
     "agent_name": "Adarsh Gella",
     "agent_email": "g.adarsh043@gmail.com",
     "agent_phone": "469-347-2862",
-    "listing_url": "https://localprohub.netlify.app/listing/test-12345"
+    "listing_url": "https://hub.localprorealty.com/listing/test-12345"
   }'
 ```
 * **What to check:** Check the marketing team inbox (defined by `MARKETING_EMAIL` or `LOCALPRO_MARKETING_EMAIL`) for a new marketing task notification email.
@@ -565,7 +565,7 @@ curl -X POST https://n8n-production-87a4d.up.railway.app/webhook/localpro-listin
     "agent_name": "Adarsh Gella",
     "agent_email": "g.adarsh043@gmail.com",
     "agent_phone": "469-347-2862",
-    "listing_url": "https://localprohub.netlify.app/listing/test-12345"
+    "listing_url": "https://hub.localprorealty.com/listing/test-12345"
   }'
 ```
 * **What to check:** Check the admin inbox (`LOCALPRO_ADMIN_EMAIL`) and marketing inbox (`LOCALPRO_MARKETING_EMAIL`) for the live listing details and marketing brief emails.

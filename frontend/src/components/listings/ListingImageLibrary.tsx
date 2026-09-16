@@ -253,7 +253,7 @@ export function ListingImageLibrary({
             <p className="text-xs font-semibold tracking-widest text-[var(--color-gold)] uppercase">
               Listing Media
             </p>
-            <span className="rounded-full bg-[var(--color-surface-3)] px-2.5 py-0.5 text-[11px] font-medium text-white">
+            <span className="rounded-full bg-[var(--color-surface-3)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-text)]">
               {images.length} {images.length === 1 ? 'Photo' : 'Photos'}
             </span>
             {heroImage ? (
@@ -267,7 +267,7 @@ export function ListingImageLibrary({
               </span>
             ) : null}
           </div>
-          <h3 className="mt-1 text-lg font-semibold text-white">
+          <h3 className="mt-1 text-lg font-semibold text-[var(--color-text)]">
             Property Image Library
           </h3>
           <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
@@ -280,7 +280,7 @@ export function ListingImageLibrary({
             <Button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="h-9 gap-2 rounded-sm bg-[var(--color-gold)] px-4 text-xs font-semibold text-black hover:bg-[#dcc487]"
+              className="h-9 gap-2 rounded-sm bg-[var(--color-gold)] px-4 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
             >
               <Plus className="size-3.5" />
               Upload Photos
@@ -318,7 +318,7 @@ export function ListingImageLibrary({
           }`}
         >
           <UploadCloud className="mb-2 size-8 text-[var(--color-gold)]" />
-          <p className="text-xs font-medium text-white">
+          <p className="text-xs font-medium text-[var(--color-text)]">
             Drag & drop property photos or agent headshot here, or click to browse
           </p>
           <p className="mt-1 text-[11px] text-[var(--color-text-secondary)]">
@@ -337,7 +337,7 @@ export function ListingImageLibrary({
             {uploadQueue.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-2 rounded bg-[var(--color-surface-2)] p-2 text-xs text-white"
+                className="flex items-center gap-2 rounded bg-[var(--color-surface-2)] p-2 text-xs text-[var(--color-text)]"
               >
                 <Loader2 className="size-3.5 shrink-0 animate-spin text-[var(--color-gold)]" />
                 <span className="truncate flex-1">{item.fileName}</span>
@@ -362,7 +362,7 @@ export function ListingImageLibrary({
         </div>
       ) : images.length === 0 ? (
         <div className="rounded border border-[var(--color-border)] bg-[var(--color-surface)] py-12 text-center text-xs text-[var(--color-text-secondary)]">
-          <ImageIcon className="mx-auto mb-2 size-8 text-zinc-600" />
+          <ImageIcon className="mx-auto mb-2 size-8 text-[var(--color-text-tertiary)]" />
           No images uploaded for this listing yet. Use the upload area above to add photos.
         </div>
       ) : (
@@ -377,12 +377,12 @@ export function ListingImageLibrary({
                 key={image.id}
                 className={`group relative flex flex-col overflow-hidden rounded-sm border bg-[var(--color-surface)] transition-all ${
                   isHero
-                    ? 'border-[var(--color-gold)] ring-1 ring-[var(--color-gold)] shadow-[0_0_12px_rgba(207,184,124,0.15)]'
-                    : 'border-[var(--color-border)] hover:border-zinc-500'
+                    ? 'border-[var(--color-gold)] ring-1 ring-[var(--color-gold)] shadow-[0_0_12px_var(--color-gold-dim)]'
+                    : 'border-[var(--color-border)] hover:border-[var(--color-border-hover)]'
                 }`}
               >
                 {/* Thumbnail Container */}
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-black/40">
+                <div className="relative aspect-4/3 w-full overflow-hidden bg-[var(--color-surface-3)]">
                   <img
                     src={image.public_url}
                     alt={image.caption || image.category || 'Listing photo'}
@@ -393,7 +393,7 @@ export function ListingImageLibrary({
                   {/* Top Badges */}
                   <div className="absolute top-1.5 left-1.5 flex flex-wrap gap-1">
                     {isHero ? (
-                      <span className="flex items-center gap-1 rounded bg-[var(--color-gold)] px-1.5 py-0.5 text-[9px] font-bold text-black shadow">
+                      <span className="flex items-center gap-1 rounded bg-[var(--color-gold)] px-1.5 py-0.5 text-[9px] font-bold text-[var(--color-black)] shadow">
                         <Star className="size-2.5 fill-black" /> HERO
                       </span>
                     ) : null}
@@ -419,7 +419,7 @@ export function ListingImageLibrary({
                         type="button"
                         onClick={() => void handleSetHero(image)}
                         title="Set as Hero cover"
-                        className="rounded bg-[var(--color-gold)] p-1.5 text-black hover:bg-[#dcc487]"
+                        className="rounded bg-[var(--color-gold)] p-1.5 text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
                       >
                         <Star className="size-3.5 fill-black" />
                       </button>
@@ -446,7 +446,7 @@ export function ListingImageLibrary({
                         <select
                           value={image.category}
                           onChange={(e) => void handleSetCategory(image, e.target.value)}
-                          className="w-full truncate rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-1.5 py-1 text-[11px] text-zinc-300 focus:border-[var(--color-gold)] focus:outline-none"
+                          className="w-full truncate rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-1.5 py-1 text-[11px] text-[var(--color-text)] focus:border-[var(--color-gold)] focus:outline-none"
                         >
                           {PHOTO_CATEGORY_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.value}>
@@ -474,12 +474,12 @@ export function ListingImageLibrary({
                           }}
                           placeholder="Room caption..."
                           autoFocus
-                          className="w-full rounded border border-[var(--color-gold)] bg-black px-1.5 py-0.5 text-[11px] text-white focus:outline-none"
+                          className="w-full rounded border border-[var(--color-gold)] bg-[var(--color-surface)] px-1.5 py-0.5 text-[11px] text-[var(--color-text)] focus:outline-none"
                         />
                         <button
                           type="button"
                           onClick={() => void handleSaveCaption(image.id)}
-                          className="rounded bg-[var(--color-gold)] p-1 text-black"
+                          className="rounded bg-[var(--color-gold)] p-1 text-[var(--color-black)]"
                         >
                           <Check className="size-3" />
                         </button>
@@ -493,8 +493,8 @@ export function ListingImageLibrary({
                         }}
                         title={canManage ? 'Click to edit caption' : undefined}
                         className={`truncate text-[11px] ${
-                          canManage ? 'cursor-pointer hover:text-zinc-200' : ''
-                        } ${image.caption ? 'text-zinc-300' : 'italic text-zinc-600'}`}
+                          canManage ? 'cursor-pointer hover:text-[var(--color-text)]' : ''
+                        } ${image.caption ? 'text-[var(--color-text-secondary)]' : 'italic text-[var(--color-text-tertiary)]'}`}
                       >
                         {image.caption || (canManage ? '+ Add caption...' : 'No caption')}
                       </p>
@@ -502,7 +502,7 @@ export function ListingImageLibrary({
                   </div>
 
                   {/* File info footer */}
-                  <div className="mt-2 flex items-center justify-between border-t border-[var(--color-border)]/40 pt-1.5 text-[10px] text-zinc-500">
+                  <div className="mt-2 flex items-center justify-between border-t border-[var(--color-border)]/40 pt-1.5 text-[10px] text-[var(--color-text-tertiary)]">
                     <span>
                       {image.file_size_bytes
                         ? `${Math.round(image.file_size_bytes / 1024)} KB`
@@ -527,16 +527,16 @@ export function ListingImageLibrary({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex max-h-[90vh] max-w-4xl flex-col overflow-hidden rounded-sm border border-[var(--color-border)] bg-[#111111]"
+            className="relative flex max-h-[90vh] max-w-4xl flex-col overflow-hidden rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)]"
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3 text-white">
+            <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3 text-[var(--color-text)]">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-gold)]">
                   {activeLightboxImage.category.replace('_', ' ')}
                 </span>
                 {activeLightboxImage.caption ? (
-                  <span className="text-xs text-zinc-300">· {activeLightboxImage.caption}</span>
+                  <span className="text-xs text-[var(--color-text-secondary)]">· {activeLightboxImage.caption}</span>
                 ) : null}
               </div>
               <div className="flex items-center gap-2">
@@ -545,14 +545,14 @@ export function ListingImageLibrary({
                   download
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded p-1.5 text-zinc-400 hover:text-white"
+                  className="rounded p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                 >
                   <Download className="size-4" />
                 </a>
                 <button
                   type="button"
                   onClick={() => setActiveLightboxImage(null)}
-                  className="rounded p-1.5 text-zinc-400 hover:text-white"
+                  className="rounded p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                 >
                   <X className="size-4" />
                 </button>

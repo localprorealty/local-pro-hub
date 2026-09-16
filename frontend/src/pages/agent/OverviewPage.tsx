@@ -35,18 +35,18 @@ function formatCurrency(val: number | string | null | undefined): string {
 function getStatusBadgeClass(status: string): string {
   const norm = status.toLowerCase()
   if (norm === 'closed') {
-    return 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/25'
+    return 'bg-emerald-500/10 text-emerald-800 border border-emerald-600/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-500/25'
   }
   if (norm === 'active') {
-    return 'bg-blue-950/40 text-blue-400 border border-blue-500/25'
+    return 'bg-blue-500/10 text-blue-800 border border-blue-600/20 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-500/25'
   }
   if (norm === 'pending') {
-    return 'bg-amber-950/40 text-amber-400 border border-amber-500/25'
+    return 'bg-amber-500/10 text-amber-800 border border-amber-600/20 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-500/25'
   }
   if (norm === 'listing') {
     return 'bg-transparent text-[var(--color-gold)] border border-[var(--color-gold)]/40'
   }
-  return 'bg-zinc-900 text-zinc-400 border border-zinc-700/50'
+  return 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] border border-[var(--color-border)]'
 }
 
 function OverviewContent() {
@@ -197,7 +197,7 @@ function OverviewContent() {
           className={`shrink-0 whitespace-nowrap px-4 py-3 sm:px-6 sm:py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
             activeTab === 'history'
               ? 'text-[var(--color-gold)]'
-              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
           }`}
         >
           Property History
@@ -216,7 +216,7 @@ function OverviewContent() {
               className={`shrink-0 whitespace-nowrap px-4 py-3 sm:px-6 sm:py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
                 activeTab === 'earnings'
                   ? 'text-[var(--color-gold)]'
-                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
               }`}
             >
               My Earnings
@@ -233,7 +233,7 @@ function OverviewContent() {
               className={`shrink-0 whitespace-nowrap px-4 py-3 sm:px-6 sm:py-3.5 text-xs font-semibold tracking-wider uppercase transition-colors relative ${
                 activeTab === 'revenue_share'
                   ? 'text-[var(--color-gold)]'
-                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
               }`}
             >
               Revenue Share
@@ -252,7 +252,7 @@ function OverviewContent() {
       {canScrollRight ? (
         <div
           aria-hidden="true"
-          className="pointer-events-none lg:hidden absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 w-10 bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent transition-opacity duration-300"
+          className="pointer-events-none lg:hidden absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 w-10 bg-gradient-to-l from-[var(--color-bg-base)] via-[var(--color-bg-base)]/80 to-transparent transition-opacity duration-300"
         >
           <ChevronRight className="size-4 text-[var(--color-gold)] animate-pulse" />
         </div>
@@ -262,7 +262,7 @@ function OverviewContent() {
       {canScrollLeft ? (
         <div
           aria-hidden="true"
-          className="pointer-events-none lg:hidden absolute left-0 top-0 bottom-0 flex items-center justify-start pl-1 w-10 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent transition-opacity duration-300"
+          className="pointer-events-none lg:hidden absolute left-0 top-0 bottom-0 flex items-center justify-start pl-1 w-10 bg-gradient-to-r from-[var(--color-bg-base)] via-[var(--color-bg-base)]/80 to-transparent transition-opacity duration-300"
         >
           <ChevronLeft className="size-4 text-[var(--color-gold)]" />
         </div>
@@ -309,7 +309,7 @@ function OverviewContent() {
                       <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold text-[var(--color-gold)]">Total Earned</p>
-                          <h3 className="text-3xl font-bold text-white mt-2">
+                          <h3 className="text-3xl font-bold text-[var(--color-text)] mt-2">
                             {formatCurrency(revData.summary.total_earned)}
                           </h3>
                         </div>
@@ -320,7 +320,7 @@ function OverviewContent() {
                       <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold text-[var(--color-gold)]">Paid Out</p>
-                          <h3 className="text-3xl font-bold text-white mt-2">
+                          <h3 className="text-3xl font-bold text-[var(--color-text)] mt-2">
                             {formatCurrency(revData.summary.paid_cash + revData.summary.paid_credit)}
                           </h3>
                         </div>
@@ -355,10 +355,10 @@ function OverviewContent() {
                           type="button"
                           disabled={policyLoading}
                           onClick={() => handleDownloadPolicy('growth_club_deck')}
-                          className="flex items-center justify-between p-4 border border-[var(--color-border)] hover:border-[var(--color-gold)]/40 transition-colors bg-black text-left group w-full"
+                          className="flex items-center justify-between p-4 border border-[var(--color-border)] hover:border-[var(--color-gold)]/40 transition-colors bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] text-left group w-full"
                         >
                           <div className="space-y-1">
-                            <span className="text-xs font-semibold text-white group-hover:text-[var(--color-gold)] block transition-colors">Growth Club Deck (PDF)</span>
+                            <span className="text-xs font-semibold text-[var(--color-text)] group-hover:text-[var(--color-gold)] block transition-colors">Growth Club Deck (PDF)</span>
                             <span className="text-[10px] text-[var(--color-text-secondary)]">Revenue share model presentation</span>
                           </div>
                           <FileDown className="size-5 text-[var(--color-text-secondary)] group-hover:text-[var(--color-gold)] transition-colors" />
@@ -368,10 +368,10 @@ function OverviewContent() {
                           type="button"
                           disabled={policyLoading}
                           onClick={() => handleDownloadPolicy('revenue_share_policy')}
-                          className="flex items-center justify-between p-4 border border-[var(--color-border)] hover:border-[var(--color-gold)]/40 transition-colors bg-black text-left group w-full"
+                          className="flex items-center justify-between p-4 border border-[var(--color-border)] hover:border-[var(--color-gold)]/40 transition-colors bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] text-left group w-full"
                         >
                           <div className="space-y-1">
-                            <span className="text-xs font-semibold text-white group-hover:text-[var(--color-gold)] block transition-colors">Revenue Share Policy (PDF)</span>
+                            <span className="text-xs font-semibold text-[var(--color-text)] group-hover:text-[var(--color-gold)] block transition-colors">Revenue Share Policy (PDF)</span>
                             <span className="text-[10px] text-[var(--color-text-secondary)]">Rules, cap periods, and unlocks</span>
                           </div>
                           <FileDown className="size-5 text-[var(--color-text-secondary)] group-hover:text-[var(--color-gold)] transition-colors" />
@@ -403,19 +403,19 @@ function OverviewContent() {
                             <div key={item.g} className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 rounded-sm space-y-3 flex flex-col justify-between">
                               <div className="space-y-1">
                                 <span className="text-[10px] uppercase text-[var(--color-text-secondary)] font-bold block">Gen {item.g} ({item.rate})</span>
-                                <span className="text-lg font-bold text-white block">{formatCurrency(amt)}</span>
+                                <span className="text-lg font-bold text-[var(--color-text)] block">{formatCurrency(amt)}</span>
                               </div>
                               {contributors.length > 0 ? (
-                                <div className="border-t border-[#2a2a2a] pt-2">
+                                <div className="border-t border-[var(--color-border)] pt-2">
                                   <span className="text-[9px] text-[var(--color-text-secondary)] uppercase block mb-1">Contributors:</span>
                                   <div className="space-y-0.5 max-h-[60px] overflow-y-auto pr-1">
                                     {contributors.map(c => (
-                                      <span key={c} className="text-[9px] text-white block font-light truncate">{c}</span>
+                                      <span key={c} className="text-[9px] text-[var(--color-text)] block font-light truncate">{c}</span>
                                     ))}
                                   </div>
                                 </div>
                               ) : (
-                                <span className="text-[9px] text-[var(--color-text-secondary)] italic block border-t border-[#2a2a2a] pt-2">No contributors yet</span>
+                                <span className="text-[9px] text-[var(--color-text-secondary)] italic block border-t border-[var(--color-border)] pt-2">No contributors yet</span>
                               )}
                             </div>
                           )
@@ -429,7 +429,7 @@ function OverviewContent() {
                       <div className="border border-[var(--color-border)] rounded-sm overflow-hidden">
                         <div className="overflow-x-auto">
                           <table className="w-full min-w-[640px] text-left text-xs">
-                          <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
+                          <thead className="bg-[var(--color-surface-3)] text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                             <tr>
                               <th className="px-6 py-4">Transaction / Type</th>
                               <th className="px-6 py-4">Contributor</th>
@@ -448,14 +448,14 @@ function OverviewContent() {
                               </tr>
                             ) : (
                               revData.earnings.map((e: any) => (
-                                <tr key={e.id} className="hover:bg-black/20">
-                                  <td className="px-6 py-4 font-semibold text-white">
+                                <tr key={e.id} className="hover:bg-[var(--color-surface-3)]">
+                                  <td className="px-6 py-4 font-semibold text-[var(--color-text)]">
                                     {e.description}
                                   </td>
-                                  <td className="px-6 py-4 text-white">
+                                  <td className="px-6 py-4 text-[var(--color-text)]">
                                     {e.contributor}
                                   </td>
-                                  <td className="px-6 py-4 text-white">
+                                  <td className="px-6 py-4 text-[var(--color-text)]">
                                     Gen {e.generation}
                                   </td>
                                   <td className="px-6 py-4 text-[var(--color-text-secondary)]">
@@ -467,11 +467,11 @@ function OverviewContent() {
                                   </td>
                                   <td className="px-6 py-4">
                                     {e.is_paid ? (
-                                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-emerald-950/40 text-emerald-400 border border-emerald-500/25">
+                                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-emerald-500/10 text-emerald-800 border border-emerald-600/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-500/25">
                                         Paid
                                       </span>
                                     ) : (
-                                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-zinc-900 text-zinc-400 border border-zinc-700/50">
+                                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] border border-[var(--color-border)]">
                                         Unpaid
                                       </span>
                                     )}
@@ -498,7 +498,7 @@ function OverviewContent() {
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Total Closed</p>
-                      <h3 className="text-3xl font-bold text-[var(--color-white)] mt-2">{closedCount}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--color-text)] mt-2">{closedCount}</h3>
                     </div>
                     <p className="text-[11px] text-[var(--color-text-secondary)] mt-2">transactions finalized</p>
                     <Briefcase className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />
@@ -507,7 +507,7 @@ function OverviewContent() {
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm relative overflow-hidden flex flex-col justify-between min-h-[120px]">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">In Progress</p>
-                      <h3 className="text-3xl font-bold text-[var(--color-white)] mt-2">{inProgressCount}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--color-text)] mt-2">{inProgressCount}</h3>
                     </div>
                     <p className="text-[11px] text-[var(--color-text-secondary)] mt-2">active, pending, or listings</p>
                     <Calendar className="absolute right-4 bottom-4 size-8 opacity-5 text-[var(--color-gold)]" />
@@ -597,7 +597,7 @@ function OverviewContent() {
                     >
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-3">
-                          <h4 className="font-semibold text-white text-base">
+                          <h4 className="font-semibold text-[var(--color-text)] text-base">
                             {tx.address}
                           </h4>
                           {tx.city && (
@@ -610,12 +610,12 @@ function OverviewContent() {
                           </span>
                           {activeTab === 'earnings' && (
                             tx.paid_at ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-emerald-950/40 text-emerald-400 border border-emerald-500/25">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-emerald-500/10 text-emerald-800 border border-emerald-600/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-500/25">
                                 <CheckCircle2 className="size-2.5" />
                                 PAID
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-zinc-900 text-zinc-400 border border-zinc-700/50">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-[9px] uppercase font-bold bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] border border-[var(--color-border)]">
                                 <AlertCircle className="size-2.5" />
                                 UNPAID
                               </span>
@@ -626,7 +626,7 @@ function OverviewContent() {
                           {tx.closing_date && (
                             <span>
                               {tx.status.toLowerCase() === 'closed' ? 'Closed: ' : 'Target Closing: '}
-                              <span className="text-white font-medium">
+                              <span className="text-[var(--color-text)] font-medium">
                                 {new Date(tx.closing_date).toLocaleDateString('en-US', {
                                   year: 'numeric',
                                   month: 'short',
@@ -638,29 +638,29 @@ function OverviewContent() {
                           )}
                            {FEATURE_REVENUE_DASHBOARD && tx.price && (
                             <span>
-                              Volume: <span className="text-white font-medium">{formatCurrency(tx.price)}</span>
+                              Volume: <span className="text-[var(--color-text)] font-medium">{formatCurrency(tx.price)}</span>
                             </span>
                           )}
                           {tx.representing && (
                             <span>
-                              Representing: <span className="text-white font-medium uppercase">{tx.representing}</span>
+                              Representing: <span className="text-[var(--color-text)] font-medium uppercase">{tx.representing}</span>
                             </span>
                           )}
                         </div>
                         {activeTab === 'earnings' && tx.payment_note && (
                           <p className="text-xs text-[var(--color-gold)] font-medium">
-                            Payment Note: <span className="text-gray-300 font-light italic">{tx.payment_note}</span>
+                            Payment Note: <span className="text-[var(--color-text-secondary)] font-light italic">{tx.payment_note}</span>
                           </p>
                         )}
                       </div>
 
                       {FEATURE_REVENUE_DASHBOARD && (
-                        <div className="flex items-center gap-6 border-t md:border-t-0 border-[#2a2a2a] pt-3 md:pt-0">
+                        <div className="flex items-center gap-6 border-t md:border-t-0 border-[var(--color-border)] pt-3 md:pt-0">
                           {activeTab === 'history' ? (
                             <>
                               <div className="text-left md:text-right">
                                 <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Gross</p>
-                                <p className="text-sm font-semibold text-white">{formatCurrency(tx.adjusted_basis)}</p>
+                                <p className="text-sm font-semibold text-[var(--color-text)]">{formatCurrency(tx.adjusted_basis)}</p>
                               </div>
                               <div className="text-left md:text-right">
                                 <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Net take-home</p>

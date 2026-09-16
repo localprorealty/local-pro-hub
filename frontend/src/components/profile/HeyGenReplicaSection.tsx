@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const fieldClass =
-  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
+  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
 
 export type HeyGenPayload = {
   heygen_avatar_id: string | null
@@ -50,12 +50,12 @@ export function HeyGenReplicaSection({
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-6">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-6">
       <div className="border-b border-[var(--color-border)]/60 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Video className="size-4 text-[var(--color-gold)]" />
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+            <h4 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider">
               HeyGen Video Replica Settings
             </h4>
             <p className="text-[11px] text-[var(--color-text-secondary)] mt-0.5">
@@ -98,7 +98,7 @@ export function HeyGenReplicaSection({
           <Button
             type="submit"
             disabled={isSaving}
-            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
           >
             {isSaving ? 'Saving...' : 'Save HeyGen Settings'}
           </Button>

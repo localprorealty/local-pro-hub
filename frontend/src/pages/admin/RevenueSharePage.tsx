@@ -339,7 +339,7 @@ function RevenueShareContent() {
               className={`shrink-0 whitespace-nowrap px-5 py-3 text-xs font-semibold uppercase tracking-wider transition-colors flex items-center relative ${
                 activeTab === tab.key
                   ? 'text-[var(--color-gold)]'
-                  : 'text-[var(--color-text-secondary)] hover:text-white'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
               }`}
             >
               {tab.icon}
@@ -398,10 +398,10 @@ function RevenueShareContent() {
                     </div>
                     <div className="flex flex-col items-start md:items-end gap-1 w-full md:w-auto">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                        <label htmlFor="period-label" className="text-xs uppercase text-gray-300 font-semibold shrink-0">Period Label:</label>
+                        <label htmlFor="period-label" className="text-xs uppercase text-[var(--color-text-secondary)] font-semibold shrink-0">Period Label:</label>
                         <Input
                           id="period-label"
-                          className="w-full sm:w-48 bg-black border-[var(--color-border)] text-white text-xs"
+                          className="w-full sm:w-48 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs"
                           value={periodLabel}
                           onChange={e => {
                             setPeriodLabel(e.target.value)
@@ -420,7 +420,7 @@ function RevenueShareContent() {
                   <div className="w-full max-w-full border border-[var(--color-border)] rounded-sm overflow-hidden">
                     <div className="w-full overflow-x-auto">
                       <table className="w-full min-w-[700px] text-left text-xs">
-                      <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
+                      <thead className="bg-[var(--color-surface-3)] text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                         <tr>
                           <th className="px-6 py-4">Agent</th>
                           <th className="px-6 py-4">Unpaid Total</th>
@@ -439,15 +439,15 @@ function RevenueShareContent() {
                           </tr>
                         ) : (
                           ledger.map(payment => (
-                            <tr key={payment.recipient_id} className="hover:bg-black/20">
+                            <tr key={payment.recipient_id} className="hover:bg-[var(--color-surface-3)]/50">
                               <td className="px-6 py-4">
-                                <span className="font-semibold text-white block">{payment.recipient_name}</span>
+                                <span className="font-semibold text-[var(--color-text)] block">{payment.recipient_name}</span>
                                 <span className="text-[10px] text-[var(--color-text-secondary)]">{payment.recipient_email}</span>
                               </td>
-                              <td className="px-6 py-4 font-bold text-white">
+                              <td className="px-6 py-4 font-bold text-[var(--color-text)]">
                                 {formatCurrency(payment.unpaid_total)}
                               </td>
-                              <td className="px-6 py-4 text-emerald-400">
+                              <td className="px-6 py-4 text-emerald-700 dark:text-emerald-400 font-semibold">
                                 {formatCurrency(payment.credit_suggested)}
                                 <span className="block text-[9px] text-[var(--color-text-secondary)] mt-0.5">
                                   Remaining room: {formatCurrency(payment.remaining_cap_room)}
@@ -459,7 +459,7 @@ function RevenueShareContent() {
                               <td className="px-6 py-4">
                                 <Input
                                   aria-label={`Payment note for ${payment.recipient_name}`}
-                                  className="w-48 bg-black/40 border-[var(--color-border)] text-white text-xs h-8"
+                                  className="w-48 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-8"
                                   value={notesByRecipient[payment.recipient_id] || ''}
                                   onChange={e => setNotesByRecipient(prev => ({ ...prev, [payment.recipient_id]: e.target.value }))}
                                   placeholder="Add payout details..."
@@ -491,7 +491,7 @@ function RevenueShareContent() {
                   <div className="w-full max-w-full border border-[var(--color-border)] rounded-sm overflow-hidden">
                     <div className="w-full overflow-x-auto">
                       <table className="w-full min-w-[760px] text-left text-xs">
-                      <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
+                      <thead className="bg-[var(--color-surface-3)] text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                         <tr>
                           <th className="px-6 py-4">Agent</th>
                           <th className="px-6 py-4">Cap Override</th>
@@ -504,22 +504,22 @@ function RevenueShareContent() {
                       </thead>
                       <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface-2)]">
                         {overrides.map(agent => (
-                          <tr key={agent.user_id} className="hover:bg-black/20">
+                          <tr key={agent.user_id} className="hover:bg-[var(--color-surface-3)]/50">
                             <td className="px-6 py-4">
-                              <span className="font-semibold text-white block">{agent.full_name}</span>
+                              <span className="font-semibold text-[var(--color-text)] block">{agent.full_name}</span>
                               <span className="text-[10px] text-[var(--color-text-secondary)]">{agent.email}</span>
                             </td>
                             <td className="px-6 py-4">
                               {editingOverrideId === agent.user_id ? (
                                 <Input
                                   aria-label="Cap Override"
-                                  className="w-24 bg-black border-[var(--color-border)] text-white text-xs h-8"
+                                  className="w-24 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-8"
                                   value={editCap}
                                   onChange={e => setEditCap(e.target.value)}
                                   placeholder={agent.cap_amount ? String(agent.cap_amount) : 'None'}
                                 />
                               ) : (
-                                <span className="text-white font-medium">
+                                <span className="text-[var(--color-text)] font-medium">
                                   {agent.cap_override !== null ? formatCurrency(agent.cap_override) : 'Default'}
                                 </span>
                               )}
@@ -528,7 +528,7 @@ function RevenueShareContent() {
                               {editingOverrideId === agent.user_id ? (
                                 <select
                                   aria-label="Eligibility Override"
-                                  className="bg-black border border-[var(--color-border)] text-white text-xs h-8 px-2 focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+                                  className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-8 px-2 focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
                                   value={editElig}
                                   onChange={e => setEditElig(e.target.value as any)}
                                 >
@@ -537,7 +537,7 @@ function RevenueShareContent() {
                                   <option value="force_false">Force Ineligible</option>
                                 </select>
                               ) : (
-                                <span className={agent.eligibility_override !== null ? (agent.eligibility_override ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium') : 'text-[var(--color-text-secondary)]'}>
+                                <span className={agent.eligibility_override !== null ? (agent.eligibility_override ? 'text-emerald-700 dark:text-emerald-400 font-medium' : 'text-red-700 dark:text-red-400 font-medium') : 'text-[var(--color-text-secondary)]'}>
                                   {agent.eligibility_override !== null ? (agent.eligibility_override ? 'Force Eligible' : 'Force Ineligible') : 'Computed Rules'}
                                 </span>
                               )}
@@ -547,7 +547,7 @@ function RevenueShareContent() {
                                 <input
                                   aria-label="Cash Override"
                                   type="checkbox"
-                                  className="size-4 rounded-sm border-[var(--color-border)] bg-black text-[var(--color-gold)] accent-[var(--color-gold)] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+                                  className="size-4 rounded-sm border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-gold)] accent-[var(--color-gold)] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
                                   checked={editCash}
                                   onChange={e => setEditCash(e.target.checked)}
                                 />
@@ -561,7 +561,7 @@ function RevenueShareContent() {
                               {editingOverrideId === agent.user_id ? (
                                 <select
                                   aria-label="Sponsor Override"
-                                  className="bg-black border border-[var(--color-border)] text-white text-xs h-8 px-2 max-w-[150px] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+                                  className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-8 px-2 max-w-[150px] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
                                   value={editSponsor}
                                   onChange={e => setEditSponsor(e.target.value)}
                                 >
@@ -573,7 +573,7 @@ function RevenueShareContent() {
                                     ))}
                                 </select>
                               ) : (
-                                <span className="text-white">
+                                <span className="text-[var(--color-text)]">
                                   {agent.sponsor_override ? overrides.find(x => x.user_id === agent.sponsor_override)?.full_name || 'Overridden' : 'Resolved Default'}
                                 </span>
                               )}
@@ -582,7 +582,7 @@ function RevenueShareContent() {
                               {editingOverrideId === agent.user_id ? (
                                 <Input
                                   aria-label="Notes"
-                                  className="w-32 bg-black border-[var(--color-border)] text-white text-xs h-8"
+                                  className="w-32 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-8"
                                   value={editNotes}
                                   onChange={e => setEditNotes(e.target.value)}
                                   placeholder="Add note..."
@@ -606,7 +606,7 @@ function RevenueShareContent() {
                                   <Button
                                     type="button"
                                     onClick={() => setEditingOverrideId(null)}
-                                    className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-[10px] uppercase px-2.5 py-1 rounded-none h-8 focus:outline focus:outline-2 focus:outline-zinc-700"
+                                    className="border border-[var(--color-border)] bg-transparent hover:bg-[var(--color-surface-3)] text-[var(--color-text)] font-semibold text-[10px] uppercase px-2.5 py-1 rounded-none h-8"
                                   >
                                     Cancel
                                   </Button>
@@ -643,7 +643,7 @@ function RevenueShareContent() {
                   <div className="w-full max-w-full border border-[var(--color-border)] rounded-sm overflow-hidden">
                     <div className="w-full overflow-x-auto">
                       <table className="w-full min-w-[700px] text-left text-xs">
-                      <thead className="bg-black/60 text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
+                      <thead className="bg-[var(--color-surface-3)] text-[var(--color-gold)] uppercase tracking-wider font-semibold border-b border-[var(--color-border)]">
                         <tr>
                           <th className="px-6 py-4">Agent Name</th>
                           <th className="px-6 py-4">Sponsor Text Synced</th>
@@ -661,19 +661,19 @@ function RevenueShareContent() {
                           </tr>
                         ) : (
                           logs.map(log => (
-                            <tr key={log.id} className="hover:bg-black/20">
+                            <tr key={log.id} className="hover:bg-[var(--color-surface-3)]/50">
                               <td className="px-6 py-4">
-                                <span className="font-semibold text-white block">{log.users.full_name}</span>
+                                <span className="font-semibold text-[var(--color-text)] block">{log.users.full_name}</span>
                                 <span className="text-[10px] text-[var(--color-text-secondary)]">{log.users.email}</span>
                               </td>
-                              <td className="px-6 py-4 font-mono font-semibold text-red-400">
+                              <td className="px-6 py-4 font-mono font-semibold text-red-600 dark:text-red-400">
                                 "{log.raw_sponsor_text}"
                               </td>
                               <td className="px-6 py-4">
-                                <span className={`px-2 py-0.5 rounded-sm text-[9px] uppercase tracking-wider font-semibold ${
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[9px] uppercase tracking-wider font-bold border ${
                                   log.resolution_status === 'ambiguous'
-                                    ? 'bg-amber-950/40 text-amber-400 border border-amber-500/20'
-                                    : 'bg-red-950/40 text-red-400 border border-red-500/20'
+                                    ? 'bg-amber-500/10 text-amber-800 border-amber-600/25 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-500/25'
+                                    : 'bg-red-500/10 text-red-800 border-red-600/25 dark:bg-red-950/40 dark:text-red-400 dark:border-red-500/25'
                                 }`}>
                                   {log.resolution_status}
                                 </span>
@@ -682,7 +682,7 @@ function RevenueShareContent() {
                                 <div className="space-y-1">
                                   <select
                                     aria-label="Assign Sponsor"
-                                    className="bg-black border border-[var(--color-border)] text-white text-xs h-8 px-2 max-w-[200px] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+                                    className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-8 px-2 max-w-[200px] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
                                     value={selectedSponsors[log.user_id] || ''}
                                     onChange={e => {
                                       setSelectedSponsors(prev => ({ ...prev, [log.user_id]: e.target.value }))
@@ -697,7 +697,7 @@ function RevenueShareContent() {
                                     {overrides
                                       .filter(x => x.user_id !== log.user_id)
                                       .map(x => (
-                                        <option key={x.user_id} value={x.user_id}>{x.full_name}</option>
+                                       <option key={x.user_id} value={x.user_id}>{x.full_name}</option>
                                       ))}
                                   </select>
                                   {sponsorErrors[log.user_id] && (
@@ -732,44 +732,44 @@ function RevenueShareContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* General params */}
                     <div className="space-y-4">
-                      <h5 className="text-xs font-semibold text-white uppercase tracking-wider">Eligibility Parameters</h5>
+                      <h5 className="text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider">Eligibility Parameters</h5>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label htmlFor="settings-min-cap" className="text-[10px] text-gray-400 uppercase font-semibold">Min Cap Amount</label>
+                          <label htmlFor="settings-min-cap" className="text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold">Min Cap Amount</label>
                           <Input
                             id="settings-min-cap"
                             type="number"
-                            className="bg-black border-[var(--color-border)] text-white text-xs h-9"
+                            className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9"
                             value={settings.min_cap_amount}
                             onChange={e => setSettings(prev => prev ? ({ ...prev, min_cap_amount: parseFloat(e.target.value) }) : null)}
                           />
                         </div>
                         <div className="space-y-1">
-                          <label htmlFor="settings-grace" className="text-[10px] text-gray-400 uppercase font-semibold">Grace Period (Months)</label>
+                          <label htmlFor="settings-grace" className="text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold">Grace Period (Months)</label>
                           <Input
                             id="settings-grace"
                             type="number"
-                            className="bg-black border-[var(--color-border)] text-white text-xs h-9"
+                            className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9"
                             value={settings.grace_period_months}
                             onChange={e => setSettings(prev => prev ? ({ ...prev, grace_period_months: parseInt(e.target.value) }) : null)}
                           />
                         </div>
                         <div className="space-y-1">
-                          <label htmlFor="settings-prod-min" className="text-[10px] text-gray-400 uppercase font-semibold">Min Production Txns</label>
+                          <label htmlFor="settings-prod-min" className="text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold">Min Production Txns</label>
                           <Input
                             id="settings-prod-min"
                             type="number"
-                            className="bg-black border-[var(--color-border)] text-white text-xs h-9"
+                            className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9"
                             value={settings.production_min_transactions}
                             onChange={e => setSettings(prev => prev ? ({ ...prev, production_min_transactions: parseInt(e.target.value) }) : null)}
                           />
                         </div>
                         <div className="space-y-1">
-                          <label htmlFor="settings-prod-window" className="text-[10px] text-gray-400 uppercase font-semibold">Production Window (Months)</label>
+                          <label htmlFor="settings-prod-window" className="text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold">Production Window (Months)</label>
                           <Input
                             id="settings-prod-window"
                             type="number"
-                            className="bg-black border-[var(--color-border)] text-white text-xs h-9"
+                            className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9"
                             value={settings.production_window_months}
                             onChange={e => setSettings(prev => prev ? ({ ...prev, production_window_months: parseInt(e.target.value) }) : null)}
                           />
@@ -779,16 +779,16 @@ function RevenueShareContent() {
 
                     {/* Rates */}
                     <div className="space-y-4">
-                      <h5 className="text-xs font-semibold text-white uppercase tracking-wider">Generation Split Rates</h5>
+                      <h5 className="text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider">Generation Split Rates</h5>
                       <div className="grid grid-cols-5 gap-2">
                         {[1, 2, 3, 4, 5].map(g => (
                           <div key={g} className="space-y-1">
-                            <label htmlFor={`settings-gen${g}-rate`} className="text-[10px] text-gray-400 uppercase font-semibold block text-center">Gen {g}</label>
+                            <label htmlFor={`settings-gen${g}-rate`} className="text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold block text-center">Gen {g}</label>
                             <Input
                               id={`settings-gen${g}-rate`}
                               type="number"
                               step="0.0001"
-                              className="bg-black border-[var(--color-border)] text-white text-xs h-9 text-center"
+                              className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9 text-center"
                               value={settings[`gen${g}_rate` as keyof GlobalSettings]}
                               onChange={e => setSettings(prev => prev ? ({ ...prev, [`gen${g}_rate`]: parseFloat(e.target.value) }) : null)}
                             />
@@ -799,38 +799,38 @@ function RevenueShareContent() {
 
                     {/* Max payouts */}
                     <div className="space-y-4 md:col-span-2">
-                      <h5 className="text-xs font-semibold text-white uppercase tracking-wider border-t border-[var(--color-border)] pt-4">Generation Caps & Bonuses</h5>
+                      <h5 className="text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider border-t border-[var(--color-border)] pt-4">Generation Caps & Bonuses</h5>
                       <div className="grid grid-cols-5 gap-4">
                         {[1, 2, 3, 4, 5].map(g => (
                           <div key={g} className="space-y-3">
                             <h6 className="text-[10px] text-[var(--color-gold)] font-bold uppercase text-center">Gen {g} Metrics</h6>
                             <div className="space-y-1">
-                              <label htmlFor={`settings-gen${g}-max`} className="text-[9px] text-gray-400 uppercase font-semibold block text-center">Max Payout</label>
+                              <label htmlFor={`settings-gen${g}-max`} className="text-[9px] text-[var(--color-text-secondary)] uppercase font-semibold block text-center">Max Payout</label>
                               <Input
                                 id={`settings-gen${g}-max`}
                                 type="number"
-                                className="bg-black border-[var(--color-border)] text-white text-xs h-9 text-center"
+                                className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9 text-center"
                                 value={settings[`gen${g}_max_payout` as keyof GlobalSettings]}
                                 onChange={e => setSettings(prev => prev ? ({ ...prev, [`gen${g}_max_payout`]: parseFloat(e.target.value) }) : null)}
                               />
                             </div>
                             <div className="space-y-1">
-                              <label htmlFor={`settings-gen${g}-bonus`} className="text-[9px] text-gray-400 uppercase font-semibold block text-center">Bonus Amt</label>
+                              <label htmlFor={`settings-gen${g}-bonus`} className="text-[9px] text-[var(--color-text-secondary)] uppercase font-semibold block text-center">Bonus Amt</label>
                               <Input
                                 id={`settings-gen${g}-bonus`}
                                 type="number"
-                                className="bg-black border-[var(--color-border)] text-white text-xs h-9 text-center"
+                                className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9 text-center"
                                 value={settings[`gen${g}_completion_bonus` as keyof GlobalSettings]}
                                 onChange={e => setSettings(prev => prev ? ({ ...prev, [`gen${g}_completion_bonus`]: parseFloat(e.target.value) }) : null)}
                               />
                             </div>
                             {g >= 2 && (
                               <div className="space-y-1">
-                                <label htmlFor={`settings-gen${g}-unlock`} className="text-[9px] text-gray-400 uppercase font-semibold block text-center">Unlock Count</label>
+                                <label htmlFor={`settings-gen${g}-unlock`} className="text-[9px] text-[var(--color-text-secondary)] uppercase font-semibold block text-center">Unlock Count</label>
                                 <Input
                                   id={`settings-gen${g}-unlock`}
                                   type="number"
-                                  className="bg-black border-[var(--color-border)] text-white text-xs h-9 text-center"
+                                  className="bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-xs h-9 text-center"
                                   value={settings[`gen${g}_unlock_count` as keyof GlobalSettings]}
                                   onChange={e => setSettings(prev => prev ? ({ ...prev, [`gen${g}_unlock_count`]: parseInt(e.target.value) }) : null)}
                                 />

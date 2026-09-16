@@ -276,7 +276,7 @@ function RevenueOverviewContent() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="h-10 bg-[var(--color-surface-3)] border-0 text-white"
+                className="h-10 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)]"
               />
             </div>
             <div className="space-y-1.5">
@@ -285,13 +285,13 @@ function RevenueOverviewContent() {
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="h-10 bg-[var(--color-surface-3)] border-0 text-white"
+                className="h-10 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)]"
               />
             </div>
           </div>
           <Button
             onClick={handleApplyFilter}
-            className="h-10 bg-[var(--color-gold)] text-black hover:bg-[#dcc487] font-bold uppercase text-xs tracking-wider px-6 rounded-sm"
+            className="h-10 bg-[var(--color-gold)] text-black hover:bg-[var(--color-gold)]/90 font-bold uppercase text-xs tracking-wider px-6 rounded-sm"
           >
             Apply Range
           </Button>
@@ -321,28 +321,28 @@ function RevenueOverviewContent() {
                   className="border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-sm overflow-hidden"
                 >
                   {/* Agent Card Summary Header */}
-                  <div className="p-6 flex flex-wrap items-center justify-between gap-4 border-b border-[#222]">
+                  <div className="p-6 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--color-border)]">
                     <div className="space-y-1">
-                      <h4 className="font-semibold text-white text-lg">{agent.name}</h4>
+                      <h4 className="font-semibold text-[var(--color-text)] text-lg">{agent.name}</h4>
                       <p className="text-xs text-[var(--color-text-secondary)] font-mono">{agent.email}</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-6">
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Total Earned</p>
-                        <p className="text-base font-bold text-white">{formatCurrency(agent.total_earned)}</p>
+                        <p className="text-base font-bold text-[var(--color-text)]">{formatCurrency(agent.total_earned)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Paid</p>
-                        <p className="text-base font-bold text-emerald-400">{formatCurrency(agent.total_paid)}</p>
+                        <p className="text-base font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(agent.total_paid)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)]">Unpaid</p>
-                        <p className="text-base font-bold text-amber-400">{formatCurrency(agent.total_unpaid)}</p>
+                        <p className="text-base font-bold text-amber-600 dark:text-amber-400">{formatCurrency(agent.total_unpaid)}</p>
                       </div>
                       <button
                         onClick={() => setExpandedAgent(isExpanded ? null : agent.email)}
-                        className="text-[var(--color-text-secondary)] hover:text-white p-2"
+                        className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] p-2"
                         aria-label="Expand transactions"
                       >
                         {isExpanded ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
@@ -352,17 +352,17 @@ function RevenueOverviewContent() {
 
                   {/* Expandable Agent Transactions Panel */}
                   {isExpanded && (
-                    <div className="p-6 bg-black/10 space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="p-6 bg-[var(--color-surface-3)]/30 space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
                       {/* Bulk action row */}
                       {agent.total_unpaid > 0 && (
-                        <div className="border-b border-[#222] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="border-b border-[var(--color-border)] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           {!isBulking ? (
                             <Button
                               onClick={() => {
                                 setBulkNote('')
                                 setActiveBulkAgent(agent.email)
                               }}
-                              className="bg-[var(--color-gold)] text-black hover:bg-[#dcc487] text-xs font-bold uppercase tracking-wider h-9 rounded-sm"
+                              className="bg-[var(--color-gold)] text-black hover:bg-[var(--color-gold)]/90 text-xs font-bold uppercase tracking-wider h-9 rounded-sm"
                             >
                               Mark All Unpaid as Paid
                             </Button>
@@ -372,7 +372,7 @@ function RevenueOverviewContent() {
                                 value={bulkNote}
                                 onChange={(e) => setBulkNote(e.target.value)}
                                 placeholder="Add an optional payment note..."
-                                className="h-9 bg-[var(--color-surface-3)] border-0 text-white placeholder-gray-500 text-xs flex-1 min-w-[200px]"
+                                className="h-9 bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-secondary)] text-xs flex-1 min-w-[200px]"
                               />
                               <div className="flex gap-2">
                                 <Button
@@ -386,7 +386,7 @@ function RevenueOverviewContent() {
                                     setActiveBulkAgent(null)
                                     setBulkNote('')
                                   }}
-                                  className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold uppercase tracking-wider h-9 px-4 rounded-sm"
+                                  className="border border-[var(--color-border)] bg-transparent hover:bg-[var(--color-surface-3)] text-[var(--color-text)] text-xs font-bold uppercase tracking-wider h-9 px-4 rounded-sm"
                                 >
                                   Cancel
                                 </Button>
@@ -401,15 +401,15 @@ function RevenueOverviewContent() {
                         {agent.transactions.map((tx) => (
                           <div
                             key={tx.commission_id}
-                            className="bg-[var(--color-surface-3)]/60 border border-[var(--color-border)]/50 p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
+                            className="bg-[var(--color-surface)] border border-[var(--color-border)] p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
                           >
                             <div className="space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-semibold text-white text-sm">{tx.address}</span>
-                                <span className={`px-1.5 py-0.5 rounded-sm text-[8px] uppercase tracking-wider font-bold ${
+                                <span className="font-semibold text-[var(--color-text)] text-sm">{tx.address}</span>
+                                <span className={`px-1.5 py-0.5 rounded-sm text-[8px] uppercase tracking-wider font-bold border ${
                                   tx.status === 'closed'
-                                    ? 'bg-emerald-950/40 text-emerald-400'
-                                    : 'bg-amber-950/40 text-amber-400'
+                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                                 }`}>
                                   {tx.status}
                                 </span>
@@ -422,7 +422,7 @@ function RevenueOverviewContent() {
                               </div>
                               {tx.payment_note && (
                                 <p className="text-xs text-[var(--color-gold)]">
-                                  Note: <span className="text-gray-300 italic font-light">{tx.payment_note}</span>
+                                  Note: <span className="text-[var(--color-text)] italic font-light">{tx.payment_note}</span>
                                 </p>
                               )}
                             </div>
@@ -430,11 +430,11 @@ function RevenueOverviewContent() {
                             <div className="flex items-center gap-6">
                               <div className="text-right">
                                 <p className="text-[10px] uppercase text-[var(--color-text-secondary)]">Commission</p>
-                                <p className="text-sm font-bold text-white">{formatCurrency(tx.amount)}</p>
+                                <p className="text-sm font-bold text-[var(--color-text)]">{formatCurrency(tx.amount)}</p>
                               </div>
 
                               {tx.paid ? (
-                                <span className="inline-flex items-center gap-1 bg-emerald-950/40 text-emerald-400 border border-emerald-500/25 px-2.5 py-1 text-[10px] font-bold rounded-sm uppercase">
+                                <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 px-2.5 py-1 text-[10px] font-bold rounded-sm uppercase">
                                   <CheckCircle2 className="size-3.5" />
                                   PAID
                                 </span>
@@ -442,7 +442,7 @@ function RevenueOverviewContent() {
                                 <Button
                                   onClick={() => void handleMarkPaid(tx.commission_id)}
                                   disabled={tx.status !== 'closed'}
-                                  className="h-8 border border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-50 text-[10px] font-bold uppercase tracking-wider rounded-sm px-3"
+                                  className="h-8 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)] disabled:opacity-50 text-[10px] font-bold uppercase tracking-wider rounded-sm px-3"
                                 >
                                   Mark Paid
                                 </Button>

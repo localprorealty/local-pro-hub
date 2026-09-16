@@ -156,16 +156,16 @@ function NewListingContent() {
   }
 
   const headerSlot = (
-    <header className="hidden lg:flex relative items-center justify-center border-b border-[#2a2a2a] px-8 py-6">
+    <header className="hidden lg:flex relative items-center justify-center border-b border-[var(--color-border)] px-8 py-6">
       <button
         type="button"
         onClick={() => navigate('/dashboard')}
-        className="absolute left-8 flex items-center text-[#CFB87C] transition-opacity hover:opacity-80"
+        className="absolute left-8 flex items-center text-[var(--color-gold)] transition-opacity hover:opacity-80"
         aria-label="Back to dashboard"
       >
         <ArrowLeft className="size-5" />
       </button>
-      <h1 className="font-[family-name:var(--font-display)] text-xl font-semibold text-white">
+      <h1 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-text)]">
         New Listing
       </h1>
     </header>
@@ -180,15 +180,15 @@ function NewListingContent() {
         {/* TC / Admin Agent Selection Section */}
         {isStaff && (
           <div className="mb-8 w-full max-w-2xl">
-            <div className="rounded-xl border border-[#CFB87C]/30 bg-[#161616] p-5 shadow-lg">
+            <div className="rounded-xl border border-[var(--color-gold)]/30 bg-[var(--color-surface)] p-5 shadow-lg">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
-                  <UserCheck className="size-5 text-[#CFB87C]" />
-                  <h2 className="text-sm font-semibold tracking-wide uppercase text-white font-[family-name:var(--font-display)]">
+                  <UserCheck className="size-5 text-[var(--color-gold)]" />
+                  <h2 className="text-sm font-semibold tracking-wide uppercase text-[var(--color-text)] font-[family-name:var(--font-display)]">
                     Create on behalf of Agent
                   </h2>
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded bg-[#CFB87C]/15 text-[#CFB87C] font-mono font-medium">
+                <span className="text-[11px] px-2 py-0.5 rounded bg-[var(--color-gold)]/15 text-[var(--color-gold)] font-mono font-medium">
                   {currentProfile?.role === 'transaction_coordinator'
                     ? 'Transaction Coordinator'
                     : 'Admin'}
@@ -196,9 +196,9 @@ function NewListingContent() {
               </div>
 
               {selectedAgent ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-[#CFB87C]/60 bg-[#1c1c1c] p-3.5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-[var(--color-gold)]/60 bg-[var(--color-surface-2)] p-3.5">
                   <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-[#CFB87C]/20 text-sm font-bold text-[#CFB87C]">
+                    <div className="flex size-10 items-center justify-center rounded-full bg-[var(--color-gold)]/20 text-sm font-bold text-[var(--color-gold)]">
                       {selectedAgent.full_name
                         ? selectedAgent.full_name
                             .split(' ')
@@ -210,15 +210,15 @@ function NewListingContent() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-sm">
+                        <span className="font-semibold text-[var(--color-text)] text-sm">
                           {selectedAgent.full_name || 'Unnamed Agent'}
                         </span>
                         <CheckCircle2 className="size-4 text-emerald-400" />
                       </div>
-                      <p className="text-xs text-[#888888]">
+                      <p className="text-xs text-[var(--color-text-secondary)]">
                         {selectedAgent.email}
                         {selectedAgent.mls_id && (
-                          <span className="ml-2 rounded bg-[#2a2a2a] px-1.5 py-0.5 text-[10px] text-[#CFB87C]">
+                          <span className="ml-2 rounded bg-[var(--color-surface-3)] px-1.5 py-0.5 text-[10px] text-[var(--color-gold)]">
                             MLS: {selectedAgent.mls_id}
                           </span>
                         )}
@@ -233,18 +233,18 @@ function NewListingContent() {
                       setSelectedAgent(null)
                       setIsPickerOpen(true)
                     }}
-                    className="border-[#3a3a3a] text-xs text-[#aaaaaa] hover:border-[#CFB87C] hover:text-white"
+                    className="border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-gold)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                   >
                     Change Agent
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-xs text-[#888888]">
+                  <p className="text-xs text-[var(--color-text-secondary)]">
                     Select the agent who will own this listing. It will appear directly in their pipeline.
                   </p>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#666666]" />
+                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
                     <Input
                       type="text"
                       value={agentSearch}
@@ -258,13 +258,13 @@ function NewListingContent() {
                           ? 'Loading agents...'
                           : 'Search agents by name, email, or MLS ID...'
                       }
-                      className="pl-9 bg-[#111111] border-[#333333] text-sm text-white placeholder:text-[#555555] focus:border-[#CFB87C]"
+                      className="pl-9 bg-[var(--color-surface-2)] border-[var(--color-border)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:border-[var(--color-gold)]"
                     />
                     {agentSearch && (
                       <button
                         type="button"
                         onClick={() => setAgentSearch('')}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                       >
                         <X className="size-4" />
                       </button>
@@ -272,14 +272,14 @@ function NewListingContent() {
                   </div>
 
                   {isPickerOpen && (
-                    <div className="max-h-60 overflow-y-auto rounded-lg border border-[#2a2a2a] bg-[#141414] shadow-2xl divide-y divide-[#222222]">
+                    <div className="max-h-60 overflow-y-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] shadow-2xl divide-y divide-[var(--color-border)]">
                       {loadingAgents ? (
-                        <div className="p-4 text-center text-xs text-[#888888]">
-                          <Loader2 className="inline size-4 animate-spin mr-2 text-[#CFB87C]" />
+                        <div className="p-4 text-center text-xs text-[var(--color-text-secondary)]">
+                          <Loader2 className="inline size-4 animate-spin mr-2 text-[var(--color-gold)]" />
                           Loading agents list...
                         </div>
                       ) : filteredAgents.length === 0 ? (
-                        <div className="p-4 text-center text-xs text-[#888888]">
+                        <div className="p-4 text-center text-xs text-[var(--color-text-secondary)]">
                           No agents found matching &ldquo;{agentSearch}&rdquo;
                         </div>
                       ) : (
@@ -292,10 +292,10 @@ function NewListingContent() {
                               setIsPickerOpen(false)
                               setError(null)
                             }}
-                            className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-[#1f1f1f]"
+                            className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-[var(--color-surface-3)]"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="flex size-8 items-center justify-center rounded-full bg-[#252525] text-xs font-semibold text-[#CFB87C]">
+                              <div className="flex size-8 items-center justify-center rounded-full bg-[var(--color-surface-3)] text-xs font-semibold text-[var(--color-gold)]">
                                 {agent.full_name
                                   ? agent.full_name
                                       .split(' ')
@@ -306,14 +306,14 @@ function NewListingContent() {
                                   : 'AG'}
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-white">
+                                <p className="text-sm font-medium text-[var(--color-text)]">
                                   {agent.full_name || 'Unnamed Agent'}
                                 </p>
-                                <p className="text-xs text-[#777777]">{agent.email}</p>
+                                <p className="text-xs text-[var(--color-text-secondary)]">{agent.email}</p>
                               </div>
                             </div>
                             {agent.mls_id && (
-                              <span className="text-[10px] font-mono text-[#CFB87C] bg-[#222222] px-2 py-0.5 rounded">
+                              <span className="text-[10px] font-mono text-[var(--color-gold)] bg-[var(--color-surface-3)] px-2 py-0.5 rounded">
                                 MLS: {agent.mls_id}
                               </span>
                             )}
@@ -349,12 +349,12 @@ function NewListingContent() {
                 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 28 }}
                 animate={{ scale: isSelected ? 1.02 : 1 }}
-                className={`relative rounded-lg border bg-[#1a1a1a] p-7 text-left transition-[border-color,box-shadow] ${
+                className={`relative rounded-lg border bg-[var(--color-surface)] p-7 text-left transition-[border-color,box-shadow] ${
                   card.enabled
                     ? isSelected
-                      ? 'border-[#CFB87C] shadow-[0_0_24px_rgba(207,184,124,0.2)]'
-                      : 'border-[#2a2a2a] hover:border-[#CFB87C] hover:shadow-[0_0_20px_rgba(207,184,124,0.15)]'
-                    : 'cursor-not-allowed border-[#2a2a2a] opacity-50'
+                      ? 'border-[var(--color-gold)] shadow-[0_0_24px_rgba(207,184,124,0.2)]'
+                      : 'border-[var(--color-border)] hover:border-[var(--color-gold)] hover:shadow-[0_0_20px_rgba(207,184,124,0.15)]'
+                    : 'cursor-not-allowed border-[var(--color-border)] opacity-50'
                 }`}
               >
                 {card.enabled ? (
@@ -365,19 +365,19 @@ function NewListingContent() {
                     aria-label={`Select ${card.title}`}
                   />
                 ) : (
-                  <span className="absolute top-4 right-4 z-10 rounded border border-[#444444] px-2 py-0.5 text-[10px] tracking-wider text-[#888888] uppercase">
+                  <span className="absolute top-4 right-4 z-10 rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-0.5 text-[10px] tracking-wider text-[var(--color-text-secondary)] uppercase">
                     Coming soon
                   </span>
                 )}
                 <Icon
-                  className={`size-8 ${card.enabled ? 'text-[#CFB87C]' : 'text-[#555555]'}`}
+                  className={`size-8 ${card.enabled ? 'text-[var(--color-gold)]' : 'text-[var(--color-text-secondary)]'}`}
                   strokeWidth={1.5}
                 />
-                <h2 className="mt-5 font-[family-name:var(--font-display)] text-lg font-semibold text-white">
+                <h2 className="mt-5 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text)]">
                   {card.title}
                 </h2>
-                <p className="mt-2 text-sm leading-relaxed text-[#888888]">{card.subtitle}</p>
-                <p className="mt-4 text-xs text-[#555555]">{card.docs}</p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">{card.subtitle}</p>
+                <p className="mt-4 text-xs text-[var(--color-text-secondary)]/70">{card.docs}</p>
               </motion.div>
             )
           })}
@@ -388,7 +388,7 @@ function NewListingContent() {
             type="button"
             disabled={!selectedType || isCreating || (isStaff && !selectedAgent)}
             onClick={() => void handleContinue()}
-            className="h-11 w-full rounded-lg bg-[#CFB87C] font-[family-name:var(--font-display)] text-sm font-bold tracking-wide text-black uppercase hover:bg-[#CFB87C]/90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="h-11 w-full rounded-lg bg-[var(--color-gold)] font-[family-name:var(--font-display)] text-sm font-bold tracking-wide text-[var(--color-black)] uppercase hover:bg-[var(--color-gold)]/90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isCreating ? (
               <span className="inline-flex items-center gap-2">
@@ -400,7 +400,7 @@ function NewListingContent() {
             )}
           </Button>
           {isStaff && !selectedAgent && (
-            <p className="mt-2 text-center text-xs text-[#888888]">
+            <p className="mt-2 text-center text-xs text-[var(--color-text-secondary)]">
               Select an agent above to proceed
             </p>
           )}

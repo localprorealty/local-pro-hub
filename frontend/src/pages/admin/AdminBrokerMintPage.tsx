@@ -82,38 +82,38 @@ function getStatusDetails(status: string) {
     case 'running':
       return {
         label: 'Running',
-        color: 'text-blue-400 bg-blue-950/30 border border-blue-500/20',
-        icon: <RefreshCw className="size-4 animate-spin text-blue-400" />,
+        color: 'text-blue-700 bg-blue-50 border border-blue-200 dark:text-blue-400 dark:bg-blue-950/30 dark:border-blue-500/20',
+        icon: <RefreshCw className="size-4 animate-spin text-blue-600 dark:text-blue-400" />,
       }
     case 'cancelled':
       return {
         label: 'Cancelled',
-        color: 'text-zinc-400 bg-zinc-950/30 border border-zinc-500/20',
-        icon: <StopCircle className="size-4 text-zinc-400" />,
+        color: 'text-zinc-700 bg-zinc-100 border border-zinc-200 dark:text-zinc-400 dark:bg-zinc-950/30 dark:border-zinc-500/20',
+        icon: <StopCircle className="size-4 text-zinc-600 dark:text-zinc-400" />,
       }
     case 'success':
       return {
         label: 'Success',
-        color: 'text-emerald-400 bg-emerald-950/30 border border-emerald-500/20',
-        icon: <CheckCircle2 className="size-4 text-emerald-400" />,
+        color: 'text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-500/20',
+        icon: <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />,
       }
     case 'completed_with_errors':
       return {
         label: 'Completed with Errors',
-        color: 'text-amber-400 bg-amber-950/30 border border-amber-500/20',
-        icon: <AlertTriangle className="size-4 text-amber-400" />,
+        color: 'text-amber-700 bg-amber-50 border border-amber-200 dark:text-amber-400 dark:bg-amber-950/30 dark:border-amber-500/20',
+        icon: <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />,
       }
     case 'failed':
       return {
         label: 'Failed',
-        color: 'text-red-400 bg-red-950/30 border border-red-500/20',
-        icon: <XCircle className="size-4 text-red-400" />,
+        color: 'text-red-700 bg-red-50 border border-red-200 dark:text-red-400 dark:bg-red-950/30 dark:border-red-500/20',
+        icon: <XCircle className="size-4 text-red-600 dark:text-red-400" />,
       }
     default:
       return {
         label: 'Never Synced',
-        color: 'text-zinc-400 bg-zinc-950/30 border border-zinc-500/20',
-        icon: <AlertTriangle className="size-4 text-zinc-400" />,
+        color: 'text-zinc-700 bg-zinc-100 border border-zinc-200 dark:text-zinc-400 dark:bg-zinc-950/30 dark:border-zinc-500/20',
+        icon: <AlertTriangle className="size-4 text-zinc-600 dark:text-zinc-400" />,
       }
   }
 }
@@ -321,20 +321,20 @@ function AdminBrokerMintContent() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Radio className="size-5 text-[var(--color-gold)] animate-pulse" />
-                    <h3 className="font-semibold text-base text-white">Live Webhook Health</h3>
+                    <h3 className="font-semibold text-base text-[var(--color-text)]">Live Webhook Health</h3>
                   </div>
                   <div className="flex items-center gap-2">
                     {syncHealth?.webhook?.status === 'active' ? (
-                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                        <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping" />
                         Active
                       </span>
                     ) : syncHealth?.webhook?.status === 'deactivated' ? (
-                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
                         Deactivated
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20">
                         {syncHealth?.webhook?.status || 'Connecting...'}
                       </span>
                     )}
@@ -342,61 +342,61 @@ function AdminBrokerMintContent() {
                 </div>
 
                 <div className="space-y-2 text-xs text-[var(--color-text-secondary)]">
-                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-border)]">
                     <span>Subscription Mode</span>
-                    <span className="font-mono text-zinc-300">Synchronous (~200ms)</span>
+                    <span className="font-mono text-[var(--color-text)]">Synchronous (~200ms)</span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-border)]">
                     <span>Target Callback</span>
-                    <span className="font-mono text-zinc-400 truncate max-w-[200px]" title={syncHealth?.webhook?.callback_url || '/webhooks/brokermint'}>
+                    <span className="font-mono text-[var(--color-text-secondary)] truncate max-w-[200px]" title={syncHealth?.webhook?.callback_url || '/webhooks/brokermint'}>
                       {syncHealth?.webhook?.callback_url ? '.../webhooks/brokermint' : 'Production Endpoint'}
                     </span>
                   </div>
-                  <div className="py-1 border-b border-[#222]">
+                  <div className="py-1 border-b border-[var(--color-border)]">
                     <div className="flex justify-between items-center mb-1">
                       <span>Subscribed Events</span>
-                      <span className="text-zinc-300 font-mono">6 Event Types</span>
+                      <span className="text-[var(--color-text)] font-mono">6 Event Types</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {['tx.create', 'tx.update', 'tx.delete', 'participant.add', 'participant.update', 'participant.remove'].map((e) => (
-                        <span key={e} className="px-1.5 py-0.5 bg-black/40 rounded text-[10px] font-mono text-zinc-400 border border-[#222]">
+                        <span key={e} className="px-1.5 py-0.5 bg-[var(--color-surface-3)] rounded text-[10px] font-mono text-[var(--color-text)] border border-[var(--color-border)]">
                           {e}
                         </span>
                       ))}
                     </div>
                   </div>
                   <div className="pt-1">
-                    <span className="block text-gray-400 mb-1">Latest Webhook Activity:</span>
+                    <span className="block text-[var(--color-text-secondary)] mb-1">Latest Webhook Activity:</span>
                     {syncHealth?.webhook?.latest_event ? (
-                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] space-y-1.5">
+                      <div className="bg-[var(--color-surface)] p-2.5 rounded border border-[var(--color-border)] font-mono text-[11px] space-y-1.5">
                         <div className="flex justify-between items-center">
                           <span className="text-[var(--color-gold)] font-medium">{syncHealth.webhook.latest_event.event_type}</span>
-                          <span className="text-zinc-500 text-[10px]">{formatDate(syncHealth.webhook.latest_event.received_at)}</span>
+                          <span className="text-[var(--color-text-secondary)] text-[10px]">{formatDate(syncHealth.webhook.latest_event.received_at)}</span>
                         </div>
-                        <div className="flex justify-between items-center text-zinc-400">
+                        <div className="flex justify-between items-center text-[var(--color-text-secondary)]">
                           <span>Txn: {syncHealth.webhook.latest_event.transaction_id || 'N/A'}</span>
                           {syncHealth.webhook.latest_event.status === 'processed' ? (
-                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold uppercase text-[9px] tracking-wider">
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold uppercase text-[9px] tracking-wider">
                               processed
                             </span>
                           ) : syncHealth.webhook.latest_event.status === 'skipped' ? (
-                            <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold uppercase text-[9px] tracking-wider" title={syncHealth.webhook.latest_event.error_message || 'Skipped'}>
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold uppercase text-[9px] tracking-wider" title={syncHealth.webhook.latest_event.error_message || 'Skipped'}>
                               skipped
                             </span>
                           ) : (
-                            <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-semibold uppercase text-[9px] tracking-wider" title={syncHealth.webhook.latest_event.error_message || 'Failed'}>
+                            <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-semibold uppercase text-[9px] tracking-wider" title={syncHealth.webhook.latest_event.error_message || 'Failed'}>
                               {syncHealth.webhook.latest_event.status}
                             </span>
                           )}
                         </div>
                         {syncHealth.webhook.latest_event.error_message && (
-                          <div className="text-[10px] text-amber-400/90 pt-0.5 truncate border-t border-[#222]" title={syncHealth.webhook.latest_event.error_message}>
+                          <div className="text-[10px] text-amber-600 dark:text-amber-400/90 pt-0.5 truncate border-t border-[var(--color-border)]" title={syncHealth.webhook.latest_event.error_message}>
                             ⚠ {syncHealth.webhook.latest_event.error_message}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-zinc-500 italic">No events received yet.</span>
+                      <span className="text-[var(--color-text-secondary)] italic">No events received yet.</span>
                     )}
                   </div>
                 </div>
@@ -412,7 +412,7 @@ function AdminBrokerMintContent() {
                   </Button>
                 )}
                 {reactivateMessage && (
-                  <p className="text-xs text-emerald-400 font-medium">{reactivateMessage}</p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">{reactivateMessage}</p>
                 )}
               </div>
 
@@ -421,51 +421,51 @@ function AdminBrokerMintContent() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Clock className="size-5 text-[var(--color-gold)]" />
-                    <h3 className="font-semibold text-base text-white">Daily Reconciliation</h3>
+                    <h3 className="font-semibold text-base text-[var(--color-text)]">Daily Reconciliation</h3>
                   </div>
-                  <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
                     <Zap className="size-3" />
                     Scheduled
                   </span>
                 </div>
 
                 <div className="space-y-2 text-xs text-[var(--color-text-secondary)]">
-                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-border)]">
                     <span>Cron Schedule</span>
-                    <span className="font-mono text-zinc-300">Daily at 2:00 AM CST</span>
+                    <span className="font-mono text-[var(--color-text)]">Daily at 2:00 AM CST</span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-border)]">
                     <span>Orchestration</span>
-                    <span className="font-mono text-zinc-300">Railway n8n (Automated)</span>
+                    <span className="font-mono text-[var(--color-text)]">Railway n8n (Automated)</span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-[#222]">
+                  <div className="flex justify-between items-center py-1 border-b border-[var(--color-border)]">
                     <span>Alert Policy</span>
-                    <span className="font-mono text-zinc-300">Failure Only (Resend)</span>
+                    <span className="font-mono text-[var(--color-text)]">Failure Only (Resend)</span>
                   </div>
                   <div className="pt-1">
-                    <span className="block text-gray-400 mb-1">Last Reconciliation Run:</span>
+                    <span className="block text-[var(--color-text-secondary)] mb-1">Last Reconciliation Run:</span>
                     {syncHealth?.reconciliation ? (
-                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] space-y-1">
+                      <div className="bg-[var(--color-surface)] p-2.5 rounded border border-[var(--color-border)] font-mono text-[11px] space-y-1">
                         <div className="flex justify-between">
-                          <span className={syncHealth.reconciliation.status === 'success' ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
+                          <span className={syncHealth.reconciliation.status === 'success' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-amber-600 dark:text-amber-400 font-semibold'}>
                             {syncHealth.reconciliation.status.toUpperCase()}
                           </span>
-                          <span className="text-zinc-500">{formatDate(syncHealth.reconciliation.started_at)}</span>
+                          <span className="text-[var(--color-text-secondary)]">{formatDate(syncHealth.reconciliation.started_at)}</span>
                         </div>
-                        <div className="flex justify-between text-zinc-400">
+                        <div className="flex justify-between text-[var(--color-text-secondary)]">
                           <span>{syncHealth.reconciliation.txns_synced} txns / {syncHealth.reconciliation.agents_synced} agents</span>
                           <span>Errors: {(syncHealth.reconciliation.errors || []).length}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="bg-black/30 p-2.5 rounded border border-[#222] font-mono text-[11px] text-zinc-500 italic">
+                      <div className="bg-[var(--color-surface)] p-2.5 rounded border border-[var(--color-border)] font-mono text-[11px] text-[var(--color-text-secondary)] italic">
                         First scheduled run pending at 2:00 AM CST.
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-1 text-[11px] text-zinc-500 leading-normal">
+                <div className="pt-1 text-[11px] text-[var(--color-text-secondary)] leading-normal">
                   Safety net synchronization across all agents even during network outages or silent webhook drops.
                 </div>
               </div>
@@ -474,13 +474,13 @@ function AdminBrokerMintContent() {
             {/* Sync Control Card */}
             <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg text-white">Manual Database Sync</h3>
+                <h3 className="font-semibold text-lg text-[var(--color-text)]">Manual Database Sync</h3>
                 <p className="text-xs text-[var(--color-text-secondary)] max-w-lg">
                   Runs email matching to map BrokerMint User IDs, then pulls all transaction records and commission items for mapped agents.
                 </p>
                 {log?.started_at && (
                   <p className="text-xs text-[var(--color-text-secondary)]">
-                    Last execution: <span className="text-white font-medium">{formatDate(log.started_at)}</span>
+                    Last execution: <span className="text-[var(--color-text)] font-medium">{formatDate(log.started_at)}</span>
                   </p>
                 )}
               </div>
@@ -489,7 +489,7 @@ function AdminBrokerMintContent() {
                   type="button"
                   disabled={isSyncing || log?.status === 'running'}
                   onClick={() => void handleSync()}
-                  className="h-11 rounded-sm bg-[var(--color-gold)] font-bold tracking-widest text-[var(--color-black)] uppercase hover:bg-[#dcc487] disabled:opacity-60 px-6"
+                  className="h-11 rounded-sm bg-[var(--color-gold)] font-bold tracking-widest text-[var(--color-black)] uppercase hover:bg-[var(--color-gold)]/90 disabled:opacity-60 px-6"
                 >
                   {isSyncing || log?.status === 'running' ? (
                     <>
@@ -554,7 +554,7 @@ function AdminBrokerMintContent() {
 
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 rounded-sm space-y-1.5">
                     <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Agents Matched</p>
-                    <div className="flex items-center gap-2 text-white">
+                    <div className="flex items-center gap-2 text-[var(--color-text)]">
                       <Users className="size-5 text-[var(--color-gold)]" />
                       <span className="text-2xl font-bold">{log?.agents_synced ?? 0}</span>
                       <span className="text-xs text-[var(--color-text-secondary)]">synced</span>
@@ -563,7 +563,7 @@ function AdminBrokerMintContent() {
 
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 rounded-sm space-y-1.5">
                     <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] font-semibold">Transactions Loaded</p>
-                    <div className="flex items-center gap-2 text-white">
+                    <div className="flex items-center gap-2 text-[var(--color-text)]">
                       <FileText className="size-5 text-[var(--color-gold)]" />
                       <span className="text-2xl font-bold">{log?.txns_synced ?? 0}</span>
                       <span className="text-xs text-[var(--color-text-secondary)]">synced</span>
@@ -574,17 +574,17 @@ function AdminBrokerMintContent() {
                 {/* Unmatched User Alert List */}
                 {(unmatchedEmails || []).length > 0 && (
                   <div className="border border-amber-500/20 bg-amber-500/5 p-6 rounded-sm space-y-3">
-                    <div className="flex items-center gap-2 text-amber-400 font-semibold text-sm">
+                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm">
                       <AlertTriangle className="size-5" />
                       Unmatched BrokerMint Emails ({(unmatchedEmails || []).length})
                     </div>
                     <p className="text-xs text-[var(--color-text-secondary)]">
                       The following agents exist in BrokerMint but have no corresponding active account in LocalPRO Hub by email. Add these agents to the roster to sync their sales figures:
                     </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-amber-200">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-amber-700 dark:text-amber-200">
                       {(unmatchedEmails || []).map((email, i) => (
                         <li key={i} className="flex items-center gap-1.5">
-                          <span className="size-1 bg-amber-400 rounded-full" />
+                          <span className="size-1 bg-amber-500 dark:bg-amber-400 rounded-full" />
                           {email}
                         </li>
                       ))}
@@ -598,9 +598,9 @@ function AdminBrokerMintContent() {
                     <button
                       type="button"
                       onClick={() => setShowErrors(!showErrors)}
-                      className="w-full px-6 py-4 flex items-center justify-between text-sm font-semibold text-white hover:bg-[var(--color-surface-3)] transition-colors"
+                      className="w-full px-6 py-4 flex items-center justify-between text-sm font-semibold text-[var(--color-text)] hover:bg-[var(--color-surface-3)] transition-colors"
                     >
-                      <span className="flex items-center gap-2 text-red-400">
+                      <span className="flex items-center gap-2 text-red-500 dark:text-red-400">
                         <XCircle className="size-4" />
                         Transaction Sync Warnings ({(txErrors || []).length})
                       </span>
@@ -608,13 +608,13 @@ function AdminBrokerMintContent() {
                     </button>
 
                     {showErrors && (
-                      <div className="border-t border-[var(--color-border)] p-6 space-y-3 max-h-[300px] overflow-y-auto bg-black/20">
+                      <div className="border-t border-[var(--color-border)] p-6 space-y-3 max-h-[300px] overflow-y-auto bg-[var(--color-surface-3)]/30">
                         {(txErrors || []).map((err, i) => (
-                          <div key={i} className="text-xs border-b border-[#222] pb-2 last:border-0 last:pb-0 space-y-1">
+                          <div key={i} className="text-xs border-b border-[var(--color-border)] pb-2 last:border-0 last:pb-0 space-y-1">
                             <div className="flex justify-between font-mono text-[var(--color-text-secondary)]">
                               <span>Transaction: {err.address || 'Unknown'} (ID: {err.bm_transaction_id})</span>
                             </div>
-                            <p className="text-red-300 font-semibold">{err.error}</p>
+                            <p className="text-red-600 dark:text-red-300 font-semibold">{err.error}</p>
                           </div>
                         ))}
                       </div>
@@ -624,11 +624,11 @@ function AdminBrokerMintContent() {
                 {/* Checklist Mappings Settings */}
                 <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm space-y-4">
                   <div className="flex items-center gap-2 relative">
-                    <h3 className="font-semibold text-lg text-white">BrokerMint Checklist Mappings</h3>
+                    <h3 className="font-semibold text-lg text-[var(--color-text)]">BrokerMint Checklist Mappings</h3>
                     <button
                       type="button"
                       onClick={() => setShowMappingInfo(!showMappingInfo)}
-                      className="text-[var(--color-text-secondary)] hover:text-white transition-colors"
+                      className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors"
                       title="What is this?"
                     >
                       <HelpCircle className="size-4" />
@@ -636,11 +636,11 @@ function AdminBrokerMintContent() {
                     {showMappingInfo && (
                       <div className="absolute left-0 top-8 z-20 w-80 rounded border border-[var(--color-border)] bg-[var(--color-surface-3)] p-4 shadow-xl text-xs space-y-3 leading-relaxed text-[var(--color-text-secondary)] animate-in fade-in slide-in-from-top-1 duration-150">
                         <div className="flex items-center justify-between border-b border-[var(--color-border)]/60 pb-2 mb-1">
-                          <span className="font-semibold text-white">Checklist Mapping Guide</span>
+                          <span className="font-semibold text-[var(--color-text)]">Checklist Mapping Guide</span>
                           <button
                             type="button"
                             onClick={() => setShowMappingInfo(false)}
-                            className="text-gray-400 hover:text-white"
+                            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                           >
                             <X className="size-3.5" />
                           </button>
@@ -651,7 +651,7 @@ function AdminBrokerMintContent() {
                         <p>
                           By mapping LocalPRO Listing Types (<code>listing</code>, <code>buyer</code>, or <code>lease</code>) to specific BrokerMint template IDs, the system auto-applies the checklist when syncing.
                         </p>
-                        <div className="bg-black/35 p-2 rounded font-mono text-[10px] space-y-1 border border-[#222]">
+                        <div className="bg-[var(--color-surface)] p-2 rounded font-mono text-[10px] space-y-1 border border-[var(--color-border)] text-[var(--color-text)]">
                           <div>• listing ID: 3301356</div>
                           <div>• buyer ID: 3301357</div>
                           <div>• lease ID: 3317147</div>
@@ -666,10 +666,10 @@ function AdminBrokerMintContent() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {['listing', 'buyer', 'lease'].map((type) => (
                       <div key={type} className="space-y-1">
-                        <label className="text-[10px] text-gray-400 uppercase font-semibold capitalize">{type} Template ID</label>
+                        <label className="text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold capitalize">{type} Template ID</label>
                         <Input
                           type="number"
-                          className="bg-black border-[var(--color-border)] text-white text-xs h-9"
+                          className="bg-[var(--color-surface-3)] border-[var(--color-border)] text-[var(--color-text)] text-xs h-9"
                           value={mappings[type] || ''}
                           onChange={(e) => setMappings({ ...mappings, [type]: e.target.value })}
                         />
@@ -678,7 +678,7 @@ function AdminBrokerMintContent() {
                   </div>
 
                   {mappingsMessage && (
-                    <p className="text-xs font-semibold text-emerald-400" role="alert">
+                    <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400" role="alert">
                       {mappingsMessage}
                     </p>
                   )}
@@ -687,7 +687,7 @@ function AdminBrokerMintContent() {
                     type="button"
                     onClick={() => void saveMappings()}
                     disabled={isSavingMappings}
-                    className="h-10 rounded-sm bg-[var(--color-gold)] font-bold tracking-widest text-[var(--color-black)] uppercase hover:bg-[#dcc487] px-6 text-xs disabled:opacity-60"
+                    className="h-10 rounded-sm bg-[var(--color-gold)] font-bold tracking-widest text-[var(--color-black)] uppercase hover:bg-[var(--color-gold)]/90 px-6 text-xs disabled:opacity-60"
                   >
                     {isSavingMappings ? 'Saving...' : 'Save Checklist Mappings'}
                   </Button>

@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { FloatingUtilityStack } from '@/components/theme/FloatingUtilityStack'
 import { ListingDetailsPanel } from '@/components/listings/ListingDetailsPanel'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
@@ -206,12 +207,12 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
   }
 
   return (
-    <main className="relative min-h-svh px-4 py-6 sm:px-6 sm:py-8 md:px-8">
+    <main className="relative min-h-svh bg-[var(--color-bg-base)] text-[var(--color-text)] px-4 py-6 sm:px-6 sm:py-8 md:px-8">
       <header className="mb-6 sm:mb-8 flex items-start justify-between border-b border-[var(--color-border)] pb-4 sm:pb-6">
         <div className="flex min-w-0 items-start gap-4">
           <Link
             to={backPath}
-            className="mt-1 shrink-0 rounded-sm p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
+            className="mt-1 shrink-0 rounded-sm p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
             aria-label="Back to overview"
           >
             <ArrowLeft className="size-5" />
@@ -220,13 +221,13 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
             <p className="mb-2 text-xs tracking-widest text-[var(--color-gold)] uppercase">
               Mission Control
             </p>
-            <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--color-white)]">
+            <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--color-text)]">
               Listing Hub
             </h1>
             {listing ? (
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                 <span>{listing.address_full ?? 'Unnamed listing'}</span>
-                <span className="text-[#555555]">·</span>
+                <span className="text-[var(--color-text-tertiary)]">·</span>
                 <ListingIdBadge id={listing.id} />
               </div>
             ) : null}
@@ -239,7 +240,7 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
       </header>
 
       {bookingSuccess ? (
-        <p className="mb-6 rounded-sm border border-[#CFB87C]/40 bg-[#CFB87C]/10 px-4 py-3 text-sm text-[#CFB87C]">
+        <p className="mb-6 rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-gold-dim)] px-4 py-3 text-sm text-[var(--color-gold)]">
           {bookingSuccess}
         </p>
       ) : null}
@@ -275,6 +276,8 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
           <span className="text-[var(--color-gold)]">{window.location.origin}{listingPath(listing.id)}</span>
         </p>
       ) : null}
+
+      <FloatingUtilityStack formPageLayout={false} />
     </main>
   )
 }

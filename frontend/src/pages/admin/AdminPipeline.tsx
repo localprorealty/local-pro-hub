@@ -133,7 +133,7 @@ function AdminPipelineContent() {
                   className={`font-medium transition-colors ${
                     isActive
                       ? 'border-b border-[var(--color-gold)] pb-1 text-[var(--color-gold)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                   }`}
                 >
                   {tabLabel(tab)} ({tabCounts[tab]})
@@ -148,7 +148,7 @@ function AdminPipelineContent() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search listings..."
-              className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)] focus-visible:ring-0"
+              className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus-visible:border-[var(--color-gold)] focus-visible:ring-0"
             />
           </label>
         </div>
@@ -178,7 +178,7 @@ function AdminPipelineContent() {
           </div>
           <p className="text-sm text-[var(--color-text-secondary)]">
             Showing{' '}
-            <span className="font-semibold text-[var(--color-white)]">
+            <span className="font-semibold text-[var(--color-text)]">
               {filteredListings.length}
             </span>{' '}
             {tabLabel(activeTab).toLowerCase()} pipelines

@@ -8,7 +8,7 @@ import { formatUsPhone, isValidMlsId } from '@/lib/format'
 import type { UserProfileRow } from '@/lib/users'
 
 const fieldClass =
-  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
+  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
 
 const TIERS: PhotographerTier[] = ['basic', 'standard', 'elite']
 const ROLES: UserRole[] = ['agent', 'marketing', 'photographer', 'admin']
@@ -113,9 +113,9 @@ export function GeneralProfileSection({
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-6">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-6">
       <div className="border-b border-[var(--color-border)]/60 pb-4">
-        <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-white)]">
+        <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text)]">
           General Profile Information
         </h3>
         <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
@@ -175,8 +175,8 @@ export function GeneralProfileSection({
               </p>
               <span className={`mt-1 inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-semibold uppercase tracking-wider ${
                 initial.status === 'active'
-                  ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40'
-                  : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
+                  ? 'bg-emerald-500/10 text-emerald-800 border border-emerald-600/20 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/40'
+                  : 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] border border-[var(--color-border)]'
               }`}>
                 {initial.status}
               </span>
@@ -307,7 +307,7 @@ export function GeneralProfileSection({
           <Button
             type="submit"
             disabled={isSaving}
-            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
           >
             {isSaving ? 'Saving profile...' : 'Save Profile Changes'}
           </Button>

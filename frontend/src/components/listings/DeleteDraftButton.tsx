@@ -49,7 +49,7 @@ export function DeleteDraftButton({
           title="Delete draft"
           aria-label="Delete draft listing"
           className={cn(
-            'inline-flex items-center justify-center rounded-sm border border-red-500/30 p-2 text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50',
+            'inline-flex items-center justify-center rounded-sm border border-red-500/30 p-2 text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300 transition-colors disabled:opacity-50',
           )}
         >
           {isDeleting ? (
@@ -64,7 +64,7 @@ export function DeleteDraftButton({
           variant="outline"
           onClick={() => setShowConfirm(true)}
           disabled={isDeleting}
-          className="border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+          className="border-red-500/40 text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-300 dark:hover:text-red-200"
         >
           {isDeleting ? (
             <Loader2 className="mr-2 size-4 animate-spin" />
@@ -87,7 +87,7 @@ export function DeleteDraftButton({
       />
 
       {error ? (
-        <p className="mt-2 text-xs text-red-400" role="alert">
+        <p className="mt-2 text-xs text-red-600 dark:text-red-400" role="alert">
           {error}
         </p>
       ) : null}

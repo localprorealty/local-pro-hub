@@ -335,7 +335,7 @@ export function ListingDetailsPanel({
               <p className="text-xs tracking-widest text-[var(--color-gold)] uppercase">
                 Listing Hub
               </p>
-              <h3 className="mt-1 text-lg sm:text-xl font-semibold text-[var(--color-white)] break-words">
+              <h3 className="mt-1 text-lg sm:text-xl font-semibold text-[var(--color-text)] break-words">
                 {listing.address_full ?? 'Unnamed listing'}
               </h3>
               <div className="mt-1.5 flex flex-wrap items-center gap-2">
@@ -365,7 +365,7 @@ export function ListingDetailsPanel({
             <Button
               type="button"
               variant="outline"
-              className="hidden sm:inline-flex shrink-0 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
+              className="hidden sm:inline-flex shrink-0 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-gold-dim)]"
               onClick={onClose}
             >
               Back to dashboard
@@ -377,7 +377,7 @@ export function ListingDetailsPanel({
               <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 Type
               </p>
-              <p className="text-xs sm:text-sm font-medium text-[var(--color-white)] truncate">
+              <p className="text-xs sm:text-sm font-medium text-[var(--color-text)] truncate">
                 {TYPE_LABEL[listing.listing_type]}
               </p>
             </div>
@@ -385,7 +385,7 @@ export function ListingDetailsPanel({
               <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 MLS
               </p>
-              <p className="text-xs sm:text-sm font-medium text-[var(--color-white)]">
+              <p className="text-xs sm:text-sm font-medium text-[var(--color-text)]">
                 {listing.mls_number ?? 'N/A'}
               </p>
             </div>
@@ -393,7 +393,7 @@ export function ListingDetailsPanel({
               <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 List Price
               </p>
-              <p className="text-xs sm:text-sm font-medium text-[var(--color-white)] truncate">
+              <p className="text-xs sm:text-sm font-medium text-[var(--color-text)] truncate">
                 {listing.list_price ? `$${listing.list_price.toLocaleString()}` : 'N/A'}
               </p>
             </div>
@@ -406,7 +406,7 @@ export function ListingDetailsPanel({
             <span className="text-[11px] uppercase tracking-widest text-[var(--color-gold)] font-semibold">
               Pipeline
             </span>
-            <span className="text-xs font-semibold text-[var(--color-white)] flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-[var(--color-text)] flex items-center gap-1.5">
               <span className="text-[var(--color-gold)] font-bold">●</span>
               <span>{STAGE_LABEL[listing.stage]}</span>
               <span className="text-[10px] text-[var(--color-text-secondary)] font-normal">
@@ -456,7 +456,7 @@ export function ListingDetailsPanel({
                   className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 -mb-px shrink-0 ${
                     isActive
                       ? 'border-[var(--color-gold)] text-[var(--color-gold)] bg-[var(--color-gold)]/5'
-                      : 'border-transparent text-[var(--color-text-secondary)] hover:text-white hover:border-zinc-700'
+                      : 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:border-[var(--color-border)]'
                   }`}
                 >
                   <Icon className="size-3.5" />
@@ -501,7 +501,7 @@ export function ListingDetailsPanel({
                   Current Phase: {STAGE_LABEL[listing.stage]}
                 </p>
               </div>
-              <h4 className="mt-1 text-lg font-semibold text-[var(--color-white)]">
+              <h4 className="mt-1 text-lg font-semibold text-[var(--color-text)]">
                 {guidance.headline}
               </h4>
               <p className="mt-2 text-sm text-[var(--color-text-secondary)] leading-relaxed">
@@ -524,7 +524,7 @@ export function ListingDetailsPanel({
                   {listing.stage === 'draft' ? (
                     <Button
                       asChild
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
                     >
                       <Link to={formPath}>Continue NTREIS form →</Link>
                     </Button>
@@ -533,7 +533,7 @@ export function ListingDetailsPanel({
                   {listing.stage === 'docs_signed' ? (
                     <Button
                       asChild
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
                     >
                       <Link to={photographyPath}>Book photography →</Link>
                     </Button>
@@ -543,14 +543,14 @@ export function ListingDetailsPanel({
                     <>
                       <Button
                         asChild
-                        className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                        className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
                       >
                         <Link to={marketingPath}>Select marketing assets →</Link>
                       </Button>
                       <Button
                         asChild
                         variant="outline"
-                        className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
+                        className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-gold-dim)]"
                       >
                         <Link to={mlsPath}>Finalize MLS submission →</Link>
                       </Button>
@@ -560,7 +560,7 @@ export function ListingDetailsPanel({
                   {listing.stage === 'mls_submitted' ? (
                     <Button
                       asChild
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487]"
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
                     >
                       <Link to={goLivePath}>Go Live →</Link>
                     </Button>
@@ -570,7 +570,7 @@ export function ListingDetailsPanel({
                     <Button
                       asChild
                       variant="outline"
-                      className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-gold-dim)]"
+                      className="h-10 rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-gold-dim)]"
                     >
                       <Link to={formPath}>Edit NTREIS form</Link>
                     </Button>
@@ -581,7 +581,7 @@ export function ListingDetailsPanel({
                       type="button"
                       onClick={() => void handleAdvance()}
                       disabled={isAdvancing}
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
                     >
                       {isAdvancing ? 'Updating...' : guidance.advanceLabel}
                     </Button>
@@ -599,7 +599,7 @@ export function ListingDetailsPanel({
             {canManage && canDeleteListing(listing.stage) && onDelete ? (
               <div className="flex items-center justify-between rounded-sm border border-red-500/20 bg-red-500/5 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-[var(--color-white)]">Delete draft</p>
+                  <p className="text-sm font-medium text-[var(--color-text)]">Delete draft</p>
                   <p className="text-xs text-[var(--color-text-secondary)]">
                     Remove this unfinished listing from your drafts.
                   </p>
@@ -638,7 +638,7 @@ export function ListingDetailsPanel({
         {activeTab === 'share' && (
           <div className="space-y-6">
             {(listing.stage === 'draft' || listing.stage === 'docs_pending') && (
-              <div className="flex items-start gap-3 rounded-sm border border-blue-500/30 bg-blue-500/10 p-4 text-xs text-blue-300">
+              <div className="flex items-start gap-3 rounded-sm border border-blue-500/30 bg-blue-500/10 p-4 text-xs text-blue-800 dark:text-blue-300">
                 <Info className="size-4 shrink-0 mt-0.5" />
                 <p>
                   Public sharing is typically activated once photos are booked and approved. You can generate a preview link now if needed, but client feedback features activate during the Marketing stage.
@@ -647,14 +647,14 @@ export function ListingDetailsPanel({
             )}
 
             {/* Public Listing Share Link Card */}
-            <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
+            <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 sm:p-5 space-y-4 overflow-hidden min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex size-7 items-center justify-center rounded bg-[#241e15] text-[#CFB87C]">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded bg-[var(--color-gold-dim)] text-[var(--color-gold)]">
                     <Globe className="size-4" />
                   </div>
-                  <div>
-                    <h4 className="text-xs font-semibold tracking-wider text-[var(--color-white)] uppercase">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-semibold tracking-wider text-[var(--color-text)] uppercase">
                       Public Listing Share Link
                     </h4>
                     <p className="text-[11px] text-[var(--color-text-secondary)]">
@@ -667,13 +667,13 @@ export function ListingDetailsPanel({
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
                       shareStatus?.is_publicly_shared
-                        ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40'
-                        : 'bg-zinc-800/60 text-zinc-400 border border-zinc-700/40'
+                        ? 'bg-emerald-500/10 text-emerald-800 border border-emerald-600/20 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/40'
+                        : 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] border border-[var(--color-border)]'
                     }`}
                   >
                     <span
                       className={`size-1.5 rounded-full ${
-                        shareStatus?.is_publicly_shared ? 'bg-emerald-400' : 'bg-zinc-500'
+                        shareStatus?.is_publicly_shared ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-[var(--color-text-tertiary)]'
                       }`}
                     />
                     {shareStatus?.is_publicly_shared ? 'Publicly Active' : 'Private (Inactive)'}
@@ -689,7 +689,7 @@ export function ListingDetailsPanel({
                 </p>
 
                 {shareError ? (
-                  <p className="text-xs text-red-400" role="alert">
+                  <p className="text-xs text-red-600 dark:text-red-400" role="alert">
                     {shareError}
                   </p>
                 ) : null}
@@ -701,64 +701,66 @@ export function ListingDetailsPanel({
                   </div>
                 ) : shareStatus?.token ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 min-w-0">
                       <input
                         type="text"
                         readOnly
                         value={`${window.location.origin}/share/${shareStatus.token}`}
-                        className="h-9 flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs text-stone-300 font-mono select-all focus:outline-none focus:border-[var(--color-gold)]"
+                        className="h-9 w-full min-w-0 flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs text-[var(--color-text)] font-mono select-all focus:outline-none focus:border-[var(--color-gold)]"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCopyLink}
-                        className="h-9 border-[var(--color-gold-border)] bg-transparent text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)]"
-                      >
-                        {copiedLink ? (
-                          <>
-                            <Check className="mr-1.5 size-3.5 text-emerald-400" />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="mr-1.5 size-3.5" />
-                            Copy Link
-                          </>
-                        )}
-                      </Button>
-
-                      <Button
-                        type="button"
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="h-9 border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[var(--color-surface)]"
-                      >
-                        <a
-                          href={`/share/${shareStatus.token}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5"
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleCopyLink}
+                          className="h-9 flex-1 sm:flex-initial border-[var(--color-gold-border)] bg-transparent text-xs text-[var(--color-gold)] hover:bg-[var(--color-gold-dim)] justify-center"
                         >
-                          <ExternalLink className="size-3.5" />
-                          View Page
-                        </a>
-                      </Button>
+                          {copiedLink ? (
+                            <>
+                              <Check className="mr-1.5 size-3.5 text-emerald-400" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="mr-1.5 size-3.5" />
+                              Copy Link
+                            </>
+                          )}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="h-9 flex-1 sm:flex-initial border-[var(--color-border)] bg-transparent text-xs text-[var(--color-text)] hover:bg-[var(--color-surface)] justify-center"
+                        >
+                          <a
+                            href={`/share/${shareStatus.token}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-1.5"
+                          >
+                            <ExternalLink className="size-3.5" />
+                            View Page
+                          </a>
+                        </Button>
+                      </div>
                     </div>
 
                     {canManage ? (
-                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[var(--color-border)]">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2.5 border-t border-[var(--color-border)] min-w-0">
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => void handleToggleShare()}
                           disabled={togglingShare}
-                          className={`h-8 text-xs ${
+                          className={`h-8 text-xs font-medium w-full sm:w-auto justify-center transition-colors ${
                             shareStatus.is_publicly_shared
-                              ? 'border-amber-700/50 text-amber-300 hover:bg-amber-950/20'
-                              : 'border-emerald-700/50 text-emerald-300 hover:bg-emerald-950/20'
+                              ? 'border-amber-400/80 bg-amber-500/10 text-amber-800 hover:bg-amber-500/20 hover:text-amber-900 dark:border-amber-700/50 dark:bg-transparent dark:text-amber-300 dark:hover:bg-amber-950/20'
+                              : 'border-emerald-400/80 bg-emerald-500/10 text-emerald-800 hover:bg-emerald-500/20 hover:text-emerald-900 dark:border-emerald-700/50 dark:bg-transparent dark:text-emerald-300 dark:hover:bg-emerald-950/20'
                           }`}
                         >
                           {togglingShare ? (
@@ -779,7 +781,7 @@ export function ListingDetailsPanel({
                           size="sm"
                           onClick={() => setShowRegenerateConfirm(true)}
                           disabled={togglingShare}
-                          className="h-8 text-[11px] text-[var(--color-text-secondary)] hover:text-red-300 hover:bg-red-950/10"
+                          className="h-8 text-[11px] text-[var(--color-text-secondary)] hover:text-red-600 hover:bg-red-500/10 dark:hover:text-red-300 dark:hover:bg-red-950/10 w-full sm:w-auto justify-center"
                         >
                           <RefreshCw className="mr-1.5 size-3" />
                           Regenerate Secret Token
@@ -793,7 +795,7 @@ export function ListingDetailsPanel({
                       type="button"
                       onClick={() => void handleToggleShare()}
                       disabled={togglingShare}
-                      className="h-9 rounded-sm bg-[var(--color-gold)] px-4 text-xs font-semibold text-black hover:bg-[#dcc487] disabled:opacity-60"
+                      className="h-9 rounded-sm bg-[var(--color-gold)] px-4 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
                     >
                       {togglingShare ? (
                         <>
@@ -820,11 +822,11 @@ export function ListingDetailsPanel({
             <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex size-7 items-center justify-center rounded bg-[#241e15] text-[#CFB87C]">
+                  <div className="flex size-7 items-center justify-center rounded bg-[var(--color-gold-dim)] text-[var(--color-gold)]">
                     <MessageSquare className="size-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold tracking-wider text-[var(--color-white)] uppercase">
+                    <h4 className="text-xs font-semibold tracking-wider text-[var(--color-text)] uppercase">
                       Client & Visitor Feedback
                     </h4>
                     <p className="text-[11px] text-[var(--color-text-secondary)]">
@@ -864,14 +866,14 @@ export function ListingDetailsPanel({
                       >
                         <div className="space-y-1 min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-white">
+                            <span className="text-xs font-semibold text-[var(--color-text)]">
                               {comment.commenter_name}
                             </span>
                             <span className="text-[10px] text-[var(--color-text-secondary)]">
                               {timeAgo}
                             </span>
                           </div>
-                          <p className="text-xs text-stone-300 whitespace-pre-wrap leading-relaxed">
+                          <p className="text-xs text-[var(--color-text-secondary)] whitespace-pre-wrap leading-relaxed">
                             {comment.comment_text}
                           </p>
                         </div>
@@ -909,14 +911,14 @@ export function ListingDetailsPanel({
               <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 space-y-4">
                 <div className="flex items-start justify-between border-b border-[var(--color-border)] pb-4">
                   <div>
-                    <h4 className="text-sm font-semibold tracking-wider text-white uppercase">
+                    <h4 className="text-sm font-semibold tracking-wider text-[var(--color-text)] uppercase">
                       BrokerMint Transaction Documents
                     </h4>
                     <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
-                      Curated Document Folder: <strong className="text-white">IABS, Listing Agreement, and disclosures</strong>
+                      Curated Document Folder: <strong className="text-[var(--color-text)]">IABS, Listing Agreement, and disclosures</strong>
                     </p>
                   </div>
-                  <span className="font-mono text-xs text-[var(--color-gold)] bg-[#1a1a1a] px-2.5 py-1 rounded border border-[#2a2a2a]">
+                  <span className="font-mono text-xs text-[var(--color-gold)] bg-[var(--color-surface)] px-2.5 py-1 rounded border border-[var(--color-border)]">
                     ID: {listing.brokermint_transaction_id}
                   </span>
                 </div>
@@ -926,7 +928,7 @@ export function ListingDetailsPanel({
                     href={`https://my.brokermint.com/#/transactions/${listing.brokermint_transaction_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[#1a1a1a] border border-[#2a2a2a] text-xs font-semibold text-[#CFB87C] hover:bg-[#2a2a2a] transition-colors"
+                    className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[var(--color-surface)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-gold)] hover:bg-[var(--color-surface-2)] transition-colors"
                   >
                     Open BrokerMint Transaction ↗
                   </a>
@@ -936,7 +938,7 @@ export function ListingDetailsPanel({
                       type="button"
                       onClick={() => void handleAdvance()}
                       disabled={isAdvancing}
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 text-xs font-bold text-black uppercase tracking-wider hover:bg-[#dcc487] disabled:opacity-60"
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-5 text-xs font-bold text-[var(--color-black)] uppercase tracking-wider hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
                     >
                       {isAdvancing ? 'Marking...' : 'Mark Docs Signed ✓'}
                     </Button>
@@ -946,7 +948,7 @@ export function ListingDetailsPanel({
             ) : (
               <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 text-center text-xs text-[var(--color-text-secondary)]">
                 <FileText className="mx-auto size-8 text-stone-500 mb-2" />
-                <p className="font-medium text-white">No BrokerMint Transaction Connected Yet</p>
+                <p className="font-medium text-[var(--color-text)]">No BrokerMint Transaction Connected Yet</p>
                 <p className="mt-1">
                   A BrokerMint transaction and document checklist are automatically initiated once the NTREIS form is submitted.
                 </p>
@@ -999,7 +1001,7 @@ export function ListingDetailsPanel({
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="mt-2 min-h-28 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-white)] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
+                className="mt-2 min-h-28 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
               />
             </div>
 
@@ -1037,7 +1039,7 @@ export function ListingDetailsPanel({
                               ),
                             )
                           }
-                          className="mt-1 h-9 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] text-xs font-mono"
+                          className="mt-1 h-9 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] text-xs font-mono"
                         />
                       </div>
                     ))
@@ -1051,14 +1053,14 @@ export function ListingDetailsPanel({
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={isSaving}
-                className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+                className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
               >
                 {isSaving ? 'Saving...' : 'Save changes'}
               </Button>
               {saveMessage ? (
-                <p className="text-sm text-emerald-300">{saveMessage}</p>
+                <p className="text-sm text-emerald-800 dark:text-emerald-300">{saveMessage}</p>
               ) : null}
-              {saveError ? <p className="text-sm text-red-300">{saveError}</p> : null}
+              {saveError ? <p className="text-sm text-red-700 dark:text-red-300">{saveError}</p> : null}
             </div>
           </div>
         )}

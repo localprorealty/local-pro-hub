@@ -271,7 +271,7 @@ function AdminApprovalsContent() {
                 className={`shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-4 py-2 text-xs tracking-widest uppercase transition-colors ${
                   isActive
                     ? 'border-b-2 border-[var(--color-gold)] bg-[var(--color-surface-3)] text-[var(--color-gold)]'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                 }`}
               >
                 {tabLabel(tab)}
@@ -312,7 +312,7 @@ function AdminApprovalsContent() {
           <Button
             type="button"
             onClick={() => void bulkApproveSelected()}
-            className="rounded-sm bg-[var(--color-gold)] px-4 text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-50"
+            className="rounded-sm bg-[var(--color-gold)] px-4 text-[var(--color-black)] hover:bg-[var(--color-gold)]/90 disabled:opacity-50"
             disabled={
               (activeTab !== 'pending' && activeTab !== 'suspended') ||
               visibleUsers.every((row) => !selectedIds[row.id])
@@ -352,7 +352,7 @@ function AdminApprovalsContent() {
                 >
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-base font-semibold text-[var(--color-white)]">
+                      <h3 className="text-base font-semibold text-[var(--color-text)]">
                         {user.full_name ?? user.email}
                         {selfRow ? (
                           <span className="ml-2 rounded-sm border border-[var(--color-gold-border)] px-2 py-0.5 text-[10px] tracking-wide text-[var(--color-gold)] uppercase">
@@ -391,7 +391,7 @@ function AdminApprovalsContent() {
 
                   <div className="grid gap-3 md:grid-cols-[1fr_auto_auto_auto_auto]">
                     {selfRoleLocked ? (
-                      <div className="h-10 min-w-36 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)]">
+                      <div className="h-10 min-w-36 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)]">
                         admin
                       </div>
                     ) : (
@@ -403,7 +403,7 @@ function AdminApprovalsContent() {
                             [user.id]: event.target.value as UserRole,
                           }))
                         }
-                        className="h-10 min-w-36 border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                        className="h-10 min-w-36 border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
                         disabled={busy}
                       >
                         {ROLE_OPTIONS.map((role) => (
@@ -418,7 +418,7 @@ function AdminApprovalsContent() {
                       type="button"
                       onClick={() => void approveUser(user.id, draftRole)}
                       disabled={busy || !canApprove}
-                      className="h-10 rounded-sm bg-[#1a2e1a] px-4 text-[#4ade80] hover:bg-[#254525] disabled:opacity-50"
+                      className="h-10 rounded-sm bg-emerald-500/15 px-4 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 hover:bg-emerald-500/25 disabled:opacity-50"
                     >
                       <UserCheck className="mr-2 size-4" aria-hidden />
                       {approveLabel}
@@ -428,7 +428,7 @@ function AdminApprovalsContent() {
                       type="button"
                       onClick={() => void updateUser(user.id, { status: 'suspended' })}
                       disabled={busy || !canReject}
-                      className="h-10 rounded-sm bg-[#2e1a1a] px-4 text-[#f87171] hover:bg-[#452525] disabled:opacity-50"
+                      className="h-10 rounded-sm bg-red-500/15 px-4 text-red-800 dark:bg-red-950/40 dark:text-red-400 hover:bg-red-500/25 disabled:opacity-50"
                     >
                       <UserX className="mr-2 size-4" aria-hidden />
                       Reject
@@ -438,7 +438,7 @@ function AdminApprovalsContent() {
                       type="button"
                       onClick={() => void updateUser(user.id, { role: draftRole })}
                       disabled={busy || !canSaveRole}
-                      className="h-10 rounded-sm bg-[var(--color-gold)] px-4 text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-50"
+                      className="h-10 rounded-sm bg-[var(--color-gold)] px-4 text-[var(--color-black)] hover:bg-[var(--color-gold)]/90 disabled:opacity-50"
                     >
                       <Check className="mr-2 size-4" aria-hidden />
                       Save Role
@@ -484,13 +484,13 @@ function AdminApprovalsContent() {
             <tbody>
               {[...pendingUsers, ...activeUsers, ...suspendedUsers].map((user) => (
                 <tr key={`table-${user.id}`} className="border-b border-[var(--color-border)]/40">
-                  <td className="px-4 py-3 text-sm text-[var(--color-white)]">
+                  <td className="px-4 py-3 text-sm text-[var(--color-text)]">
                     {user.full_name ?? '—'}
                   </td>
                   <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
                     {user.email}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-white)]">
+                  <td className="px-4 py-3 text-sm text-[var(--color-text)]">
                     {user.role ?? 'agent'}
                   </td>
                   <td className="px-4 py-3 text-sm text-[var(--color-gold)]">

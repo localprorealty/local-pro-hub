@@ -101,12 +101,12 @@ function ChangePasswordSection() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-6">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-6">
       <div className="border-b border-[var(--color-border)]/60 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Shield className="size-4 text-[var(--color-gold)]" />
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+            <h4 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wider">
               Account Password
             </h4>
             <p className="text-[11px] text-[var(--color-text-secondary)] mt-0.5">
@@ -122,7 +122,7 @@ function ChangePasswordSection() {
       <form onSubmit={handleUpdatePassword} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="current-password-input" className="text-xs text-[#888888]">
+            <Label htmlFor="current-password-input" className="text-xs text-[var(--color-text-secondary)]">
               Current Password
             </Label>
             <div className="relative">
@@ -134,7 +134,7 @@ function ChangePasswordSection() {
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isUpdating}
-                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
               />
               <button
                 type="button"
@@ -142,7 +142,7 @@ function ChangePasswordSection() {
                 aria-pressed={showCurrentPassword}
                 onClick={() => setShowCurrentPassword((prev) => !prev)}
                 disabled={isUpdating}
-                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-white)] disabled:opacity-50"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
               >
                 {showCurrentPassword ? (
                   <EyeOff className="size-4" aria-hidden />
@@ -154,7 +154,7 @@ function ChangePasswordSection() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="new-password-input" className="text-xs text-[#888888]">
+            <Label htmlFor="new-password-input" className="text-xs text-[var(--color-text-secondary)]">
               New Password
             </Label>
             <div className="relative">
@@ -166,7 +166,7 @@ function ChangePasswordSection() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isUpdating}
-                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
               />
               <button
                 type="button"
@@ -174,7 +174,7 @@ function ChangePasswordSection() {
                 aria-pressed={showNewPassword}
                 onClick={() => setShowNewPassword((prev) => !prev)}
                 disabled={isUpdating}
-                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-white)] disabled:opacity-50"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
               >
                 {showNewPassword ? (
                   <EyeOff className="size-4" aria-hidden />
@@ -186,7 +186,7 @@ function ChangePasswordSection() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="confirm-password-input" className="text-xs text-[#888888]">
+            <Label htmlFor="confirm-password-input" className="text-xs text-[var(--color-text-secondary)]">
               Confirm New Password
             </Label>
             <div className="relative">
@@ -198,7 +198,7 @@ function ChangePasswordSection() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isUpdating}
-                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
+                className="h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] pr-11 text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]"
               />
               <button
                 type="button"
@@ -206,7 +206,7 @@ function ChangePasswordSection() {
                 aria-pressed={showConfirmPassword}
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 disabled={isUpdating}
-                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#888888] transition-colors hover:text-[var(--color-white)] disabled:opacity-50"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="size-4" aria-hidden />
@@ -222,7 +222,7 @@ function ChangePasswordSection() {
           <Button
             type="submit"
             disabled={isUpdating}
-            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[#c5a85c] disabled:opacity-50"
+            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-50"
           >
             {isUpdating ? 'Updating password...' : 'Update Password'}
           </Button>
@@ -348,7 +348,7 @@ function ProfileContent({ role }: ProfilePageProps) {
                   className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 -mb-px ${
                     isActive
                       ? 'border-[var(--color-gold)] text-[var(--color-gold)] bg-[var(--color-gold)]/5'
-                      : 'border-transparent text-[var(--color-text-secondary)] hover:text-white hover:border-zinc-700'
+                      : 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:border-[var(--color-border)]'
                   }`}
                 >
                   <Icon className="size-3.5" />
@@ -384,7 +384,7 @@ function ProfileContent({ role }: ProfilePageProps) {
                   onSave={handleSaveBranding}
                 />
               ) : (
-                <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[#101010] p-6 text-center text-xs text-[var(--color-text-secondary)]">
+                <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center text-xs text-[var(--color-text-secondary)]">
                   Marketing brand customization is available for agents and administrators.
                 </div>
               )}

@@ -123,7 +123,7 @@ export function MobileShootWizard({
   return (
     <div className="space-y-5">
       {/* 3-Step Interactive Stepper Bar */}
-      <nav aria-label="Booking Progress" className="rounded-sm border border-[var(--color-border)] bg-[#161616] p-1.5 sm:p-2">
+      <nav aria-label="Booking Progress" className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 sm:p-2">
         <div className="flex items-center justify-between gap-1">
           {/* Step 1: Photographer */}
           <button
@@ -132,9 +132,9 @@ export function MobileShootWizard({
             className={cn(
               'flex flex-1 min-w-0 items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 text-[11px] sm:text-xs font-semibold rounded-sm transition-all',
               step === 1
-                ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
+                ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
                 : step > 1
-                  ? 'text-white hover:text-[#CFB87C]'
+                  ? 'text-[var(--color-text)] hover:text-[var(--color-gold)]'
                   : 'text-[var(--color-text-secondary)]',
             )}
           >
@@ -142,10 +142,10 @@ export function MobileShootWizard({
               className={cn(
                 'flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
                 step === 1
-                  ? 'bg-[#CFB87C] text-black'
+                  ? 'bg-[var(--color-gold)] text-black font-semibold'
                   : step > 1
-                    ? 'bg-[#CFB87C]/30 text-[#CFB87C]'
-                    : 'bg-white/10 text-white',
+                    ? 'bg-[var(--color-gold)]/30 text-[var(--color-gold)]'
+                    : 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)]',
               )}
             >
               {step > 1 ? <Check className="size-3 stroke-[3]" /> : '1'}
@@ -153,7 +153,7 @@ export function MobileShootWizard({
             <span className="truncate min-w-0">Photographer</span>
           </button>
 
-          <ChevronRight className="size-3 text-zinc-600 shrink-0 mx-0.5" />
+          <ChevronRight className="size-3 text-[var(--color-text-secondary)] opacity-50 shrink-0 mx-0.5" />
 
           {/* Step 2: Date & Time */}
           <button
@@ -163,22 +163,22 @@ export function MobileShootWizard({
             className={cn(
               'flex flex-1 min-w-0 items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 text-[11px] sm:text-xs font-semibold rounded-sm transition-all',
               step === 2
-                ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
+                ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
                 : step > 2
-                  ? 'text-white hover:text-[#CFB87C]'
+                  ? 'text-[var(--color-text)] hover:text-[var(--color-gold)]'
                   : selectedPhotographer
-                    ? 'text-[var(--color-text-secondary)] hover:text-white'
-                    : 'text-zinc-600 cursor-not-allowed opacity-60',
+                    ? 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
+                    : 'text-[var(--color-text-secondary)] cursor-not-allowed opacity-40',
             )}
           >
             <span
               className={cn(
                 'flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
                 step === 2
-                  ? 'bg-[#CFB87C] text-black'
+                  ? 'bg-[var(--color-gold)] text-black font-semibold'
                   : step > 2
-                    ? 'bg-[#CFB87C]/30 text-[#CFB87C]'
-                    : 'bg-white/10 text-white',
+                    ? 'bg-[var(--color-gold)]/30 text-[var(--color-gold)]'
+                    : 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)]',
               )}
             >
               {step > 2 ? <Check className="size-3 stroke-[3]" /> : '2'}
@@ -186,7 +186,7 @@ export function MobileShootWizard({
             <span className="truncate min-w-0">Date & Time</span>
           </button>
 
-          <ChevronRight className="size-3 text-zinc-600 shrink-0 mx-0.5" />
+          <ChevronRight className="size-3 text-[var(--color-text-secondary)] opacity-50 shrink-0 mx-0.5" />
 
           {/* Step 3: Confirm */}
           <button
@@ -198,16 +198,16 @@ export function MobileShootWizard({
             className={cn(
               'flex flex-1 min-w-0 items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 text-[11px] sm:text-xs font-semibold rounded-sm transition-all',
               step === 3
-                ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
+                ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
                 : selectedPhotographer && selectedDate && selectedTime
-                  ? 'text-[var(--color-text-secondary)] hover:text-white'
-                  : 'text-zinc-600 cursor-not-allowed opacity-60',
+                  ? 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
+                  : 'text-[var(--color-text-secondary)] cursor-not-allowed opacity-40',
             )}
           >
             <span
               className={cn(
                 'flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
-                step === 3 ? 'bg-[#CFB87C] text-black' : 'bg-white/10 text-white',
+                step === 3 ? 'bg-[var(--color-gold)] text-black font-semibold' : 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)]',
               )}
             >
               3
@@ -223,19 +223,19 @@ export function MobileShootWizard({
       {step === 1 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold tracking-widest text-[#CFB87C] uppercase">
+            <p className="text-[11px] font-semibold tracking-widest text-[var(--color-gold)] uppercase">
               Step 1 — Choose Photographer
             </p>
             {photographers.some((p) => p.photographer_tier === preferredTier) && (
               <span className="text-[11px] text-[var(--color-text-secondary)]">
-                Preferred: <strong className="text-white capitalize">{preferredTier}</strong>
+                Preferred: <strong className="text-[var(--color-text)] capitalize">{preferredTier}</strong>
               </span>
             )}
           </div>
 
           <div className="space-y-3">
             {photographers.length === 0 ? (
-              <p className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-5 text-sm text-[var(--color-text-secondary)] text-center">
+              <p className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-5 text-sm text-[var(--color-text-secondary)] text-center">
                 No active photographers available.
               </p>
             ) : (
@@ -253,13 +253,13 @@ export function MobileShootWizard({
                     className={cn(
                       'w-full rounded-sm border p-4 text-left transition-all min-h-[64px]',
                       selected
-                        ? 'border-[#CFB87C] bg-[#CFB87C]/10 ring-1 ring-[#CFB87C]'
-                        : 'border-[var(--color-border)] bg-[#1a1a1a] hover:border-[#CFB87C]/50 active:bg-white/5',
+                        ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/10 ring-1 ring-[var(--color-gold)]'
+                        : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-gold)]/50 active:bg-[var(--color-surface-2)]',
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-white text-base truncate">
+                        <p className="font-semibold text-[var(--color-text)] text-base truncate">
                           {photographer.full_name}
                         </p>
                         {photographer.phone ? (
@@ -282,7 +282,7 @@ export function MobileShootWizard({
                       <span className="text-[11px] sm:text-xs text-[var(--color-text-secondary)] truncate min-w-0">
                         Standard Real Estate Package
                       </span>
-                      <span className="text-[11px] sm:text-xs font-bold tracking-wider text-[#CFB87C] uppercase flex items-center gap-1 shrink-0">
+                      <span className="text-[11px] sm:text-xs font-bold tracking-wider text-[var(--color-gold)] uppercase flex items-center gap-1 shrink-0">
                         {selected ? (
                           <>
                             <Check className="size-3.5" /> Selected
@@ -302,7 +302,7 @@ export function MobileShootWizard({
               <Button
                 type="button"
                 onClick={() => setStep(2)}
-                className="w-full h-12 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-md px-4"
+                className="w-full h-12 bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90 flex items-center justify-center gap-2 text-sm shadow-md px-4"
               >
                 <span>Continue to Date & Time</span>
                 <ChevronRight className="size-4 shrink-0" />
@@ -318,7 +318,7 @@ export function MobileShootWizard({
                 className="w-full rounded-sm border border-dashed border-red-500/30 hover:border-red-500/50 bg-red-950/10 hover:bg-red-950/20 p-4 text-left transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold text-white">Skip Photography</p>
+                  <p className="font-semibold text-[var(--color-text)]">Skip Photography</p>
                   <span className="rounded-sm bg-red-900/30 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
                     Bypass Stage
                   </span>
@@ -341,12 +341,12 @@ export function MobileShootWizard({
       {step === 2 && (
         <div className="space-y-5">
           {/* Selected Photographer Recap Banner */}
-          <div className="flex items-center justify-between rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] px-3.5 py-2.5">
+          <div className="flex items-center justify-between rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-2.5">
             <div className="flex items-center gap-2 min-w-0">
-              <User className="size-4 text-[#CFB87C] shrink-0" />
+              <User className="size-4 text-[var(--color-gold)] shrink-0" />
               <div className="truncate">
                 <span className="text-xs text-[var(--color-text-secondary)]">Photographer: </span>
-                <span className="text-xs font-semibold text-white">
+                <span className="text-xs font-semibold text-[var(--color-text)]">
                   {selectedPhotographer?.full_name}
                 </span>
               </div>
@@ -354,17 +354,17 @@ export function MobileShootWizard({
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="text-xs font-semibold text-[#CFB87C] hover:underline flex items-center gap-1 shrink-0 ml-2"
+              className="text-xs font-semibold text-[var(--color-gold)] hover:underline flex items-center gap-1 shrink-0 ml-2"
             >
               <Edit2 className="size-3" /> Change
             </button>
           </div>
 
           {/* Date Picker Agenda Section */}
-          <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3.5">
+          <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-3.5">
             {/* Week navigation header */}
             <div className="flex items-center justify-between gap-2 min-w-0">
-              <p className="text-[11px] font-semibold tracking-wider text-[#CFB87C] uppercase flex items-center gap-1.5 shrink-0">
+              <p className="text-[11px] font-semibold tracking-wider text-[var(--color-gold)] uppercase flex items-center gap-1.5 shrink-0">
                 <CalendarIcon className="size-3.5" />
                 <span>Select Date</span>
               </p>
@@ -372,18 +372,18 @@ export function MobileShootWizard({
                 <button
                   type="button"
                   onClick={() => onWeekChange(addDays(weekStart, -7))}
-                  className="rounded-sm p-1 text-[#CFB87C] hover:bg-[#CFB87C]/10 active:bg-[#CFB87C]/20 transition-colors"
+                  className="rounded-sm p-1 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 active:bg-[var(--color-gold)]/20 transition-colors"
                   aria-label="Previous Week"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
-                <span className="font-[family-name:var(--font-display)] text-xs font-semibold text-white px-1 whitespace-nowrap">
+                <span className="font-[family-name:var(--font-display)] text-xs font-semibold text-[var(--color-text)] px-1 whitespace-nowrap">
                   {monthLabel}
                 </span>
                 <button
                   type="button"
                   onClick={() => onWeekChange(addDays(weekStart, 7))}
-                  className="rounded-sm p-1 text-[#CFB87C] hover:bg-[#CFB87C]/10 active:bg-[#CFB87C]/20 transition-colors"
+                  className="rounded-sm p-1 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 active:bg-[var(--color-gold)]/20 transition-colors"
                   aria-label="Next Week"
                 >
                   <ChevronRight className="size-4" />
@@ -394,7 +394,7 @@ export function MobileShootWizard({
             {/* Horizontal Swipeable Date Strip */}
             {isLoadingAvailability ? (
               <div className="flex h-16 items-center justify-center gap-2 text-xs text-[var(--color-text-secondary)]">
-                <Loader2 className="size-4 animate-spin text-[#CFB87C]" />
+                <Loader2 className="size-4 animate-spin text-[var(--color-gold)]" />
                 <span>Loading availability...</span>
               </div>
             ) : (
@@ -423,30 +423,30 @@ export function MobileShootWizard({
                       className={cn(
                         'flex h-16 min-w-[58px] shrink-0 snap-center flex-col items-center justify-center rounded-sm border p-2 transition-all select-none',
                         isSelected
-                          ? 'border-[#CFB87C] bg-[#CFB87C]/20 text-white ring-2 ring-[#CFB87C]/50 shadow-sm'
+                          ? 'border-2 border-[var(--color-gold)] bg-[var(--color-gold)]/20 text-[var(--color-text)] ring-2 ring-[var(--color-gold)]/50 shadow-sm'
                           : disabled
-                            ? 'cursor-not-allowed border-[var(--color-border)]/50 bg-[#121212] text-[#555555]'
-                            : 'border-[var(--color-border)] bg-[#141414] text-white hover:border-[#CFB87C]/50 active:bg-white/5',
+                            ? 'cursor-not-allowed border-[var(--color-border)]/50 bg-[var(--color-surface-3)]/40 text-[var(--color-text-secondary)] opacity-40'
+                            : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:border-[var(--color-gold)]/50 active:bg-[var(--color-surface-3)]',
                       )}
                     >
                       <span className="text-[10px] uppercase font-medium text-[var(--color-text-secondary)]">
                         {dayName}
                       </span>
-                      <span className="text-base font-bold text-white leading-tight">
+                      <span className="text-base font-bold text-[var(--color-text)] leading-tight">
                         {dayNum}
                       </span>
                       <span className="mt-1 flex items-center justify-center">
                         {status === 'available' && (
-                          <span className="size-1.5 rounded-full bg-[#CFB87C]" title="Available" />
+                          <span className="size-1.5 rounded-full bg-emerald-500" title="Available" />
                         )}
                         {status === 'blocked' && (
-                          <span className="size-1.5 rounded-full bg-red-500" title="Blocked" />
+                          <span className="size-1.5 rounded-full bg-rose-500" title="Blocked" />
                         )}
                         {status === 'booked' && (
                           <span className="size-1.5 rounded-full bg-amber-500" title="Booked" />
                         )}
                         {status === 'past' && (
-                          <span className="size-1.5 rounded-full bg-zinc-700" title="Past" />
+                          <span className="size-1.5 rounded-full bg-zinc-500 opacity-40" title="Past" />
                         )}
                       </span>
                     </button>
@@ -458,21 +458,21 @@ export function MobileShootWizard({
             {/* Date Legend */}
             <div className="flex flex-wrap items-center gap-3 pt-1 text-[10px] text-[var(--color-text-secondary)] border-t border-[var(--color-border)]/40">
               <span className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[#CFB87C]" /> Available
+                <span className="size-2 rounded-full bg-emerald-500" /> Available
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-amber-500" /> Booked
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-red-500" /> Blocked
+                <span className="size-2 rounded-full bg-rose-500" /> Blocked
               </span>
             </div>
           </div>
 
           {/* Time Slots Section */}
           {selectedDate ? (
-            <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3">
-              <p className="text-[11px] font-semibold tracking-widest text-[#CFB87C] uppercase flex items-center gap-1.5">
+            <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-3">
+              <p className="text-[11px] font-semibold tracking-widest text-[var(--color-gold)] uppercase flex items-center gap-1.5">
                 <Clock className="size-3.5" />
                 <span>Available Times for {formatShootDate(selectedDate)}</span>
               </p>
@@ -490,10 +490,10 @@ export function MobileShootWizard({
                       className={cn(
                         'flex h-12 items-center justify-center rounded-sm border px-3 text-sm font-medium transition-all',
                         taken
-                          ? 'cursor-not-allowed border-[var(--color-border)]/50 bg-[#121212] text-[#555555] line-through'
+                          ? 'cursor-not-allowed border-[var(--color-border)]/50 bg-[var(--color-surface-3)]/40 text-[var(--color-text-secondary)] opacity-40 line-through'
                           : active
-                            ? 'border-[#CFB87C] bg-[#CFB87C] text-black font-semibold ring-2 ring-[#CFB87C]/40 shadow-sm'
-                            : 'border-[var(--color-border)] bg-[#141414] text-white hover:border-[#CFB87C]/50 active:bg-white/5',
+                            ? 'border-[var(--color-gold)] bg-[var(--color-gold)] text-black font-semibold ring-2 ring-[var(--color-gold)]/40 shadow-sm'
+                            : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:border-[var(--color-gold)]/50 active:bg-[var(--color-surface-3)]',
                       )}
                     >
                       {formatShootTime(slot)}
@@ -503,7 +503,7 @@ export function MobileShootWizard({
               </div>
             </div>
           ) : (
-            <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[#141414] p-4 text-center text-xs text-[var(--color-text-secondary)]">
+            <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-center text-xs text-[var(--color-text-secondary)]">
               Select a date above to view available time slots.
             </div>
           )}
@@ -514,7 +514,7 @@ export function MobileShootWizard({
               type="button"
               variant="outline"
               onClick={() => setStep(1)}
-              className="h-11 border-[var(--color-border)] bg-[#141414] text-white hover:bg-white/5 px-4 shrink-0"
+              className="h-11 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)] px-4 shrink-0"
             >
               <ChevronLeft className="size-4 mr-1" />
               Back
@@ -523,7 +523,7 @@ export function MobileShootWizard({
               type="button"
               disabled={!selectedDate || !selectedTime}
               onClick={() => setStep(3)}
-              className="h-11 flex-1 min-w-0 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-md"
+              className="h-11 flex-1 min-w-0 bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90 flex items-center justify-center gap-2 text-sm shadow-md"
             >
               <span className="truncate">Review Booking</span>
               <ChevronRight className="size-4 shrink-0" />
@@ -536,7 +536,7 @@ export function MobileShootWizard({
               type="button"
               disabled={isSkipping}
               onClick={() => void onSkip()}
-              className="text-xs text-[var(--color-text-secondary)] hover:text-red-300 underline underline-offset-4 transition-colors"
+              className="text-xs text-[var(--color-text-secondary)] hover:text-red-400 underline underline-offset-4 transition-colors"
             >
               Need to bypass scheduling? Skip photography instead →
             </button>
@@ -545,24 +545,24 @@ export function MobileShootWizard({
       )}
 
       {/* ========================================================= */}
-      {/* STEP 3: Notes & Confirm                                   */}
+      {/* STEP 3: Review & Confirmation                             */}
       {/* ========================================================= */}
       {step === 3 && (
         <div className="space-y-5">
-          <p className="text-[11px] font-semibold tracking-widest text-[#CFB87C] uppercase">
+          <p className="text-[11px] font-semibold tracking-widest text-[var(--color-gold)] uppercase">
             Step 3 — Review & Confirm Shoot
           </p>
 
           {/* Comprehensive Booking Summary Card */}
-          <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-4">
+          <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-4">
             <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
-              <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-white">
+              <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--color-text)]">
                 Shoot Details
               </h3>
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-xs font-semibold text-[#CFB87C] hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-[var(--color-gold)] hover:underline flex items-center gap-1"
               >
                 <Edit2 className="size-3" /> Edit Details
               </button>
@@ -572,7 +572,7 @@ export function MobileShootWizard({
               <div className="flex items-start justify-between gap-2">
                 <span className="text-[var(--color-text-secondary)] text-xs">Photographer</span>
                 <div className="text-right min-w-0 flex-1">
-                  <p className="font-semibold text-white truncate">{selectedPhotographer?.full_name}</p>
+                  <p className="font-semibold text-[var(--color-text)] truncate">{selectedPhotographer?.full_name}</p>
                   <span
                     className={cn(
                       'inline-block rounded-sm px-1.5 py-0.2 text-[9px] font-bold tracking-widest uppercase mt-0.5',
@@ -587,10 +587,10 @@ export function MobileShootWizard({
               <div className="flex items-start justify-between gap-2 border-t border-[var(--color-border)]/40 pt-2.5">
                 <span className="text-[var(--color-text-secondary)] text-xs">Date & Time</span>
                 <div className="text-right min-w-0 flex-1">
-                  <p className="font-semibold text-white truncate">
+                  <p className="font-semibold text-[var(--color-text)] truncate">
                     {selectedDate ? formatShootDate(selectedDate) : 'Not selected'}
                   </p>
-                  <p className="text-xs text-[#CFB87C] font-medium">
+                  <p className="text-xs text-[var(--color-gold)] font-medium">
                     {selectedTime ? formatShootTime(selectedTime) : ''}
                   </p>
                 </div>
@@ -598,7 +598,7 @@ export function MobileShootWizard({
 
               <div className="flex items-start justify-between gap-2 border-t border-[var(--color-border)]/40 pt-2.5">
                 <span className="text-[var(--color-text-secondary)] text-xs">Property</span>
-                <p className="font-medium text-white text-right max-w-[200px] truncate">
+                <p className="font-medium text-[var(--color-text)] text-right max-w-[200px] truncate">
                   {listingAddress}
                 </p>
               </div>
@@ -618,7 +618,7 @@ export function MobileShootWizard({
                 onChange={(e) => onChangeAccessNotes(e.target.value)}
                 placeholder="Gate code, lockbox combo, key location, dog on premises..."
                 rows={3}
-                className="w-full rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] px-3 py-2 text-sm text-white focus:outline focus:outline-1 focus:outline-[#CFB87C]"
+                className="w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-sm text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)]"
               />
             </div>
 
@@ -628,13 +628,13 @@ export function MobileShootWizard({
           </div>
 
           {/* Sticky Bottom Action Bar for Mobile Submission */}
-          <div className="sticky bottom-0 z-20 -mx-4 -mb-6 bg-[#121212]/95 backdrop-blur-md border-t border-[var(--color-border)] p-4 flex items-center gap-3">
+          <div className="sticky bottom-0 z-20 -mx-4 -mb-6 bg-[var(--color-surface)]/95 backdrop-blur-md border-t border-[var(--color-border)] p-4 flex items-center gap-3">
             <Button
               type="button"
               variant="outline"
               disabled={isBooking}
               onClick={() => setStep(2)}
-              className="h-11 border-[var(--color-border)] bg-[#1a1a1a] text-white hover:bg-white/5 px-4 shrink-0"
+              className="h-11 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)] px-4 shrink-0"
             >
               <ChevronLeft className="size-4 mr-1" />
               Back
@@ -643,7 +643,7 @@ export function MobileShootWizard({
               type="button"
               disabled={isBooking || !selectedPhotographer || !selectedDate || !selectedTime}
               onClick={() => void onConfirm()}
-              className="h-11 flex-1 min-w-0 bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2 text-sm shadow-lg"
+              className="h-11 flex-1 min-w-0 bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90 flex items-center justify-center gap-2 text-sm shadow-lg"
             >
               {isBooking ? (
                 <>
@@ -662,7 +662,7 @@ export function MobileShootWizard({
               type="button"
               disabled={isSkipping}
               onClick={() => void onSkip()}
-              className="text-xs text-[var(--color-text-secondary)] hover:text-red-300 underline underline-offset-4 transition-colors"
+              className="text-xs text-[var(--color-text-secondary)] hover:text-red-400 underline underline-offset-4 transition-colors"
             >
               Need to bypass scheduling? Skip photography instead →
             </button>

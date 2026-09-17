@@ -166,7 +166,7 @@ function NewListingContent() {
         <ArrowLeft className="size-5" />
       </button>
       <h1 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-text)]">
-        New Listing
+        New Transaction
       </h1>
     </header>
   )

@@ -137,7 +137,7 @@ export function AiRefinementPanel({
 
   if (!activePage) {
     return (
-      <aside className="w-full xl:w-[280px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4 text-sm text-[var(--color-text-secondary)]">
+      <aside className="w-full xl:w-[280px] shrink-0 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-text-secondary)]">
         No text pages available for refinement on this asset.
       </aside>
     )
@@ -150,15 +150,15 @@ export function AiRefinementPanel({
   const isOver = Boolean(thresholdConfig && charCount > thresholdConfig.threshold)
 
   return (
-    <aside className="w-full xl:w-[320px] shrink-0 rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-4">
-      <h3 className="text-sm font-semibold text-white">Text editor & AI refine</h3>
+    <aside className="w-full xl:w-[320px] shrink-0 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+      <h3 className="text-sm font-semibold text-[var(--color-text)]">Text editor & AI refine</h3>
 
       <div className="mt-4">
         <Label className="text-xs text-[var(--color-text-secondary)]">
           Select section to edit
         </Label>
         <Select value={activePage.key} onValueChange={onActivePageChange}>
-          <SelectTrigger className="mt-1 w-full border-[var(--color-border)] bg-[#0a0a0a] text-white">
+          <SelectTrigger className="mt-1 w-full border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -176,14 +176,14 @@ export function AiRefinementPanel({
           <Label htmlFor="active-page-content" className="text-xs font-medium text-[var(--color-text-secondary)]">
             Content (freely editable)
           </Label>
-          <span className="text-[10px] text-[#888888]">Live preview</span>
+          <span className="text-[10px] text-[var(--color-text-secondary)]">Live preview</span>
         </div>
         <textarea
           id="active-page-content"
           value={currentContent}
           onChange={(event) => activePage.applyContent(event.target.value)}
           rows={6}
-          className={`mt-1 w-full resize-y rounded-sm border bg-[#0a0a0a] px-3 py-2 text-xs leading-relaxed text-white focus:outline focus:outline-2 focus:outline-[#CFB87C] ${
+          className={`mt-1 w-full resize-y rounded-sm border bg-[var(--color-surface-3)] px-3 py-2 text-xs leading-relaxed text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)] ${
             isOver ? 'border-amber-500/50' : 'border-[var(--color-border)]'
           }`}
           placeholder="Enter or edit text..."
@@ -192,7 +192,7 @@ export function AiRefinementPanel({
           <span
             data-testid="char-counter"
             className={`text-xs tabular-nums ${
-              isOver ? 'font-semibold text-amber-400' : 'text-[#888888]'
+              isOver ? 'font-semibold text-amber-600 dark:text-amber-400' : 'text-[var(--color-text-secondary)]'
             }`}
           >
             {thresholdConfig
@@ -204,9 +204,9 @@ export function AiRefinementPanel({
         {isOver && thresholdConfig && (
           <div
             role="status"
-            className="mt-2 flex items-start gap-2 rounded-sm border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-200"
+            className="mt-2 flex items-start gap-2 rounded-sm border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-900 dark:text-amber-200"
           >
-            <AlertTriangle className="size-4 shrink-0 text-amber-400 mt-0.5" aria-hidden />
+            <AlertTriangle className="size-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" aria-hidden />
             <p className="leading-relaxed">
               {getThresholdWarningMessage(thresholdConfig.templateType)}
             </p>
@@ -227,7 +227,7 @@ export function AiRefinementPanel({
               ? 'Change the email address to test@localprorealty.com'
               : 'Make the description more luxurious and focus on the pool'
           }
-          className="mt-1 min-h-20 w-full rounded-sm border border-[var(--color-border)] bg-[#0a0a0a] px-3 py-2 text-xs text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
+          className="mt-1 min-h-20 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-xs text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)]"
         />
       </div>
 
@@ -240,7 +240,7 @@ export function AiRefinementPanel({
             onRefineSuccess?.()
           })
         }}
-        className="mt-4 h-10 w-full rounded-sm bg-[#CFB87C] text-sm font-semibold text-[#0a0a0a] hover:bg-[#dcc487] disabled:opacity-50"
+        className="mt-4 h-10 w-full rounded-sm bg-[var(--color-gold)] text-sm font-semibold text-black hover:bg-[var(--color-gold)]/90 disabled:opacity-50"
       >
         {isRefining ? (
           <>
@@ -271,7 +271,7 @@ export function AiRefinementPanel({
                   <button
                     type="button"
                     onClick={() => onUndo(activePage.key)}
-                    className="mt-1 text-[#CFB87C] hover:underline"
+                    className="mt-1 text-[var(--color-gold)] hover:underline"
                   >
                     Undo
                   </button>

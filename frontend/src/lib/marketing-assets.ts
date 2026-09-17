@@ -77,8 +77,9 @@ export const STATUS_LABEL: Record<MarketingAssetStatus, string> = {
 }
 
 export function statusBadgeClass(status: MarketingAssetStatus): string {
-  if (status === 'done') return 'bg-emerald-500/15 text-emerald-400'
-  return 'bg-[#2a2a2a] text-[var(--color-text-secondary)]'
+  if (status === 'done') return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+  if (status === 'in_progress') return 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border border-[var(--color-gold)]/30'
+  return 'bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] border border-[var(--color-border)]'
 }
 
 export const PROCESSING_FEE_CENTS = 45

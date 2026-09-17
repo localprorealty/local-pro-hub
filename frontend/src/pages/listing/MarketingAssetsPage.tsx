@@ -555,8 +555,8 @@ function MarketingAssetsContent() {
         subtitle={listingContext.address_full}
         email={agentEmail}
       >
-        <div className="mx-auto max-w-md rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-8 space-y-6 text-center">
-          <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+        <div className="mx-auto max-w-md rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-8 space-y-6 text-center">
+          <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-[var(--color-text)]">
             Saved Draft Found
           </h3>
           <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
@@ -566,7 +566,7 @@ function MarketingAssetsContent() {
             <Button
               type="button"
               onClick={handleContinueDraft}
-              className="h-11 w-full rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+              className="h-11 w-full rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
             >
               Continue Previous Draft
             </Button>
@@ -574,7 +574,7 @@ function MarketingAssetsContent() {
               type="button"
               variant="outline"
               onClick={handleStartNew}
-              className="h-11 w-full rounded-sm border-[var(--color-border)] bg-transparent font-semibold text-white hover:bg-[#2a2a2a]"
+              className="h-11 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface-2)] font-semibold text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
             >
               Start New (Discard Draft)
             </Button>
@@ -618,8 +618,8 @@ function MarketingAssetsContent() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`rounded-sm px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-[#CFB87C]/15 text-[#CFB87C]'
-                    : 'text-[var(--color-text-secondary)] hover:text-white'
+                    ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                 }`}
               >
                 {tab.label}
@@ -636,14 +636,14 @@ function MarketingAssetsContent() {
 
           {/* Mobile Segmented Control: [ Preview | Edit Copy & AI ] */}
           {refinementPages.length > 0 ? (
-            <div className="grid grid-cols-2 rounded-lg border border-[var(--color-border)] bg-[#111111] p-1 xl:hidden">
+            <div className="grid grid-cols-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-1 xl:hidden">
               <button
                 type="button"
                 onClick={() => setMobileViewMode('preview')}
                 className={`flex items-center justify-center gap-2 rounded-md py-2.5 text-xs font-semibold transition-all ${
                   mobileViewMode === 'preview'
-                    ? 'bg-[#CFB87C] text-[#0a0a0a] shadow-sm'
-                    : 'text-[var(--color-text-secondary)] hover:text-white'
+                    ? 'bg-[var(--color-gold)] text-black font-semibold shadow-sm'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                 }`}
               >
                 <Eye className="size-3.5" />
@@ -654,8 +654,8 @@ function MarketingAssetsContent() {
                 onClick={() => setMobileViewMode('edit')}
                 className={`flex items-center justify-center gap-2 rounded-md py-2.5 text-xs font-semibold transition-all ${
                   mobileViewMode === 'edit'
-                    ? 'bg-[#CFB87C] text-[#0a0a0a] shadow-sm'
-                    : 'text-[var(--color-text-secondary)] hover:text-white'
+                    ? 'bg-[var(--color-gold)] text-black font-semibold shadow-sm'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                 }`}
               >
                 <Sparkles className="size-3.5" />
@@ -666,7 +666,7 @@ function MarketingAssetsContent() {
 
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
             <div
-              className={`min-w-0 flex-1 overflow-hidden rounded-md border border-[var(--color-border)] bg-[#111111] ${
+              className={`min-w-0 flex-1 overflow-hidden rounded-md border border-[var(--color-border)] bg-[var(--color-surface-2)] ${
                 refinementPages.length > 0 && mobileViewMode === 'edit'
                   ? 'hidden xl:block'
                   : 'block'
@@ -772,7 +772,7 @@ function MarketingAssetsContent() {
                 type="button"
                 disabled={isDownloading}
                 onClick={() => void handleDownloadJustSold()}
-                className="rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+                className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
               >
                 <Download className="mr-2 size-4" />
                 Download PNG (1080×1080)
@@ -785,7 +785,7 @@ function MarketingAssetsContent() {
                   type="button"
                   disabled={isDownloading}
                   onClick={() => void handleDownloadFlyerPng()}
-                  className="rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+                  className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
                 >
                   <Download className="mr-2 size-4" />
                   Download PNG
@@ -795,7 +795,7 @@ function MarketingAssetsContent() {
                   disabled={isDownloading}
                   variant="outline"
                   onClick={() => void handleDownloadFlyerPdf()}
-                  className="border-[var(--color-border)] bg-transparent text-white hover:bg-[#1a1a1a]"
+                  className="border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                 >
                   <Download className="mr-2 size-4" />
                   Download PDF
@@ -808,7 +808,7 @@ function MarketingAssetsContent() {
                 type="button"
                 disabled={isDownloading || !neighborhoodGuide}
                 onClick={() => void handleDownloadBookPdf()}
-                className="rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+                className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
               >
                 <Download className="mr-2 size-4" />
                 Download full PDF

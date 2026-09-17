@@ -151,18 +151,18 @@ export function VendorOrderEmailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-sm border border-[var(--color-border)] bg-[#161616] p-4 sm:p-6 shadow-2xl my-4 sm:my-8 max-h-[92vh] flex flex-col">
+      <div className="w-full max-w-2xl rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:p-6 shadow-2xl my-4 sm:my-8 max-h-[92vh] flex flex-col">
         <div className="flex items-start justify-between border-b border-[var(--color-border)] pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#CFB87C]/10 text-[#CFB87C]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[var(--color-gold)]/10 text-[var(--color-gold)]">
               <Mail className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-white">
+              <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--color-text)]">
                 Send Order Email
               </h3>
               <p className="text-xs text-[var(--color-text-secondary)]">
-                To: <span className="text-white font-medium">{vendor.name}</span>
+                To: <span className="text-[var(--color-text)] font-medium">{vendor.name}</span>
               </p>
             </div>
           </div>
@@ -170,14 +170,14 @@ export function VendorOrderEmailModal({
             type="button"
             onClick={onClose}
             disabled={isSending}
-            className="rounded-sm p-1 text-[var(--color-text-secondary)] hover:text-white transition-colors"
+            className="rounded-sm p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Sender Channel Status Banner */}
-        <div className="mt-4 rounded-sm border border-[var(--color-border)] bg-[#111111] p-3 text-xs">
+        <div className="mt-4 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3 text-xs">
           {isLoadingStatus ? (
             <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -188,16 +188,16 @@ export function VendorOrderEmailModal({
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               <span>
                 Sending directly from your connected Gmail address (
-                <strong className="text-white">{gmailStatus.gmail_email}</strong>) via direct SMTP.
+                <strong className="text-[var(--color-text)]">{gmailStatus.gmail_email}</strong>) via direct SMTP.
               </span>
             </div>
           ) : (
-            <div className="flex items-start gap-2 text-amber-300">
+            <div className="flex items-start gap-2 text-amber-500 dark:text-amber-300">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <div className="leading-relaxed">
                 <span>
                   No Gmail App Password connected. Email will be sent via LocalPRO notification service on your behalf (
-                  <strong className="text-white">{agentProfile?.email || 'your profile email'}</strong> set as Reply-To).
+                  <strong className="text-[var(--color-text)]">{agentProfile?.email || 'your profile email'}</strong> set as Reply-To).
                 </span>
               </div>
             </div>
@@ -215,7 +215,7 @@ export function VendorOrderEmailModal({
               value={recipientEmail}
               onChange={(e) => setRecipientEmail(e.target.value)}
               placeholder="orders@photographer.com"
-              className="w-full rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] px-3 py-2 text-sm text-white focus:outline focus:outline-1 focus:outline-[#CFB87C]"
+              className="w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-sm text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)]"
             />
           </div>
 
@@ -228,7 +228,7 @@ export function VendorOrderEmailModal({
               required
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] px-3 py-2 text-sm text-white focus:outline focus:outline-1 focus:outline-[#CFB87C]"
+              className="w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-sm text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)]"
             />
           </div>
 
@@ -237,7 +237,7 @@ export function VendorOrderEmailModal({
               <label className="block text-xs font-semibold tracking-wider uppercase text-[var(--color-text-secondary)]">
                 Email Message Body <span className="text-[10px] lowercase text-[var(--color-text-secondary)]">(editable)</span>
               </label>
-              <span className="text-[11px] text-[#CFB87C]">
+              <span className="text-[11px] text-[var(--color-gold)] font-medium">
                 Feel free to add instructions or notes below
               </span>
             </div>
@@ -246,7 +246,7 @@ export function VendorOrderEmailModal({
               rows={8}
               value={bodyText}
               onChange={(e) => setBodyText(e.target.value)}
-              className="w-full rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] p-3 text-xs font-mono leading-relaxed text-white focus:outline focus:outline-1 focus:outline-[#CFB87C] max-h-[260px] sm:max-h-[360px]"
+              className="w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] p-3 text-xs font-mono leading-relaxed text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)] max-h-[260px] sm:max-h-[360px]"
             />
             <p className="mt-1 text-[11px] text-[var(--color-text-secondary)]">
               Whatever you type above is exactly what will be sent to the photographer.
@@ -259,13 +259,13 @@ export function VendorOrderEmailModal({
               id="mark-completed-checkbox"
               checked={markCompleted}
               onChange={(e) => setMarkCompleted(e.target.checked)}
-              className="h-4 w-4 rounded border-[var(--color-border)] bg-[#0d0d0d] text-[#CFB87C] focus:ring-[#CFB87C]"
+              className="h-4 w-4 rounded border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-gold)] focus:ring-[var(--color-gold)]"
             />
             <label
               htmlFor="mark-completed-checkbox"
               className="text-xs text-[var(--color-text-secondary)] cursor-pointer"
             >
-              Automatically advance listing stage to <strong className="text-white">Shoot Booked</strong> upon sending
+              Automatically advance listing stage to <strong className="text-[var(--color-text)]">Shoot Booked</strong> upon sending
             </label>
           </div>
 
@@ -282,14 +282,14 @@ export function VendorOrderEmailModal({
               variant="outline"
               disabled={isSending}
               onClick={onClose}
-              className="border-[var(--color-border)] text-white hover:bg-white/5"
+              className="border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSending}
-              className="bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center gap-2"
+              className="bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90 flex items-center gap-2"
             >
               {isSending ? (
                 <>

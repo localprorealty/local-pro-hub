@@ -157,7 +157,7 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
             <SidebarNavLink
               to="/listing/new"
               icon={<Plus className="size-4" />}
-              label="New Listing"
+              label="New Transaction"
               onClick={onNavigate}
             />
           ) : null}

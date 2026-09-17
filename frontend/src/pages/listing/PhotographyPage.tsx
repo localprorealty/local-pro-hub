@@ -315,8 +315,8 @@ function PhotographyContent() {
           }}
           className={`flex items-center gap-2 border-b-2 px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold transition-colors shrink-0 whitespace-nowrap ${
             activeTab === 'internal'
-              ? 'border-[#CFB87C] text-[#CFB87C]'
-              : 'border-transparent text-[var(--color-text-secondary)] hover:text-white'
+              ? 'border-[var(--color-gold)] text-[var(--color-gold)]'
+              : 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
           }`}
         >
           <Camera className="h-4 w-4 shrink-0" />
@@ -330,8 +330,8 @@ function PhotographyContent() {
           }}
           className={`flex items-center gap-2 border-b-2 px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold transition-colors shrink-0 whitespace-nowrap ${
             activeTab === 'vendor'
-              ? 'border-[#CFB87C] text-[#CFB87C]'
-              : 'border-transparent text-[var(--color-text-secondary)] hover:text-white'
+              ? 'border-[var(--color-gold)] text-[var(--color-gold)]'
+              : 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
           }`}
         >
           <Building2 className="h-4 w-4 shrink-0" />
@@ -360,27 +360,24 @@ function PhotographyContent() {
                 setSelectedDate(null)
                 setSelectedTime(null)
               }}
-              preferredTier={preferredTier}
-              isSkipping={isSkipping}
-              onSkip={handleSkip}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              selectedTime={selectedTime}
+              onSelectTime={setSelectedTime}
               weekStart={weekStart}
               onWeekChange={setWeekStart}
               blockedDates={blockedSet}
               bookedDates={bookedDateSet}
               bookedTimesForDay={bookedTimesForDay}
-              selectedDate={selectedDate}
-              onSelectDate={(iso) => {
-                setSelectedDate(iso)
-                setSelectedTime(null)
-              }}
-              selectedTime={selectedTime}
-              onSelectTime={setSelectedTime}
               isLoadingAvailability={isLoadingAvailability}
               accessNotes={accessNotes}
               onChangeAccessNotes={setAccessNotes}
-              isBooking={isBooking}
               onConfirm={handleConfirm}
-              listingAddress={listing.address_full ?? 'Unnamed listing'}
+              onSkip={handleSkip}
+              isBooking={isBooking}
+              isSkipping={isSkipping}
+              preferredTier={preferredTier}
+              listingAddress={listing.address_full ?? 'Address not set'}
             />
           </div>
 
@@ -388,7 +385,7 @@ function PhotographyContent() {
           <div className="hidden lg:grid gap-8 lg:grid-cols-[380px_1fr]">
           <div className="space-y-6">
             <section>
-              <p className="mb-3 text-[10px] tracking-widest text-[#CFB87C] uppercase">
+              <p className="mb-3 text-[10px] tracking-widest text-[var(--color-gold)] uppercase">
                 Photographer
               </p>
               <div className="space-y-3">
@@ -408,14 +405,14 @@ function PhotographyContent() {
                           setSelectedDate(null)
                           setSelectedTime(null)
                         }}
-                        className={`w-full rounded-sm border bg-[#1a1a1a] p-4 text-left transition-colors ${
+                        className={`w-full rounded-sm border bg-[var(--color-surface)] p-4 text-left transition-colors ${
                           selected
-                            ? 'border-[#CFB87C]'
-                            : 'border-[var(--color-border)] hover:border-[#CFB87C]/50'
+                            ? 'border-[var(--color-gold)] ring-1 ring-[var(--color-gold)]'
+                            : 'border-[var(--color-border)] hover:border-[var(--color-gold)]/50'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-semibold text-white">{photographer.full_name}</p>
+                          <p className="font-semibold text-[var(--color-text)]">{photographer.full_name}</p>
                           <span
                             className={`rounded-sm px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase ${tierBadgeClass(photographer.photographer_tier)}`}
                           >
@@ -427,7 +424,7 @@ function PhotographyContent() {
                             {photographer.phone}
                           </p>
                         ) : null}
-                        <p className="mt-3 text-xs font-bold tracking-widest text-[#CFB87C] uppercase">
+                        <p className="mt-3 text-xs font-bold tracking-widest text-[var(--color-gold)] uppercase">
                           {selected ? 'Selected' : 'Select'}
                         </p>
                       </button>
@@ -442,7 +439,7 @@ function PhotographyContent() {
                   className="w-full rounded-sm border border-dashed border-[var(--color-border)] hover:border-red-500/40 bg-red-950/5 hover:bg-red-950/10 p-4 text-left transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-white">Skip Photography</p>
+                    <p className="font-semibold text-[var(--color-text)]">Skip Photography</p>
                     <span className="rounded-sm bg-red-900/25 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
                       Skip Flow
                     </span>
@@ -494,7 +491,7 @@ function PhotographyContent() {
 
                   {selectedDate ? (
                     <div className="mt-4">
-                      <p className="mb-2 text-[10px] tracking-widest text-[#CFB87C] uppercase">
+                      <p className="mb-2 text-[10px] tracking-widest text-[var(--color-gold)] uppercase">
                         Time
                       </p>
                       <div className="grid grid-cols-2 gap-2">
@@ -509,10 +506,10 @@ function PhotographyContent() {
                               onClick={() => setSelectedTime(slot)}
                               className={`rounded-sm border px-3 py-2 text-sm ${
                                 taken
-                                  ? 'cursor-not-allowed border-[var(--color-border)] bg-[#141414] text-[#555555]'
+                                  ? 'cursor-not-allowed border-[var(--color-border)]/50 bg-[var(--color-surface-3)]/40 text-[var(--color-text-secondary)] opacity-40 line-through'
                                   : active
-                                    ? 'border-[#CFB87C] bg-[#CFB87C]/15 text-white'
-                                    : 'border-[var(--color-border)] bg-[#1a1a1a] text-white hover:border-[#CFB87C]/50'
+                                    ? 'border-[var(--color-gold)] bg-[var(--color-gold)] text-black font-semibold ring-2 ring-[var(--color-gold)]/40 shadow-sm'
+                                    : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:border-[var(--color-gold)]/50'
                               }`}
                             >
                               {formatShootTime(slot)}
@@ -527,8 +524,8 @@ function PhotographyContent() {
             </AnimatePresence>
           </div>
 
-          <aside className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-6">
-            <h2 className="font-[family-name:var(--font-display)] text-lg text-white">
+          <aside className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+            <h2 className="font-[family-name:var(--font-display)] text-lg text-[var(--color-text)] font-semibold">
               Booking Summary
             </h2>
 
@@ -537,7 +534,7 @@ function PhotographyContent() {
                 <div className="flex items-center justify-between gap-3 border-b border-[var(--color-border)] pb-4">
                   <div>
                     <p className="text-[var(--color-text-secondary)]">Photographer</p>
-                    <p className="font-semibold text-white">{selectedPhotographer.full_name}</p>
+                    <p className="font-semibold text-[var(--color-text)]">{selectedPhotographer.full_name}</p>
                   </div>
                   <span
                     className={`rounded-sm px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase ${tierBadgeClass(selectedPhotographer.photographer_tier)}`}
@@ -547,15 +544,15 @@ function PhotographyContent() {
                 </div>
                 <div>
                   <p className="text-[var(--color-text-secondary)]">Date</p>
-                  <p className="text-white">{formatShootDate(selectedDate)}</p>
+                  <p className="text-[var(--color-text)]">{formatShootDate(selectedDate)}</p>
                 </div>
                 <div>
                   <p className="text-[var(--color-text-secondary)]">Time</p>
-                  <p className="text-white">{formatShootTime(selectedTime)}</p>
+                  <p className="text-[var(--color-gold)] font-medium">{formatShootTime(selectedTime)}</p>
                 </div>
                 <div>
                   <p className="text-[var(--color-text-secondary)]">Property</p>
-                  <p className="text-white">{listing.address_full ?? 'Address not set'}</p>
+                  <p className="text-[var(--color-text)]">{listing.address_full ?? 'Address not set'}</p>
                 </div>
 
                 <div className="pt-2">
@@ -570,7 +567,7 @@ function PhotographyContent() {
                     value={accessNotes}
                     onChange={(event) => setAccessNotes(event.target.value)}
                     placeholder="Gate code, key location, dog..."
-                    className="mt-2 min-h-24 w-full rounded-sm border border-[var(--color-border)] bg-[#0a0a0a] px-3 py-2 text-sm text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
+                    className="mt-2 min-h-24 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-sm text-[var(--color-text)] focus:outline focus:outline-1 focus:outline-[var(--color-gold)]"
                   />
                 </div>
 
@@ -578,7 +575,7 @@ function PhotographyContent() {
                   type="button"
                   disabled={isBooking}
                   onClick={() => void handleConfirm()}
-                  className="h-11 w-full rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+                  className="h-11 w-full rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
                 >
                   {isBooking ? (
                     <>
@@ -609,9 +606,9 @@ function PhotographyContent() {
           <div className="lg:hidden space-y-5">
             {vendors.length === 0 ? (
               <div className="space-y-4">
-                <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[#161616] p-6 text-center space-y-3">
-                  <Building2 className="mx-auto h-8 w-8 text-[#CFB87C]/70" />
-                  <h4 className="text-sm font-semibold text-white">No External Vendors Saved</h4>
+                <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center space-y-3">
+                  <Building2 className="mx-auto h-8 w-8 text-[var(--color-gold)]/70" />
+                  <h4 className="text-sm font-semibold text-[var(--color-text)]">No External Vendors Saved</h4>
                   <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
                     Add your preferred photographer or media vendor to place orders directly or
                     send order request emails with a single click.
@@ -619,7 +616,7 @@ function PhotographyContent() {
                   <Button
                     asChild
                     size="sm"
-                    className="mt-2 bg-[#CFB87C] text-black font-semibold hover:bg-[#dcc487]"
+                    className="mt-2 bg-[var(--color-gold)] text-black font-semibold hover:bg-[var(--color-gold)]/90"
                   >
                     <Link to="/profile">Add Vendor in Profile Settings →</Link>
                   </Button>
@@ -632,7 +629,7 @@ function PhotographyContent() {
                   className="w-full rounded-sm border border-dashed border-red-500/30 hover:border-red-500/50 bg-red-950/10 hover:bg-red-950/20 p-4 text-left transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-white">Skip Photography</p>
+                    <p className="font-semibold text-[var(--color-text)]">Skip Photography</p>
                     <span className="rounded-sm bg-red-900/30 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
                       Bypass Stage
                     </span>
@@ -651,12 +648,12 @@ function PhotographyContent() {
                 {vendors.length > 1 && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                      <p className="text-[10px] tracking-widest text-[var(--color-gold)] uppercase font-semibold">
                         Select Vendor
                       </p>
                       <Link
                         to="/profile"
-                        className="text-xs text-[#CFB87C] hover:underline flex items-center gap-1"
+                        className="text-xs text-[var(--color-gold)] hover:underline flex items-center gap-1"
                       >
                         <Plus className="h-3 w-3" />
                         Manage in Profile
@@ -673,13 +670,13 @@ function PhotographyContent() {
                             className={cn(
                               'px-3 py-2 rounded-sm text-xs font-medium shrink-0 border transition-all flex items-center gap-1.5',
                               isSelected
-                                ? 'border-[#CFB87C] bg-[#CFB87C]/15 text-white font-semibold'
-                                : 'border-[var(--color-border)] bg-[#1a1a1a] text-[var(--color-text-secondary)] hover:text-white',
+                                ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/15 text-[var(--color-text)] font-semibold'
+                                : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
                             )}
                           >
                             <span>{vendor.name}</span>
                             {vendor.is_default && (
-                              <span className="text-[9px] uppercase font-bold text-[#CFB87C]">
+                              <span className="text-[9px] uppercase font-bold text-[var(--color-gold)]">
                                 (Default)
                               </span>
                             )}
@@ -693,23 +690,23 @@ function PhotographyContent() {
                 {/* Selected Vendor Overview Card */}
                 {selectedVendor && (
                   <div className="space-y-4">
-                    <div className="rounded-sm border border-[var(--color-border)] bg-[#141414] p-4 space-y-2">
+                    <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-white text-base">{selectedVendor.name}</h3>
+                        <h3 className="font-semibold text-[var(--color-text)] text-base">{selectedVendor.name}</h3>
                         {selectedVendor.is_default && (
-                          <span className="text-[10px] uppercase font-bold tracking-wider text-[#CFB87C]">
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-gold)]">
                             Preferred Vendor
                           </span>
                         )}
                       </div>
                       {selectedVendor.website_url && (
                         <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
-                          <Globe className="h-3.5 w-3.5 text-[#CFB87C] shrink-0" />
+                          <Globe className="h-3.5 w-3.5 text-[var(--color-gold)] shrink-0" />
                           <a
                             href={selectedVendor.website_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:underline text-white truncate"
+                            className="hover:underline text-[var(--color-text)] truncate"
                           >
                             {selectedVendor.website_url}
                           </a>
@@ -735,8 +732,8 @@ function PhotographyContent() {
                     </div>
 
                     {/* Step 1: Order actions */}
-                    <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3">
-                      <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                    <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-3">
+                      <p className="text-[10px] tracking-widest text-[var(--color-gold)] uppercase font-semibold">
                         Step 1 — Place Your Order
                       </p>
 
@@ -750,9 +747,9 @@ function PhotographyContent() {
                               window.open(selectedVendor.website_url, '_blank', 'noopener,noreferrer')
                             }
                           }}
-                          className="h-11 w-full border-[var(--color-border)] text-white hover:bg-white/5 flex items-center justify-center gap-2"
+                          className="h-11 w-full border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)] flex items-center justify-center gap-2"
                         >
-                          <Globe className="h-4 w-4 text-[#CFB87C]" />
+                          <Globe className="h-4 w-4 text-[var(--color-gold)]" />
                           <span>Open Online Ordering Portal</span>
                           <ExternalLink className="h-3.5 w-3.5 ml-1 opacity-70" />
                         </Button>
@@ -760,7 +757,7 @@ function PhotographyContent() {
                         <Button
                           type="button"
                           onClick={() => setIsOrderModalOpen(true)}
-                          className="h-11 w-full bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2"
+                          className="h-11 w-full bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90 flex items-center justify-center gap-2"
                         >
                           <Mail className="h-4 w-4" />
                           <span>Send Direct Order Email...</span>
@@ -769,18 +766,18 @@ function PhotographyContent() {
                     </div>
 
                     {/* Step 2: Confirmation & Advance Stage */}
-                    <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4 space-y-3">
-                      <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                    <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-3">
+                      <p className="text-[10px] tracking-widest text-[var(--color-gold)] uppercase font-semibold">
                         Step 2 — Advance Listing
                       </p>
                       <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                        Once you have placed the order with {selectedVendor.name}, mark photography ordered to advance this listing to <strong className="text-white">Shoot Booked</strong>.
+                        Once you have placed the order with {selectedVendor.name}, mark photography ordered to advance this listing to <strong className="text-[var(--color-text)]">Shoot Booked</strong>.
                       </p>
                       <Button
                         type="button"
                         disabled={isMarkingOrdered}
                         onClick={() => void handleMarkVendorOrdered()}
-                        className="w-full h-11 bg-white/10 hover:bg-white/15 text-white font-semibold flex items-center justify-center gap-2"
+                        className="w-full h-11 bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/25 text-[var(--color-text)] font-semibold flex items-center justify-center gap-2"
                       >
                         {isMarkingOrdered ? (
                           <>
@@ -802,7 +799,7 @@ function PhotographyContent() {
                         className="w-full rounded-sm border border-dashed border-red-500/30 hover:border-red-500/50 bg-red-950/10 hover:bg-red-950/20 p-4 text-left transition-colors"
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-semibold text-white">Skip Photography</p>
+                          <p className="font-semibold text-[var(--color-text)]">Skip Photography</p>
                           <span className="rounded-sm bg-red-900/30 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
                             Bypass Stage
                           </span>
@@ -826,12 +823,12 @@ function PhotographyContent() {
           <div className="space-y-6">
             <section>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase">
+                <p className="text-[10px] tracking-widest text-[var(--color-gold)] uppercase">
                   Your Preferred Vendors
                 </p>
                 <Link
                   to="/profile"
-                  className="text-xs text-[#CFB87C] hover:underline flex items-center gap-1"
+                  className="text-xs text-[var(--color-gold)] hover:underline flex items-center gap-1"
                 >
                   <Plus className="h-3 w-3" />
                   Manage in Profile
@@ -839,9 +836,9 @@ function PhotographyContent() {
               </div>
 
               {vendors.length === 0 ? (
-                <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[#161616] p-6 text-center space-y-3">
-                  <Building2 className="mx-auto h-8 w-8 text-[#CFB87C]/70" />
-                  <h4 className="text-sm font-semibold text-white">No External Vendors Saved</h4>
+                <div className="rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center space-y-3">
+                  <Building2 className="mx-auto h-8 w-8 text-[var(--color-gold)]/70" />
+                  <h4 className="text-sm font-semibold text-[var(--color-text)]">No External Vendors Saved</h4>
                   <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
                     Add your preferred photographer or media vendor to place orders directly or
                     send order request emails with a single click.
@@ -849,7 +846,7 @@ function PhotographyContent() {
                   <Button
                     asChild
                     size="sm"
-                    className="mt-2 bg-[#CFB87C] text-black font-semibold hover:bg-[#dcc487]"
+                    className="mt-2 bg-[var(--color-gold)] text-black font-semibold hover:bg-[var(--color-gold)]/90"
                   >
                     <Link to="/profile">Add Vendor in Profile Settings →</Link>
                   </Button>
@@ -863,23 +860,23 @@ function PhotographyContent() {
                         key={vendor.id}
                         type="button"
                         onClick={() => setSelectedVendor(vendor)}
-                        className={`w-full rounded-sm border bg-[#1a1a1a] p-4 text-left transition-colors ${
+                        className={`w-full rounded-sm border bg-[var(--color-surface)] p-4 text-left transition-colors ${
                           selected
-                            ? 'border-[#CFB87C]'
-                            : 'border-[var(--color-border)] hover:border-[#CFB87C]/50'
+                            ? 'border-[var(--color-gold)] ring-1 ring-[var(--color-gold)]'
+                            : 'border-[var(--color-border)] hover:border-[var(--color-gold)]/50'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-semibold text-white">{vendor.name}</p>
+                          <p className="font-semibold text-[var(--color-text)]">{vendor.name}</p>
                           {vendor.is_default && (
-                            <span className="rounded-sm bg-[#CFB87C]/15 px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#CFB87C] uppercase">
+                            <span className="rounded-sm bg-[var(--color-gold)]/15 px-2 py-0.5 text-[10px] font-bold tracking-widest text-[var(--color-gold)] uppercase">
                               Default
                             </span>
                           )}
                         </div>
                         {vendor.website_url && (
                           <p className="mt-1 text-xs text-[var(--color-text-secondary)] truncate flex items-center gap-1">
-                            <Globe className="h-3 w-3 shrink-0 text-[#CFB87C]" />
+                            <Globe className="h-3 w-3 shrink-0 text-[var(--color-gold)]" />
                             {vendor.website_url.replace(/^https?:\/\//, '')}
                           </p>
                         )}
@@ -889,7 +886,7 @@ function PhotographyContent() {
                             {vendor.email}
                           </p>
                         )}
-                        <p className="mt-3 text-xs font-bold tracking-widest text-[#CFB87C] uppercase">
+                        <p className="mt-3 text-xs font-bold tracking-widest text-[var(--color-gold)] uppercase">
                           {selected ? 'Selected' : 'Select'}
                         </p>
                       </button>
@@ -906,7 +903,7 @@ function PhotographyContent() {
                   className="w-full rounded-sm border border-dashed border-[var(--color-border)] hover:border-red-500/40 bg-red-950/5 hover:bg-red-950/10 p-4 text-left transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-white">Skip Photography</p>
+                    <p className="font-semibold text-[var(--color-text)]">Skip Photography</p>
                     <span className="rounded-sm bg-red-900/25 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-red-200">
                       Skip Flow
                     </span>
@@ -922,9 +919,9 @@ function PhotographyContent() {
             </section>
           </div>
 
-          <aside className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-6 space-y-6">
+          <aside className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-6">
             <div>
-              <h2 className="font-[family-name:var(--font-display)] text-lg text-white">
+              <h2 className="font-[family-name:var(--font-display)] text-lg text-[var(--color-text)] font-semibold">
                 External Vendor Ordering
               </h2>
               <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
@@ -935,23 +932,23 @@ function PhotographyContent() {
             {selectedVendor ? (
               <div className="space-y-6">
                 {/* Vendor Overview Card */}
-                <div className="rounded-sm border border-[var(--color-border)] bg-[#141414] p-4 space-y-2">
+                <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-white text-base">{selectedVendor.name}</h3>
+                    <h3 className="font-semibold text-[var(--color-text)] text-base">{selectedVendor.name}</h3>
                     {selectedVendor.is_default && (
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-[#CFB87C]">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-gold)]">
                         Preferred Vendor
                       </span>
                     )}
                   </div>
                   {selectedVendor.website_url && (
                     <p className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
-                      <Globe className="h-3.5 w-3.5 text-[#CFB87C] shrink-0" />
+                      <Globe className="h-3.5 w-3.5 text-[var(--color-gold)] shrink-0" />
                       <a
                         href={selectedVendor.website_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:underline text-white truncate"
+                        className="hover:underline text-[var(--color-text)] truncate"
                       >
                         {selectedVendor.website_url}
                       </a>
@@ -978,16 +975,16 @@ function PhotographyContent() {
 
                 {/* Step 1: Order actions */}
                 <div className="space-y-3">
-                  <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                  <p className="text-[10px] tracking-widest text-[var(--color-gold)] uppercase font-semibold">
                     Step 1 — Place Your Order
                   </p>
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     {/* Website Portal Button */}
-                    <div className="flex flex-col justify-between rounded-sm border border-[var(--color-border)] bg-[#111111] p-4 space-y-3">
+                    <div className="flex flex-col justify-between rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 space-y-3">
                       <div>
-                        <div className="flex items-center gap-2 font-medium text-white text-sm">
-                          <Globe className="h-4 w-4 text-[#CFB87C]" />
+                        <div className="flex items-center gap-2 font-medium text-[var(--color-text)] text-sm">
+                          <Globe className="h-4 w-4 text-[var(--color-gold)]" />
                           Online Ordering Portal
                         </div>
                         <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
@@ -1003,7 +1000,7 @@ function PhotographyContent() {
                             window.open(selectedVendor.website_url, '_blank', 'noopener,noreferrer')
                           }
                         }}
-                        className="w-full border-[var(--color-border)] text-white hover:bg-white/5 flex items-center justify-center gap-2"
+                        className="w-full border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)] flex items-center justify-center gap-2"
                       >
                         <span>Open Ordering Site</span>
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -1011,10 +1008,10 @@ function PhotographyContent() {
                     </div>
 
                     {/* Send Order Email Button */}
-                    <div className="flex flex-col justify-between rounded-sm border border-[var(--color-border)] bg-[#111111] p-4 space-y-3">
+                    <div className="flex flex-col justify-between rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 space-y-3">
                       <div>
-                        <div className="flex items-center gap-2 font-medium text-white text-sm">
-                          <Mail className="h-4 w-4 text-[#CFB87C]" />
+                        <div className="flex items-center gap-2 font-medium text-[var(--color-text)] text-sm">
+                          <Mail className="h-4 w-4 text-[var(--color-gold)]" />
                           Direct Order Email
                         </div>
                         <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
@@ -1024,7 +1021,7 @@ function PhotographyContent() {
                       <Button
                         type="button"
                         onClick={() => setIsOrderModalOpen(true)}
-                        className="w-full bg-[#CFB87C] font-semibold text-black hover:bg-[#dcc487] flex items-center justify-center gap-2"
+                        className="w-full bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90 flex items-center justify-center gap-2"
                       >
                         <Send className="h-3.5 w-3.5" />
                         <span>Send Order Email...</span>
@@ -1034,18 +1031,18 @@ function PhotographyContent() {
                 </div>
 
                 {/* Step 2: Confirmation & Advance Stage */}
-                <div className="rounded-sm border border-[var(--color-border)] bg-[#111111] p-4 space-y-3">
-                  <p className="text-[10px] tracking-widest text-[#CFB87C] uppercase font-semibold">
+                <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 space-y-3">
+                  <p className="text-[10px] tracking-widest text-[var(--color-gold)] uppercase font-semibold">
                     Step 2 — Advance Listing
                   </p>
                   <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                    If you placed the order on the vendor&apos;s site directly, mark photography ordered below to advance this listing to <strong className="text-white">Shoot Booked</strong>.
+                    If you placed the order on the vendor&apos;s site directly, mark photography ordered below to advance this listing to <strong className="text-[var(--color-text)]">Shoot Booked</strong>.
                   </p>
                   <Button
                     type="button"
                     disabled={isMarkingOrdered}
                     onClick={() => void handleMarkVendorOrdered()}
-                    className="w-full h-11 bg-white/10 hover:bg-white/15 text-white font-semibold flex items-center justify-center gap-2"
+                    className="w-full h-11 bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/25 text-[var(--color-text)] font-semibold flex items-center justify-center gap-2"
                   >
                     {isMarkingOrdered ? (
                       <>

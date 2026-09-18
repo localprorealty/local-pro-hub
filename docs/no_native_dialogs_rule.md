@@ -95,3 +95,9 @@ For general background notifications, copy-to-clipboard alerts, or transient con
 ## Rationale
 1. **Universal Mobile & PWA Experience**: Native browser dialogs (`window.alert` / `window.confirm`) block the JavaScript main thread, break full-screen PWA shells, look inconsistent across Android/iOS/Desktop browsers, and violate LocalPRO's premium dark-theme design system.
 2. **Accessibility & Predictability**: Custom Radix-based accessible dialogs retain focus trapping, support Esc key dismissal, preserve ARIA attributes, and render within the application's visual hierarchy.
+
+---
+
+## Related Standing Rules
+- `docs/no_self_browser_verification_rule.md`: **Ban on Agent Self-Testing via Browser Automation**. Never open the browser, launch Playwright, use `browser_subagent`, or run interactive/headless browser sessions for visual verification. Always stop and request screenshots from Adarsh.
+- `docs/ai_text_template_rule.md`: **Ban on Raw Character-Index Text Slicing** in fixed-size visual containers.

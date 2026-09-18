@@ -190,13 +190,13 @@ function GoLiveContent() {
               <span>Step 11 of 11</span>
               <span>100% complete</span>
             </div>
-            <div className="h-1 overflow-hidden rounded-full bg-[#2a2a2a]">
-              <div className="h-full w-full rounded-full bg-[#CFB87C]" />
+            <div className="h-1 overflow-hidden rounded-full bg-[var(--color-surface-2)]">
+              <div className="h-full w-full rounded-full bg-[var(--color-gold)]" />
             </div>
           </div>
 
-          <div className="rounded-md border border-emerald-500/30 bg-emerald-600 px-6 py-4 text-center">
-            <p className="font-[family-name:var(--font-display)] text-lg font-semibold text-white">
+          <div className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-6 py-4 text-center">
+            <p className="font-[family-name:var(--font-display)] text-lg font-semibold text-emerald-800 dark:text-emerald-300">
               Ready to go live
             </p>
           </div>
@@ -205,7 +205,7 @@ function GoLiveContent() {
             {MILESTONES.map((label) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-300"
+                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300"
               >
                 <Check className="size-3.5" aria-hidden />
                 {label}
@@ -214,8 +214,8 @@ function GoLiveContent() {
           </div>
 
           {listing.brokermint_transaction_id ? (
-            <div className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-5 space-y-3">
-              <h5 className="text-xs tracking-wider text-white uppercase font-semibold">Linked BrokerMint Transaction</h5>
+            <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-3 shadow-sm">
+              <h5 className="text-xs tracking-wider text-[var(--color-text)] uppercase font-semibold">Linked BrokerMint Transaction</h5>
               <p className="text-xs text-[var(--color-text-secondary)]">
                 Access transaction checklists, documents, and participant roles.
               </p>
@@ -224,19 +224,19 @@ function GoLiveContent() {
                   href={`https://my.brokermint.com/#/transactions/${listing.brokermint_transaction_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[#111111] border border-[#2a2a2a] text-xs font-semibold text-[#CFB87C] hover:bg-[#2a2a2a] transition-colors"
+                  className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-gold)] hover:bg-[var(--color-surface-3)] transition-colors"
                 >
                   Open BrokerMint Transaction ↗
                 </a>
                 <span className="text-xs text-[var(--color-text-secondary)]">
-                  (ID: <strong className="text-white font-mono">{listing.brokermint_transaction_id}</strong>)
+                  (ID: <strong className="text-[var(--color-text)] font-mono">{listing.brokermint_transaction_id}</strong>)
                 </span>
               </div>
             </div>
           ) : null}
 
-          <div className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-5 space-y-3">
-            <h5 className="text-xs tracking-wider text-white uppercase font-semibold">LocalPRO Listing Credentials</h5>
+          <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-3 shadow-sm">
+            <h5 className="text-xs tracking-wider text-[var(--color-text)] uppercase font-semibold">LocalPRO Listing Credentials</h5>
             <p className="text-xs text-[var(--color-text-secondary)]">
               Copy your LocalPRO Listing ID to load it inside the Chrome Extension helper.
             </p>
@@ -244,17 +244,17 @@ function GoLiveContent() {
               <button
                 type="button"
                 onClick={() => void handleCopyListingId()}
-                className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[#111111] border border-[#2a2a2a] text-xs font-semibold text-[#CFB87C] hover:bg-[#2a2a2a] transition-colors"
+                className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-gold)] hover:bg-[var(--color-surface-3)] transition-colors"
               >
                 {copiedListingId ? 'Copied!' : 'Copy Listing ID'}
               </button>
               <span className="text-xs text-[var(--color-text-secondary)]">
-                (ID: <strong className="text-white font-mono">{id}</strong>)
+                (ID: <strong className="text-[var(--color-text)] font-mono">{id}</strong>)
               </span>
             </div>
           </div>
 
-          <section className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-5">
+          <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm">
             <div className="flex items-center justify-between gap-3 border-b border-[var(--color-border)] pb-3">
               <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--color-text-secondary)] uppercase">
                 Listing description
@@ -264,7 +264,7 @@ function GoLiveContent() {
                   type="button"
                   disabled={isGenerating}
                   onClick={() => void handleGenerate()}
-                  className="inline-flex items-center gap-1.5 text-xs text-[#CFB87C] hover:underline disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 text-xs text-[var(--color-gold)] hover:underline disabled:opacity-50"
                 >
                   <RefreshCw className={`size-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
                   Regenerate
@@ -272,7 +272,7 @@ function GoLiveContent() {
                 <button
                   type="button"
                   onClick={() => void handleCopy()}
-                  className="inline-flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)] hover:text-white"
+                  className="inline-flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                 >
                   <Copy className="size-3.5" />
                   {copied ? 'Copied' : 'Copy'}
@@ -287,7 +287,7 @@ function GoLiveContent() {
                 setSkipOwnDescription(false)
               }}
               placeholder="Generate or paste your MLS-ready property description."
-              className="mt-4 min-h-44 w-full resize-y rounded-sm border-0 bg-transparent text-sm leading-relaxed text-white focus:outline-none"
+              className="mt-4 min-h-44 w-full resize-y rounded-sm border-0 bg-transparent text-sm leading-relaxed text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:outline-none"
             />
             <p className="mt-2 text-right text-xs text-[var(--color-text-secondary)]">
               {charCount} / {DESCRIPTION_LIMIT}
@@ -306,7 +306,7 @@ function GoLiveContent() {
                     )
                   }
                 }}
-                className="mt-2 text-xs text-[var(--color-text-secondary)] underline hover:text-[#CFB87C]"
+                className="mt-2 text-xs text-[var(--color-text-secondary)] underline hover:text-[var(--color-gold)]"
               >
                 Skip — use my own description
               </button>
@@ -325,7 +325,7 @@ function GoLiveContent() {
               type="date"
               value={goLiveDate}
               onChange={(event) => setGoLiveDate(event.target.value)}
-              className="mt-3 block w-full rounded-md border border-[var(--color-border)] bg-[#1a1a1a] px-4 py-3 text-center text-white focus:outline focus:outline-2 focus:outline-[#CFB87C]"
+              className="mt-3 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-center text-[var(--color-text)] shadow-sm focus:outline focus:outline-2 focus:outline-[var(--color-gold)]"
             />
           </div>
 
@@ -333,7 +333,7 @@ function GoLiveContent() {
             type="button"
             disabled={!canGoLive || isGoingLive}
             onClick={() => setShowConfirmDialog(true)}
-            className="h-14 w-full rounded-sm bg-[#CFB87C] text-base font-bold tracking-wide text-[#0a0a0a] uppercase hover:bg-[#dcc487] disabled:opacity-50"
+            className="h-14 w-full rounded-sm bg-[var(--color-gold)] text-base font-bold tracking-wide text-black uppercase hover:bg-[var(--color-gold)]/90 disabled:opacity-50"
           >
             {isGoingLive ? (
               <>
@@ -360,7 +360,7 @@ function GoLiveContent() {
                     setShowConfirmDialog(false)
                     void handleGoLive()
                   }}
-                  className="bg-[#CFB87C] text-[#0a0a0a] hover:bg-[#dcc487]"
+                  className="bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
                 >
                   Yes, Mark as Live
                 </AlertDialogAction>
@@ -369,7 +369,7 @@ function GoLiveContent() {
           </AlertDialog>
 
           {actionError ? (
-            <p className="text-center text-sm text-red-300" role="alert">
+            <p className="text-center text-sm text-red-600 dark:text-red-300" role="alert">
               {actionError}
             </p>
           ) : null}

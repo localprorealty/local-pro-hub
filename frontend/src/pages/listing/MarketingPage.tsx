@@ -104,6 +104,13 @@ function MarketingContent() {
     const updatedStatuses = await addMarketingAsset(id, asset.id, asset.name, asset.priceCents)
     if (updatedStatuses) {
       setStatuses(updatedStatuses as Record<string, MarketingAssetStatus>)
+      const newSelected = new Set<string>()
+      for (const [aId, status] of Object.entries(updatedStatuses)) {
+        if (status === 'in_progress' || status === 'done') {
+          newSelected.add(aId)
+        }
+      }
+      setSelected(newSelected)
     } else {
       // Rollback on failure
       setStatuses((prev) => {
@@ -137,6 +144,13 @@ function MarketingContent() {
     const updatedStatuses = await removeMarketingAsset(id, assetId)
     if (updatedStatuses) {
       setStatuses(updatedStatuses as Record<string, MarketingAssetStatus>)
+      const newSelected = new Set<string>()
+      for (const [aId, status] of Object.entries(updatedStatuses)) {
+        if (status === 'in_progress' || status === 'done') {
+          newSelected.add(aId)
+        }
+      }
+      setSelected(newSelected)
     } else {
       // Rollback on failure
       setStatuses((prev) => ({ ...prev, [assetId]: 'in_progress' }))
@@ -192,8 +206,8 @@ function MarketingContent() {
         <PipelineDotNav activeIndex={0} />
 
         <div className="space-y-6">
-          <section className="rounded-md border border-[#CFB87C]/40 bg-[#CFB87C]/10 p-5">
-            <h2 className="font-[family-name:var(--font-display)] text-lg text-white">
+          <section className="rounded-md border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/10 p-5">
+            <h2 className="font-[family-name:var(--font-display)] text-lg text-[var(--color-text)]">
               Auto-generate marketing assets
             </h2>
             <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
@@ -202,7 +216,7 @@ function MarketingContent() {
             </p>
             <Button
               asChild
-              className="mt-4 h-11 rounded-sm bg-[#CFB87C] font-semibold text-[#0a0a0a] hover:bg-[#dcc487]"
+              className="mt-4 h-11 rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
             >
               <Link to={getMarketingAssetsPath(id)}>Create marketing assets →</Link>
             </Button>
@@ -216,22 +230,24 @@ function MarketingContent() {
             return (
               <article
                 key={asset.id}
-                className={`rounded-md border bg-[#1a1a1a] p-5 transition-colors ${
-                  isSelected ? 'border-[#CFB87C]/60' : 'border-[var(--color-border)]'
+                className={`rounded-md border bg-[var(--color-surface)] p-5 transition-all ${
+                  isSelected ? 'border-[var(--color-gold)] shadow-[0_0_15px_rgba(207,184,124,0.08)]' : 'border-[var(--color-border)] hover:border-[var(--color-gold)]/40'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-[10px] font-semibold tracking-[0.15em] text-[var(--color-text-secondary)] uppercase">
                     {asset.name}
                   </p>
-                  <span className="rounded-sm bg-[#2a2a2a] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#CFB87C] uppercase">
+                  <span className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[var(--color-gold)] uppercase">
                     {asset.priceLabel}
                   </span>
                 </div>
 
                 <div className="mt-6 flex justify-center">
-                  <div className="flex size-14 items-center justify-center rounded-full bg-[#CFB87C]/10">
-                    <Icon className="size-7 text-[#CFB87C]" aria-hidden />
+                  <div className={`flex size-14 items-center justify-center rounded-full transition-colors ${
+                    isSelected ? 'bg-[var(--color-gold)]/20' : 'bg-[var(--color-gold)]/10'
+                  }`}>
+                    <Icon className="size-7 text-[var(--color-gold)]" aria-hidden />
                   </div>
                 </div>
 
@@ -248,13 +264,20 @@ function MarketingContent() {
                   <button
                     type="button"
                     onClick={() => void handleToggleAsset(asset.id)}
-                    className={`text-[10px] tracking-widest uppercase font-semibold transition-colors duration-150 ${
+                    className={`group/btn rounded-sm px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase transition-colors ${
                       isSelected 
-                        ? 'text-[var(--color-gold)] hover:text-red-400' 
-                        : 'text-[var(--color-text-secondary)] hover:text-white'
+                        ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] hover:bg-red-500/15 hover:text-red-500' 
+                        : 'bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]'
                     }`}
                   >
-                    {isSelected ? 'Selected' : 'Add'}
+                    {isSelected ? (
+                      <>
+                        <span className="group-hover/btn:hidden">Selected</span>
+                        <span className="hidden group-hover/btn:inline">Remove</span>
+                      </>
+                    ) : (
+                      '+ Add'
+                    )}
                   </button>
                 </div>
               </article>
@@ -263,8 +286,8 @@ function MarketingContent() {
         </section>
         </div>
 
-        <aside className="h-fit rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-6">
-          <h2 className="text-[10px] font-semibold tracking-[0.2em] text-[#CFB87C] uppercase">
+        <aside className="h-fit rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
+          <h2 className="text-[10px] font-semibold tracking-[0.2em] text-[var(--color-gold)] uppercase">
             Marketing Summary
           </h2>
 
@@ -273,7 +296,7 @@ function MarketingContent() {
               <li className="text-sm text-[var(--color-text-secondary)]">No assets selected</li>
             ) : (
               selectedAssets.map((asset) => (
-                <li key={asset.id} className="flex items-center justify-between text-sm text-white">
+                <li key={asset.id} className="flex items-center justify-between text-sm text-[var(--color-text)]">
                   <span>{asset.name}</span>
                   <span className="text-[var(--color-text-secondary)]">
                     {`$${(asset.priceCents / 100).toFixed(2)}`}
@@ -290,7 +313,7 @@ function MarketingContent() {
                 <p className="text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
                   Total due
                 </p>
-                <p className="mt-1 font-[family-name:var(--font-display)] text-3xl text-white">
+                <p className="mt-1 font-[family-name:var(--font-display)] text-3xl text-[var(--color-text)]">
                   {`$${(totalCents / 100).toFixed(2)}`}
                 </p>
               </div>
@@ -301,7 +324,7 @@ function MarketingContent() {
             type="button"
             disabled={selectedAssets.length === 0 || isNotifying}
             onClick={() => void handleNotify()}
-            className="h-12 w-full rounded-sm bg-[#CFB87C] text-sm font-bold tracking-wide text-[#0a0a0a] uppercase hover:bg-[#dcc487] disabled:opacity-50"
+            className="h-12 w-full rounded-sm bg-[var(--color-gold)] text-sm font-bold tracking-wide text-black uppercase hover:bg-[var(--color-gold)]/90 disabled:opacity-50"
           >
             {isNotifying ? (
               <>
@@ -314,7 +337,7 @@ function MarketingContent() {
           </Button>
 
           {notifyMessage ? (
-            <p className="mt-4 text-sm text-emerald-400" role="status">
+            <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400" role="status">
               {notifyMessage}
             </p>
           ) : null}
@@ -323,7 +346,7 @@ function MarketingContent() {
             type="button"
             variant="outline"
             onClick={() => navigate(getMlsPath(id))}
-            className="mt-6 h-10 w-full rounded-sm border-[var(--color-border)] bg-transparent text-sm text-white hover:bg-[#1a1a1a]"
+            className="mt-6 h-10 w-full rounded-sm border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
           >
             Continue to MLS submission →
           </Button>

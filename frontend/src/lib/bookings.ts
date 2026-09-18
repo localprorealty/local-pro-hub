@@ -162,9 +162,9 @@ export function toIsoDate(date: Date): string {
 }
 
 export function tierBadgeClass(tier: PhotographerTier): string {
-  if (tier === 'elite') return 'bg-[#CFB87C] text-[#0a0a0a]'
-  if (tier === 'standard') return 'bg-[#3B8BD4] text-white'
-  return 'bg-[#555555] text-white'
+  if (tier === 'elite') return 'bg-[var(--color-gold)] text-black font-semibold'
+  if (tier === 'standard') return 'bg-sky-600 text-white font-semibold'
+  return 'bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] font-semibold'
 }
 
 export async function getPhotographers(tier?: string): Promise<Photographer[]> {

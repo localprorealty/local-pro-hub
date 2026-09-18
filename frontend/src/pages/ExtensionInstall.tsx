@@ -16,6 +16,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Button } from '@/components/ui/button'
 import type { Session } from '@supabase/supabase-js'
 import type { UserProfile } from '@/lib/auth'
+import { CHROME_WEBSTORE_URL } from '@/lib/constants'
 import lpMonogram from '@/assets/branding/LP_Gold.png'
 
 const ChromeIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -47,8 +48,8 @@ type ExtensionInstallPageProps = {
 }
 
 function ExtensionInstallContent() {
-  const webStoreUrl = (import.meta.env.VITE_CHROME_WEBSTORE_URL || '').trim()
-  const [showManualSteps, setShowManualSteps] = useState(!webStoreUrl)
+  const webStoreUrl = (import.meta.env.VITE_CHROME_WEBSTORE_URL || CHROME_WEBSTORE_URL).trim()
+  const [showManualSteps, setShowManualSteps] = useState(false)
 
   const handleDownloadZip = () => {
     window.location.href = '/extension.zip'
@@ -104,7 +105,7 @@ function ExtensionInstallContent() {
       icon: <CheckCircle className="size-5 text-[var(--color-success)]" />,
       title: 'Verify & Enable',
       description:
-        'Confirm that the "LocalPRO Hub Helper" card appears in your extensions list and is turned on. You can now use it on MLS Matrix!',
+        'Confirm that the "LocalPRO Hub Matrix Assistant" card appears in your extensions list and is turned on. You can now use it on MLS Matrix!',
     },
   ]
 
@@ -115,10 +116,10 @@ function ExtensionInstallContent() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-2">
             <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-white)]">
-              {webStoreUrl ? 'One-Click Installation' : 'Download LocalPRO Helper Extension'}
+              {webStoreUrl ? 'One-Click Installation' : 'Download LocalPRO Matrix Assistant Extension'}
             </h2>
             <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-              Automate your MLS Matrix inputs directly. The LocalPRO Helper Extension syncs your
+              Automate your MLS Matrix inputs directly. The LocalPRO Hub Matrix Assistant extension syncs your
               active listings and fills form fields with a single click.
             </p>
           </div>

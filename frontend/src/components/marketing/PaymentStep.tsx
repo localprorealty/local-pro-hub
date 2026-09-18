@@ -41,22 +41,22 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
 
   return (
     <div className="mx-auto max-w-lg">
-      <div className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-6 shadow-xl">
+      <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl">
         <div className="flex items-center justify-between">
-          <h2 className="font-[family-name:var(--font-display)] text-xl text-white">
+          <h2 className="font-[family-name:var(--font-display)] text-xl text-[var(--color-text)]">
             Marketing Package
           </h2>
-          <span className="flex items-center gap-1 text-xs text-[#CFB87C]">
+          <span className="flex items-center gap-1 text-xs text-[var(--color-gold)]">
             <Tag className="size-3.5" />
             Launch Special
           </span>
         </div>
 
         {/* Line Items */}
-        <ul className="mt-6 space-y-3 text-sm text-white">
+        <ul className="mt-6 space-y-3 text-sm text-[var(--color-text)]">
           {PACKAGE_ITEMS.map((item) => (
             <li key={item.id} className="flex items-center justify-between">
-              <span className="text-stone-200">{item.label}</span>
+              <span className="text-[var(--color-text-secondary)]">{item.label}</span>
               {promoApplied ? (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-stone-500 line-through">${item.price}</span>
@@ -65,7 +65,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
                   </span>
                 </div>
               ) : (
-                <span className="font-medium text-white">${item.price}</span>
+                <span className="font-medium text-[var(--color-text)]">${item.price}</span>
               )}
             </li>
           ))}
@@ -89,12 +89,12 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
                 if (promoError) setPromoError(null)
               }}
               placeholder="Enter promo code (e.g. ILoveLPR)"
-              className="flex-1 rounded-sm border border-[var(--color-border)] bg-[#0d0d0d] px-3 py-2 text-sm text-white placeholder:text-stone-500 focus:border-[#CFB87C] focus:outline-none"
+              className="flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:border-[var(--color-gold)] focus:outline-none"
             />
             <Button
               type="submit"
               variant="outline"
-              className="shrink-0 rounded-sm border-[#CFB87C]/60 bg-[#CFB87C]/10 text-xs font-bold tracking-wider text-[#CFB87C] hover:bg-[#CFB87C]/20"
+              className="shrink-0 rounded-sm border-[var(--color-gold)]/60 bg-[var(--color-gold)]/10 text-xs font-bold tracking-wider text-[var(--color-gold)] hover:bg-[var(--color-gold)]/20"
             >
               Apply
             </Button>
@@ -103,7 +103,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
           {promoError && <p className="mt-2 text-xs text-red-400">{promoError}</p>}
 
           {promoApplied && (
-            <div className="mt-3 flex items-center justify-between rounded-sm border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">
+            <div className="mt-3 flex items-center justify-between rounded-sm border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-300">
               <span className="flex items-center gap-1.5 font-medium">
                 <Check className="size-3.5 text-emerald-400" />
                 Promo <strong>ILoveLPR</strong> active ($30 value free)
@@ -114,7 +114,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
                   setPromoApplied(false)
                   setPromoInput('')
                 }}
-                className="text-[11px] text-stone-400 underline hover:text-white"
+                className="text-[11px] text-[var(--color-text-secondary)] underline hover:text-[var(--color-text)]"
               >
                 Remove
               </button>
@@ -123,9 +123,9 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
         </form>
 
         {/* Total Summary */}
-        <div className="mt-4 border-t border-[var(--color-border)] pt-4 text-white">
+        <div className="mt-4 border-t border-[var(--color-border)] pt-4 text-[var(--color-text)]">
           <div className="flex items-baseline justify-between">
-            <span className="font-semibold text-stone-200">Total</span>
+            <span className="font-semibold text-[var(--color-text)]">Total</span>
             {promoApplied ? (
               <div className="text-right">
                 <span className="mr-2 text-sm text-stone-500 line-through">${PACKAGE_TOTAL}</span>
@@ -134,7 +134,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
                 </span>
               </div>
             ) : (
-              <span className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+              <span className="font-[family-name:var(--font-display)] text-xl font-bold text-[var(--color-text)]">
                 ${PACKAGE_TOTAL}
               </span>
             )}
@@ -151,7 +151,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
           type="button"
           disabled={isProcessing}
           onClick={() => void handlePay()}
-          className="mt-6 h-12 w-full rounded-sm bg-[#CFB87C] text-base font-bold text-[#0a0a0a] hover:bg-[#dcc487]"
+          className="mt-6 h-12 w-full rounded-sm bg-[var(--color-gold)] text-base font-bold text-black hover:bg-[var(--color-gold)]/90"
         >
           {isProcessing ? (
             <>

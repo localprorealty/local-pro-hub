@@ -27,22 +27,22 @@ export function ListingIdBadge({ id, className, showLabel = true }: ListingIdBad
       title="Click to copy Listing ID"
       aria-label={`Copy listing ID ${id}`}
       className={cn(
-        'group inline-flex items-center gap-1.5 rounded border border-[#2a2a2a] bg-[#141414] px-2 py-0.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[#CFB87C]/50 hover:text-white',
+        'group inline-flex items-center gap-1.5 rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-0.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-gold-border)] hover:text-[var(--color-text)]',
         className,
       )}
     >
       {showLabel ? (
-        <span className="text-[10px] font-semibold tracking-wider text-[#888888] uppercase group-hover:text-[#CFB87C]">
+        <span className="text-[10px] font-semibold tracking-wider text-[var(--color-text-secondary)] uppercase group-hover:text-[var(--color-gold)]">
           ID:
         </span>
       ) : null}
-      <span className="max-w-[130px] truncate font-mono text-[11px] text-white sm:max-w-none sm:text-xs">
+      <span className="max-w-[130px] truncate font-mono text-[11px] text-[var(--color-text)] sm:max-w-none sm:text-xs">
         {id}
       </span>
       {copied ? (
-        <Check className="size-3 shrink-0 text-[#CFB87C]" />
+        <Check className="size-3 shrink-0 text-[var(--color-gold)]" />
       ) : (
-        <Copy className="size-3 shrink-0 text-[#666666] group-hover:text-white" />
+        <Copy className="size-3 shrink-0 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text)]" />
       )}
     </button>
   )

@@ -20,7 +20,7 @@ type ReviewSectionProps = {
 function StatusIcon({ status }: { status: 'complete' | 'partial' | 'empty' }) {
   if (status === 'complete') return <CheckCircle2 className="size-4 text-emerald-500" />
   if (status === 'partial') return <AlertCircle className="size-4 text-orange-400" />
-  return <Circle className="size-4 text-[#555555]" />
+  return <Circle className="size-4 text-[var(--color-text-muted)]" />
 }
 
 export function ReviewSection({
@@ -58,10 +58,10 @@ export function ReviewSection({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-[#2a2a2a]">
+      <div className="overflow-hidden rounded-lg border border-[var(--color-border)]">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[460px] text-left text-sm">
-            <thead className="bg-[#111111] text-[10px] tracking-wider text-[#888888] uppercase">
+            <thead className="bg-[var(--color-surface-2)] text-[10px] tracking-wider text-[var(--color-text-secondary)] uppercase">
               <tr>
                 <th className="px-4 py-3 font-medium">Section</th>
                 <th className="px-4 py-3 font-medium">Required</th>
@@ -74,10 +74,10 @@ export function ReviewSection({
                 const { requiredCount, filledCount } = getSectionRequiredCounts(section, formData)
                 const status = getSectionStatus(section, formData)
                 return (
-                  <tr key={section.id} className="border-t border-[#2a2a2a]">
-                    <td className="px-4 py-3 text-white">{section.name}</td>
-                    <td className="px-4 py-3 text-[#888888]">{requiredCount}</td>
-                    <td className="px-4 py-3 text-[#888888]">{filledCount}</td>
+                  <tr key={section.id} className="border-t border-[var(--color-border)]">
+                    <td className="px-4 py-3 text-[var(--color-text)]">{section.name}</td>
+                    <td className="px-4 py-3 text-[var(--color-text-secondary)]">{requiredCount}</td>
+                    <td className="px-4 py-3 text-[var(--color-text-secondary)]">{filledCount}</td>
                     <td className="px-4 py-3">
                       <StatusIcon status={status} />
                     </td>
@@ -93,7 +93,7 @@ export function ReviewSection({
         type="button"
         disabled={!allComplete || isSubmitting}
         onClick={onContinue}
-        className="h-11 w-full rounded-lg bg-[#CFB87C] font-[family-name:var(--font-display)] text-sm font-bold tracking-wide text-black uppercase hover:bg-[#CFB87C]/90 disabled:opacity-40"
+        className="h-11 w-full rounded-lg bg-[var(--color-gold)] font-[family-name:var(--font-display)] text-sm font-bold tracking-wide text-black uppercase hover:bg-[var(--color-gold)]/90 disabled:opacity-40"
       >
         {isSubmitting ? (
           <span className="inline-flex items-center gap-2">

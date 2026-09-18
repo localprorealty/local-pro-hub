@@ -1,5 +1,6 @@
 import { FileText, Download, Search, Eye, Plus, Trash2, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { MissionShell } from '@/components/layout/MissionShell'
 import { Input } from '@/components/ui/input'
@@ -25,12 +26,22 @@ const INITIAL_TEMPLATES: TemplateItem[] = [
   { id: '5', name: 'Residential Real Estate Listing Agreement (Lease)', category: 'Listing Contracts', format: 'PDF', updatedAt: '2026-06-20', size: '195 KB' },
 ]
 
-export default function AdminTemplatesPage() {
+interface AdminTemplatesPageProps {
+  role?: 'agent' | 'admin'
+}
+
+export default function AdminTemplatesPage({ role }: AdminTemplatesPageProps = {}) {
+  const location = useLocation()
+  const isExplicitAdminRoute = location.pathname.startsWith('/admin')
   const [search, setSearch] = useState('')
   const [templates, setTemplates] = useState<TemplateItem[]>([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [templateToDelete, setTemplateToDelete] = useState<TemplateItem | null>(null)
-  const [userRole, setUserRole] = useState<'agent' | 'admin'>('agent')
+  const [userRole, setUserRole] = useState<'agent' | 'admin'>(() => {
+    if (role) return role
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) return 'admin'
+    return 'agent'
+  })
   const [newTemplate, setNewTemplate] = useState({
     name: '',
     category: 'Disclosures',
@@ -43,6 +54,9 @@ export default function AdminTemplatesPage() {
     let isMounted = true
 
     const loadSessionAndData = async () => {
+      // If role is already known via props or explicit admin route, skip async fetch
+      if (role || isExplicitAdminRoute) return
+
       try {
         const {
           data: { session },
@@ -122,7 +136,7 @@ export default function AdminTemplatesPage() {
     t.category.toLowerCase().includes(search.toLowerCase())
   )
 
-  const isAdmin = userRole === 'admin'
+  const isAdmin = role === 'admin' || isExplicitAdminRoute || userRole === 'admin'
 
   const templatesContent = (
     <div className="space-y-6 w-full min-w-0">
@@ -133,7 +147,7 @@ export default function AdminTemplatesPage() {
         {isAdmin && (
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-[var(--color-gold)] font-bold tracking-wider text-[var(--color-black)] hover:bg-[#dcc487] uppercase text-xs h-10 px-4 flex items-center gap-1.5 shrink-0 rounded-sm"
+            className="bg-[var(--color-gold)] font-bold tracking-wider text-[var(--color-black)] hover:bg-[var(--color-gold)]/90 uppercase text-xs h-10 px-4 flex items-center gap-1.5 shrink-0 rounded-sm"
           >
             <Plus className="size-4" />
             Add Template
@@ -148,14 +162,14 @@ export default function AdminTemplatesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search templates..."
-            className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)] focus-visible:ring-0"
+            className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus-visible:border-[var(--color-gold)] focus-visible:ring-0"
           />
         </label>
       </div>
 
-      <div className="w-full max-w-full rounded-md border border-[var(--color-border)] bg-[#111111] overflow-hidden">
+      <div className="w-full max-w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
         <div className="w-full overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm text-white">
+          <table className="w-full min-w-[640px] border-collapse text-left text-sm text-[var(--color-text)]">
             <thead>
               <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/50 text-[10px] font-semibold tracking-wider text-[var(--color-text-secondary)] uppercase">
                 <th className="px-6 py-4">Template Name</th>
@@ -175,7 +189,7 @@ export default function AdminTemplatesPage() {
                   </td>
                   <td className="px-6 py-4 text-[var(--color-text-secondary)]">{t.category}</td>
                   <td className="px-6 py-4">
-                    <span className="rounded bg-[#2a2a2a] px-1.5 py-0.5 text-xs text-[#CFB87C]">
+                    <span className="rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-1.5 py-0.5 text-xs text-[var(--color-gold)]">
                       {t.format}
                     </span>
                   </td>
@@ -187,7 +201,7 @@ export default function AdminTemplatesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-[var(--color-text-secondary)] hover:text-white h-8 px-2.5"
+                          className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] h-8 px-2.5"
                           onClick={() => {
                             window.open('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', '_blank')
                           }}
@@ -199,7 +213,7 @@ export default function AdminTemplatesPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-[var(--color-gold)] hover:text-white h-8 px-2.5"
+                        className="text-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 h-8 px-2.5"
                       >
                         <Download className="mr-1 size-3.5" />
                         Download
@@ -236,12 +250,12 @@ export default function AdminTemplatesPage() {
           <div className="w-full max-w-md rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 shadow-xl relative animate-in fade-in zoom-in duration-200">
             <button
               onClick={() => setIsAddModalOpen(false)}
-              className="absolute top-4 right-4 text-[var(--color-text-secondary)] hover:text-white"
+              className="absolute top-4 right-4 text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
             >
               <X className="size-5" />
             </button>
 
-            <h3 className="font-semibold text-lg text-white mb-2">Add New Template</h3>
+            <h3 className="font-semibold text-lg text-[var(--color-text)] mb-2">Add New Template</h3>
             <p className="text-xs text-[var(--color-text-secondary)] mb-6">
               Create a document template placeholder. You can link this template to brokerage transactions.
             </p>
@@ -256,7 +270,7 @@ export default function AdminTemplatesPage() {
                   value={newTemplate.name}
                   onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
                   placeholder="e.g. Lead Paint Disclosure Form"
-                  className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-white focus-visible:ring-0 focus-visible:border-[var(--color-gold)]"
+                  className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus-visible:ring-0 focus-visible:border-[var(--color-gold)]"
                 />
               </div>
 
@@ -268,7 +282,7 @@ export default function AdminTemplatesPage() {
                   <select
                     value={newTemplate.category}
                     onChange={(e) => setNewTemplate({ ...newTemplate, category: e.target.value })}
-                    className="w-full h-10 px-3 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-white text-sm focus:ring-0 focus:border-[var(--color-gold)] outline-none"
+                    className="w-full h-10 px-3 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)] text-sm focus:ring-0 focus:border-[var(--color-gold)] outline-none"
                   >
                     <option value="Disclosures">Disclosures</option>
                     <option value="Listing Contracts">Listing Contracts</option>
@@ -285,7 +299,7 @@ export default function AdminTemplatesPage() {
                   <select
                     value={newTemplate.format}
                     onChange={(e) => setNewTemplate({ ...newTemplate, format: e.target.value })}
-                    className="w-full h-10 px-3 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-white text-sm focus:ring-0 focus:border-[var(--color-gold)] outline-none"
+                    className="w-full h-10 px-3 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)] text-sm focus:ring-0 focus:border-[var(--color-gold)] outline-none"
                   >
                     <option value="PDF">PDF</option>
                     <option value="DOCX">DOCX</option>
@@ -303,7 +317,7 @@ export default function AdminTemplatesPage() {
                   value={newTemplate.size}
                   onChange={(e) => setNewTemplate({ ...newTemplate, size: e.target.value })}
                   placeholder="e.g. 150 KB"
-                  className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-white focus-visible:ring-0 focus-visible:border-[var(--color-gold)]"
+                  className="h-10 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus-visible:ring-0 focus-visible:border-[var(--color-gold)]"
                 />
               </div>
 
@@ -311,13 +325,13 @@ export default function AdminTemplatesPage() {
                 <Button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="bg-transparent border border-[var(--color-border)] hover:bg-[#222] text-white h-10 px-4 rounded-sm text-xs"
+                  className="bg-transparent border border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] h-10 px-4 rounded-sm text-xs"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[var(--color-gold)] font-bold text-[var(--color-black)] hover:bg-[#dcc487] uppercase text-xs h-10 px-4 rounded-sm"
+                  className="bg-[var(--color-gold)] font-bold text-[var(--color-black)] hover:bg-[var(--color-gold)]/90 uppercase text-xs h-10 px-4 rounded-sm"
                 >
                   Create
                 </Button>

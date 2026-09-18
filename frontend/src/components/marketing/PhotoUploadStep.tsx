@@ -212,7 +212,7 @@ export function PhotoUploadStep({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="font-[family-name:var(--font-display)] text-2xl text-white">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-text)]">
             Upload & Select Marketing Photos
           </h2>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
@@ -235,7 +235,7 @@ export function PhotoUploadStep({
 
       {/* Drag and Drop Zone */}
       <div
-        className="rounded-sm border border-dashed border-[var(--color-border)] bg-[#1a1a1a] p-8 text-center transition-colors hover:border-[var(--color-gold)]/50"
+        className="rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center transition-colors hover:border-[var(--color-gold)]/50"
         onDragOver={(event) => event.preventDefault()}
         onDrop={(event) => {
           event.preventDefault()
@@ -251,14 +251,14 @@ export function PhotoUploadStep({
           onChange={(event) => void handleFiles(event.target.files)}
         />
         <ImagePlus className="mx-auto size-10 text-[var(--color-gold)]" />
-        <p className="mt-3 text-sm font-medium text-white">Drag and drop photos here</p>
+        <p className="mt-3 text-sm font-medium text-[var(--color-text)]">Drag and drop photos here</p>
         <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
           Unlimited photos · JPG, PNG, WebP, or HEIC · Auto-compressed for rapid generation
         </p>
         <Button
           type="button"
           variant="outline"
-          className="mt-4 border-[var(--color-border)] bg-transparent text-white hover:bg-[#2a2a2a]"
+          className="mt-4 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
           onClick={() => inputRef.current?.click()}
         >
           Choose photos to upload
@@ -292,7 +292,7 @@ export function PhotoUploadStep({
               return (
                 <div
                   key={photo.id}
-                  className={`group relative overflow-hidden rounded-sm border bg-[#141414] transition-all ${
+                  className={`group relative overflow-hidden rounded-sm border bg-[var(--color-surface-2)] transition-all ${
                     isHero
                       ? 'border-[var(--color-gold)] shadow-[0_0_12px_rgba(207,184,124,0.2)]'
                       : 'border-[var(--color-border)] hover:border-neutral-600'
@@ -307,7 +307,7 @@ export function PhotoUploadStep({
 
                     {/* Badges */}
                     {isHero ? (
-                      <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-[#CFB87C] px-2 py-0.5 text-[10px] font-bold text-black shadow">
+                      <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-[var(--color-gold)] px-2 py-0.5 text-[10px] font-bold text-black shadow">
                         <Star className="size-3 fill-black" />
                         HERO
                       </span>
@@ -333,7 +333,7 @@ export function PhotoUploadStep({
                     {/* Uploading overlay */}
                     {photo.isUploading ? (
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 text-white">
-                        <Loader2 className="size-6 animate-spin text-[#CFB87C]" />
+                        <Loader2 className="size-6 animate-spin text-[var(--color-gold)]" />
                         <span className="mt-2 text-xs">Uploading & compressing...</span>
                       </div>
                     ) : null}
@@ -365,10 +365,10 @@ export function PhotoUploadStep({
                       onValueChange={(value) => void updateCategory(photo.id, value as PhotoCategory)}
                       disabled={photo.isUploading}
                     >
-                      <SelectTrigger className="mt-1 h-8 w-full border-[var(--color-border)] bg-[#0a0a0a] text-xs text-white">
+                      <SelectTrigger className="mt-1 h-8 w-full border-[var(--color-border)] bg-[var(--color-surface-3)] text-xs text-[var(--color-text)]">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="max-h-60 border-[var(--color-border)] bg-[#141414] text-white">
+                      <SelectContent className="max-h-60 border-[var(--color-border)] bg-[var(--color-surface-3)] text-[var(--color-text)]">
                         {PHOTO_CATEGORY_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value} className="text-xs">
                             {option.label}
@@ -407,7 +407,7 @@ export function PhotoUploadStep({
           type="button"
           disabled={!hasHero || isUploadingAny}
           onClick={onContinue}
-          className="h-11 rounded-sm bg-[#CFB87C] px-8 font-semibold text-[#0a0a0a] transition-all hover:bg-[#dcc487] disabled:opacity-50 shrink-0"
+          className="h-11 rounded-sm bg-[var(--color-gold)] px-8 font-semibold text-black transition-all hover:bg-[var(--color-gold)]/90 disabled:opacity-50 shrink-0"
         >
           {isUploadingAny ? (
             <>

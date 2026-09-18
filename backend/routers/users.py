@@ -1,8 +1,12 @@
 import os
 from typing import Any
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from pydantic import BaseModel
 
 from deps.auth import get_service_client, require_active_user
+
+class ThemePreferencePayload(BaseModel):
+    theme: str
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -102,3 +106,27 @@ async def delete_brand_logo(
         print(f"Warning: Could not clean up storage files: {e}")
 
     return {"success": True}
+ 
+ 
+@router.patch("/me/theme")
+async def update_theme_preference(
+    payload: ThemePreferencePayload,
+    user_id: str = Depends(require_active_user),
+) -> dict[str, Any]:
+    theme = payload.theme.strip().lower()
+    if theme not in ("dark", "light"):
+        raise HTTPException(
+            status_code=400,
+            detail="Theme preference must be 'dark' or 'light'",
+        )
+
+    client = get_service_client()
+    try:
+        client.table("users").update({"theme_preference": theme}).eq("id", user_id).execute()
+    except Exception as e:
+        print(f"Notice: Could not update users.theme_preference (migration 030 may be pending in SQL editor): {e}")
+
+    return {
+        "success": True,
+        "theme": theme,
+    }

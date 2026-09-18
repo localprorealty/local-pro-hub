@@ -20,10 +20,13 @@ import {
   Loader2,
   Building2,
   AlertCircle,
+  Sun,
+  Moon,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
 import lpLogo from '@/assets/branding/LP_Gold.png'
+import { useTheme } from '@/lib/theme'
 import {
   fetchPublicListingShare,
   submitPublicComment,
@@ -33,6 +36,7 @@ import {
 
 export function PublicListingSharePage() {
   const { token } = useParams<{ token: string }>()
+  const { theme, toggleTheme } = useTheme()
 
   const [data, setData] = useState<PublicListingShareData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -217,14 +221,14 @@ export function PublicListingSharePage() {
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0d0d0d] text-stone-100 flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen bg-[var(--color-bg-base)] text-[var(--color-text)] flex flex-col items-center justify-center p-6">
         <div className="text-center space-y-4">
           <img
             src={lpLogo}
             alt="LocalPRO Realty"
             className="h-14 w-auto mx-auto object-contain animate-pulse"
           />
-          <div className="flex items-center justify-center gap-3 text-sm text-[#CFB87C]">
+          <div className="flex items-center justify-center gap-3 text-sm text-[var(--color-gold)]">
             <Loader2 className="size-5 animate-spin" />
             <span>Loading listing presentation...</span>
           </div>
@@ -236,50 +240,67 @@ export function PublicListingSharePage() {
   // 404 / Inactive Link State
   if (notFound || !data) {
     return (
-      <div className="min-h-screen bg-[#0d0d0d] text-stone-100 flex flex-col justify-between p-6">
+      <div className="min-h-screen bg-[var(--color-bg-base)] text-[var(--color-text)] flex flex-col justify-between p-6">
         {/* Top Header */}
-        <header className="max-w-4xl mx-auto w-full pt-8 flex items-center justify-between border-b border-[#222] pb-6">
+        <header className="max-w-4xl mx-auto w-full pt-8 flex items-center justify-between border-b border-[var(--color-border)] pb-6">
           <div className="flex items-center gap-3">
             <img src={lpLogo} alt="LocalPRO Realty" className="h-10 w-auto object-contain" />
             <div>
-              <h1 className="text-sm font-semibold tracking-wider text-white uppercase">
+              <h1 className="text-sm font-semibold tracking-wider text-[var(--color-text)] uppercase">
                 LocalPRO Realty
               </h1>
-              <p className="text-xs text-[#CFB87C]">A Modern Brokerage</p>
+              <p className="text-xs text-[var(--color-gold)]">A Modern Brokerage</p>
             </div>
           </div>
           <a
             href="https://localprorealty.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-[#999] hover:text-[#CFB87C] transition-colors flex items-center gap-1"
+            className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-gold)] transition-colors flex items-center gap-1"
           >
             localprorealty.com <ExternalLink className="size-3" />
           </a>
         </header>
 
         {/* Center Card */}
-        <main className="max-w-md mx-auto w-full my-12 bg-[#161616] border border-[#262626] rounded-md p-8 text-center shadow-2xl">
-          <div className="size-12 rounded-full bg-[#2a2215] border border-[#524124] text-[#CFB87C] flex items-center justify-center mx-auto mb-5">
+        <main className="max-w-md mx-auto w-full my-12 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md p-8 text-center shadow-xl">
+          <div className="size-12 rounded-full bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/30 text-[var(--color-gold)] flex items-center justify-center mx-auto mb-5">
             <AlertCircle className="size-6" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Listing Unavailable</h2>
-          <p className="text-sm text-[#a0a0a0] leading-relaxed mb-6">
+          <h2 className="text-xl font-bold text-[var(--color-text)] mb-2">Listing Unavailable</h2>
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-6">
             {errorMessage ||
               'This listing is currently private or the share link is inactive. If you are the property owner, please contact your LocalPRO agent for an updated link.'}
           </p>
           <a
             href="https://localprorealty.com"
-            className="inline-flex items-center justify-center w-full py-2.5 px-4 bg-[#CFB87C] hover:bg-[#dcc487] text-black font-semibold text-xs tracking-wider uppercase rounded transition-colors"
+            className="inline-flex items-center justify-center w-full py-2.5 px-4 bg-[var(--color-gold)] hover:bg-[var(--color-gold)]/90 text-black font-semibold text-xs tracking-wider uppercase rounded transition-colors"
           >
             Visit LocalPRO Realty
           </a>
         </main>
 
         {/* Footer */}
-        <footer className="max-w-4xl mx-auto w-full border-t border-[#222] pt-6 text-center text-xs text-[#666]">
+        <footer className="max-w-4xl mx-auto w-full border-t border-[var(--color-border)] pt-6 text-center text-xs text-[var(--color-text-secondary)]">
           <p>LocalPRO Realty • 5801 Headquarters Dr Ste 775, Plano, TX 75024 • (972) 996-5555</p>
         </footer>
+
+        {/* Direct Theme Toggle */}
+        <div className="fixed right-6 bottom-6 z-40">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className="flex size-11 items-center justify-center rounded-full border border-[var(--color-gold-border)] bg-[var(--color-surface)] text-[var(--color-gold)] shadow-[0_4px_16px_rgba(0,0,0,0.35)] backdrop-blur-md transition-all hover:scale-105 hover:border-[var(--color-gold)] hover:shadow-[0_0_16px_rgba(207,184,124,0.3)] active:scale-95 cursor-pointer"
+          >
+            {theme === 'dark' ? (
+              <Sun className="size-5 text-[var(--color-gold)]" />
+            ) : (
+              <Moon className="size-5 text-[var(--color-gold)]" />
+            )}
+          </button>
+        </div>
       </div>
     )
   }
@@ -295,9 +316,9 @@ export function PublicListingSharePage() {
   const heroPhoto = data.photos.find((p) => p.is_hero) || data.photos[0]
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-stone-100 font-sans antialiased selection:bg-[#CFB87C] selection:text-black">
+    <div className="min-h-screen bg-[var(--color-bg-base)] text-[var(--color-text)] font-sans antialiased selection:bg-[var(--color-gold)] selection:text-black">
       {/* 1. FIXED TOP BROKERAGE BRANDING HEADER */}
-      <header className="sticky top-0 z-30 bg-[#0d0d0de6] backdrop-blur-md border-b border-[#202020] px-4 lg:px-8 py-3.5 transition-all">
+      <header className="sticky top-0 z-30 bg-[var(--color-surface)]/95 backdrop-blur-md border-b border-[var(--color-border)] px-4 lg:px-8 py-3.5 transition-all">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
@@ -306,26 +327,26 @@ export function PublicListingSharePage() {
               className="h-9 w-auto object-contain drop-shadow"
             />
             <div>
-              <span className="text-sm font-bold tracking-wider text-white uppercase block leading-none">
+              <span className="text-sm font-bold tracking-wider text-[var(--color-text)] uppercase block leading-none">
                 LocalPRO Realty
               </span>
-              <span className="text-[11px] text-[#CFB87C] tracking-wide block mt-1">
+              <span className="text-[11px] text-[var(--color-gold)] tracking-wide block mt-1">
                 A Modern Brokerage • Dallas-Fort Worth
               </span>
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-5 text-xs text-[#a0a0a0]">
+          <div className="hidden sm:flex items-center gap-5 text-xs text-[var(--color-text-secondary)]">
             <span className="flex items-center gap-1.5">
-              <MapPin className="size-3.5 text-[#CFB87C]" />
+              <MapPin className="size-3.5 text-[var(--color-gold)]" />
               5801 Headquarters Dr, Plano, TX
             </span>
-            <span className="text-[#333]">|</span>
+            <span className="text-[var(--color-border)]">|</span>
             <a
               href="tel:9729965555"
-              className="flex items-center gap-1.5 hover:text-[#CFB87C] transition-colors"
+              className="flex items-center gap-1.5 hover:text-[var(--color-gold)] transition-colors"
             >
-              <Phone className="size-3.5 text-[#CFB87C]" />
+              <Phone className="size-3.5 text-[var(--color-gold)]" />
               (972) 996-5555
             </a>
           </div>
@@ -333,23 +354,23 @@ export function PublicListingSharePage() {
       </header>
 
       {/* 2. HERO IMAGE & PROPERTY HEADER */}
-      <div className="relative bg-[#111] border-b border-[#222]">
+      <div className="relative bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-6xl mx-auto px-4 lg:px-8 py-8 lg:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Info Column */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#241e15] border border-[#524124] text-[#CFB87C] text-xs font-semibold tracking-wide uppercase">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/30 text-[var(--color-gold)] text-xs font-semibold tracking-wide uppercase">
                 <Building2 className="size-3.5" />
                 {data.specs.property_type || 'Residential Property'}
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--color-text)] tracking-tight leading-tight">
                 {data.address_full}
               </h1>
 
               {data.specs.subdivision ? (
-                <p className="text-sm sm:text-base text-[#a0a0a0] flex items-center gap-1.5">
-                  <MapPin className="size-4 text-[#CFB87C]" />
+                <p className="text-sm sm:text-base text-[var(--color-text-secondary)] flex items-center gap-1.5">
+                  <MapPin className="size-4 text-[var(--color-gold)]" />
                   Subdivision: {data.specs.subdivision}
                 </p>
               ) : null}
@@ -357,10 +378,10 @@ export function PublicListingSharePage() {
               {/* Price Callout */}
               {data.list_price ? (
                 <div className="pt-2">
-                  <span className="text-xs tracking-widest text-[#a0a0a0] uppercase block">
+                  <span className="text-xs tracking-widest text-[var(--color-text-secondary)] uppercase block">
                     Listing Price
                   </span>
-                  <span className="text-3xl sm:text-4xl font-black text-[#CFB87C]">
+                  <span className="text-3xl sm:text-4xl font-black text-[var(--color-gold)]">
                     ${Number(data.list_price).toLocaleString()}
                   </span>
                 </div>
@@ -369,43 +390,43 @@ export function PublicListingSharePage() {
               {/* Quick Specs Bar */}
               <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {data.specs.bedrooms ? (
-                  <div className="bg-[#171717] border border-[#262626] rounded p-3 text-center">
-                    <Bed className="size-4 text-[#CFB87C] mx-auto mb-1" />
-                    <span className="text-lg font-bold text-white block">
+                  <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-3 text-center">
+                    <Bed className="size-4 text-[var(--color-gold)] mx-auto mb-1" />
+                    <span className="text-lg font-bold text-[var(--color-text)] block">
                       {data.specs.bedrooms}
                     </span>
-                    <span className="text-[11px] text-[#888] uppercase tracking-wider">Beds</span>
+                    <span className="text-[11px] text-[var(--color-text-secondary)] uppercase tracking-wider">Beds</span>
                   </div>
                 ) : null}
 
                 {data.specs.bathrooms_full ? (
-                  <div className="bg-[#171717] border border-[#262626] rounded p-3 text-center">
-                    <Bath className="size-4 text-[#CFB87C] mx-auto mb-1" />
-                    <span className="text-lg font-bold text-white block">
+                  <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-3 text-center">
+                    <Bath className="size-4 text-[var(--color-gold)] mx-auto mb-1" />
+                    <span className="text-lg font-bold text-[var(--color-text)] block">
                       {data.specs.bathrooms_full}
                       {data.specs.bathrooms_half ? `.${data.specs.bathrooms_half}` : ''}
                     </span>
-                    <span className="text-[11px] text-[#888] uppercase tracking-wider">Baths</span>
+                    <span className="text-[11px] text-[var(--color-text-secondary)] uppercase tracking-wider">Baths</span>
                   </div>
                 ) : null}
 
                 {data.specs.square_feet ? (
-                  <div className="bg-[#171717] border border-[#262626] rounded p-3 text-center">
-                    <Maximize2 className="size-4 text-[#CFB87C] mx-auto mb-1" />
-                    <span className="text-lg font-bold text-white block">
+                  <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-3 text-center">
+                    <Maximize2 className="size-4 text-[var(--color-gold)] mx-auto mb-1" />
+                    <span className="text-lg font-bold text-[var(--color-text)] block">
                       {Number(data.specs.square_feet).toLocaleString()}
                     </span>
-                    <span className="text-[11px] text-[#888] uppercase tracking-wider">Sq Ft</span>
+                    <span className="text-[11px] text-[var(--color-text-secondary)] uppercase tracking-wider">Sq Ft</span>
                   </div>
                 ) : null}
 
                 {data.specs.year_built ? (
-                  <div className="bg-[#171717] border border-[#262626] rounded p-3 text-center">
-                    <Calendar className="size-4 text-[#CFB87C] mx-auto mb-1" />
-                    <span className="text-lg font-bold text-white block">
+                  <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-3 text-center">
+                    <Calendar className="size-4 text-[var(--color-gold)] mx-auto mb-1" />
+                    <span className="text-lg font-bold text-[var(--color-text)] block">
                       {data.specs.year_built}
                     </span>
-                    <span className="text-[11px] text-[#888] uppercase tracking-wider">Built</span>
+                    <span className="text-[11px] text-[var(--color-text-secondary)] uppercase tracking-wider">Built</span>
                   </div>
                 ) : null}
               </div>
@@ -415,7 +436,7 @@ export function PublicListingSharePage() {
             <div className="lg:col-span-5">
               {heroPhoto ? (
                 <div
-                  className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[#333] shadow-2xl group cursor-pointer"
+                  className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[var(--color-border)] shadow-2xl group cursor-pointer"
                   onClick={() => setLightboxIndex(0)}
                 >
                   <img
@@ -425,7 +446,7 @@ export function PublicListingSharePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white">
-                    <span className="bg-black/60 backdrop-blur px-2.5 py-1 rounded text-[#CFB87C] font-medium">
+                    <span className="bg-black/60 backdrop-blur px-2.5 py-1 rounded text-[var(--color-gold)] font-medium">
                       Primary Cover Photo
                     </span>
                     <span className="bg-black/60 backdrop-blur px-2.5 py-1 rounded text-stone-300">
@@ -434,8 +455,8 @@ export function PublicListingSharePage() {
                   </div>
                 </div>
               ) : (
-                <div className="aspect-[4/3] rounded-lg border border-dashed border-[#333] bg-[#161616] flex flex-col items-center justify-center p-6 text-center text-[#666]">
-                  <Building2 className="size-10 text-[#444] mb-2" />
+                <div className="aspect-[4/3] rounded-lg border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] flex flex-col items-center justify-center p-6 text-center text-[var(--color-text-secondary)]">
+                  <Building2 className="size-10 text-[var(--color-text-secondary)] mb-2" />
                   <p className="text-xs">Professional Photography in progress</p>
                 </div>
               )}
@@ -445,19 +466,19 @@ export function PublicListingSharePage() {
       </div>
 
       {/* 3. LISTING LIFECYCLE / PIPELINE PROGRESS STEPPER */}
-      <section className="bg-[#121212] border-b border-[#222] py-8">
+      <section className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)] py-8">
         <div className="max-w-6xl mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-[#CFB87C]">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--color-gold)]">
                 Listing Lifecycle Progress
               </h2>
-              <p className="text-xs text-[#888] mt-0.5">
+              <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
                 Real-time milestone tracking from signing to MLS activation
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#1e1e1e] border border-[#333] text-xs text-white">
-              <ShieldCheck className="size-3.5 text-emerald-400" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)]">
+              <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400" />
               Verified Status
             </span>
           </div>
@@ -473,27 +494,27 @@ export function PublicListingSharePage() {
                   key={step.key}
                   className={`relative p-3.5 rounded-md border transition-all ${
                     isCurrent
-                      ? 'bg-[#221c13] border-[#CFB87C] text-white shadow-lg shadow-[#cfb87c10]'
+                      ? 'bg-[var(--color-gold)]/10 border-[var(--color-gold)] text-[var(--color-text)] shadow-sm'
                       : isCompleted
-                        ? 'bg-[#181818] border-[#2c2c2c] text-stone-200'
-                        : 'bg-[#141414] border-[#1e1e1e] text-[#666]'
+                        ? 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)]'
+                        : 'bg-[var(--color-surface)]/60 border border-[var(--color-border)] text-[var(--color-text-secondary)]'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono tracking-wider uppercase text-[#888]">
+                    <span className="text-[10px] font-mono tracking-wider uppercase text-[var(--color-text-secondary)]">
                       Stage 0{idx + 1}
                     </span>
                     {isCompleted ? (
-                      <CheckCircle2 className="size-4 text-emerald-400" />
+                      <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
                     ) : isCurrent ? (
-                      <span className="size-2.5 rounded-full bg-[#CFB87C] animate-ping" />
+                      <span className="size-2.5 rounded-full bg-[var(--color-gold)] animate-ping" />
                     ) : (
-                      <Circle className="size-3 text-[#444]" />
+                      <Circle className="size-3 text-[var(--color-text-secondary)]/50" />
                     )}
                   </div>
                   <h3
                     className={`text-xs font-bold leading-snug ${
-                      isCurrent ? 'text-[#CFB87C]' : isCompleted ? 'text-white' : 'text-[#888]'
+                      isCurrent ? 'text-[var(--color-gold)]' : isCompleted ? 'text-[var(--color-text)]' : 'text-[var(--color-text-secondary)]'
                     }`}
                   >
                     {step.label}
@@ -517,8 +538,8 @@ export function PublicListingSharePage() {
             <section>
               <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                 <div>
-                  <h2 className="text-lg font-bold text-white tracking-wide">Property Gallery</h2>
-                  <p className="text-xs text-[#888]">{data.photos.length} High-Resolution Photos</p>
+                  <h2 className="text-lg font-bold text-[var(--color-text)] tracking-wide">Property Gallery</h2>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{data.photos.length} High-Resolution Photos</p>
                 </div>
 
                 {/* Filter pills if multiple categories */}
@@ -531,8 +552,8 @@ export function PublicListingSharePage() {
                         onClick={() => setSelectedCategory(cat)}
                         className={`px-3 py-1 rounded text-xs capitalize font-medium transition-colors ${
                           selectedCategory === cat
-                            ? 'bg-[#CFB87C] text-black'
-                            : 'bg-[#1c1c1c] text-[#999] hover:bg-[#282828] hover:text-white'
+                            ? 'bg-[var(--color-gold)] text-black font-semibold'
+                            : 'bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]'
                         }`}
                       >
                         {cat}
@@ -543,7 +564,7 @@ export function PublicListingSharePage() {
               </div>
 
               {filteredPhotos.length === 0 ? (
-                <div className="rounded-md border border-[#222] bg-[#141414] p-8 text-center text-[#777]">
+                <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center text-[var(--color-text-secondary)]">
                   <p className="text-sm">No photos available in this category.</p>
                 </div>
               ) : (
@@ -551,7 +572,7 @@ export function PublicListingSharePage() {
                   {filteredPhotos.map((photo, index) => (
                     <div
                       key={photo.id}
-                      className="group relative aspect-[4/3] rounded-md overflow-hidden bg-[#1a1a1a] border border-[#262626] cursor-pointer shadow hover:border-[#CFB87C] transition-all"
+                      className="group relative aspect-[4/3] rounded-md overflow-hidden bg-[var(--color-surface-2)] border border-[var(--color-border)] cursor-pointer shadow hover:border-[var(--color-gold)] transition-all"
                       onClick={() => setLightboxIndex(index)}
                     >
                       <img
@@ -578,31 +599,31 @@ export function PublicListingSharePage() {
 
             {/* PROPERTY STORY / REMARKS SECTION */}
             {data.description ? (
-              <section className="bg-[#141414] border border-[#262626] rounded-md p-6 sm:p-8">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#CFB87C] mb-4">
+              <section className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md p-6 sm:p-8 shadow-sm">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--color-gold)] mb-4">
                   About This Property
                 </h2>
-                <div className="prose prose-invert max-w-none text-sm leading-relaxed text-[#c4c4c4] whitespace-pre-line">
+                <div className="max-w-none text-sm leading-relaxed text-[var(--color-text)] whitespace-pre-line">
                   {data.description}
                 </div>
               </section>
             ) : null}
 
             {/* CLIENT & VISITOR FEEDBACK SECTION */}
-            <section className="bg-[#141414] border border-[#262626] rounded-md p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-between border-b border-[#262626] pb-4">
+            <section className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="size-8 rounded bg-[#241e15] border border-[#524124] text-[#CFB87C] flex items-center justify-center">
+                  <div className="size-8 rounded bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/30 text-[var(--color-gold)] flex items-center justify-center">
                     <MessageSquare className="size-4" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-white">Client & Visitor Feedback</h2>
-                    <p className="text-xs text-[#888]">
+                    <h2 className="text-base font-bold text-[var(--color-text)]">Client & Visitor Feedback</h2>
+                    <p className="text-xs text-[var(--color-text-secondary)]">
                       Leave questions, feedback, or private notes directly for the listing agent
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-mono text-[#CFB87C] bg-[#221c13] px-2.5 py-1 rounded border border-[#524124]">
+                <span className="text-xs font-mono text-[var(--color-gold)] bg-[var(--color-gold)]/10 px-2.5 py-1 rounded border border-[var(--color-gold)]/30">
                   {data.comments?.length || 0} Comments
                 </span>
               </div>
@@ -610,12 +631,12 @@ export function PublicListingSharePage() {
               {/* Feedback Submission Form */}
               <form onSubmit={handleSubmitComment} className="space-y-4">
                 {commentSuccess ? (
-                  <div className="p-3 rounded bg-emerald-950/40 border border-emerald-600/40 text-xs text-emerald-300 flex items-center justify-between">
+                  <div className="p-3 rounded bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-600/40 text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
                     <span>Thank you! Your feedback has been sent to the listing agent.</span>
                     <button
                       type="button"
                       onClick={() => setCommentSuccess(false)}
-                      className="text-emerald-400 hover:text-white"
+                      className="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-white"
                     >
                       ✕
                     </button>
@@ -623,7 +644,7 @@ export function PublicListingSharePage() {
                 ) : null}
 
                 {commentError ? (
-                  <div className="p-3 rounded bg-red-950/40 border border-red-600/40 text-xs text-red-300">
+                  <div className="p-3 rounded bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-600/40 text-xs text-red-800 dark:text-red-300">
                     {commentError}
                   </div>
                 ) : null}
@@ -642,8 +663,8 @@ export function PublicListingSharePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] font-medium tracking-wide text-[#999] uppercase block mb-1.5">
-                      Your Name <span className="text-[#CFB87C]">*</span>
+                    <label className="text-[11px] font-medium tracking-wide text-[var(--color-text-secondary)] uppercase block mb-1.5">
+                      Your Name <span className="text-[var(--color-gold)]">*</span>
                     </label>
                     <input
                       type="text"
@@ -651,14 +672,14 @@ export function PublicListingSharePage() {
                       placeholder="e.g., Jane Doe (Homeowner) or Prospective Buyer"
                       value={commenterName}
                       onChange={(e) => setCommenterName(e.target.value)}
-                      className="w-full h-10 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-3 text-xs text-white placeholder:text-[#555] focus:outline-none focus:border-[#CFB87C]"
+                      className="w-full h-10 rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-xs text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-[var(--color-gold)]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-medium tracking-wide text-[#999] uppercase block mb-1.5">
-                    Your Feedback / Note <span className="text-[#CFB87C]">*</span>
+                  <label className="text-[11px] font-medium tracking-wide text-[var(--color-text-secondary)] uppercase block mb-1.5">
+                    Your Feedback / Note <span className="text-[var(--color-gold)]">*</span>
                   </label>
                   <textarea
                     required
@@ -666,14 +687,14 @@ export function PublicListingSharePage() {
                     placeholder="Type your feedback, photo impressions, or showing inquiries here..."
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    className="w-full rounded border border-[#2a2a2a] bg-[#1a1a1a] p-3 text-xs text-white placeholder:text-[#555] focus:outline-none focus:border-[#CFB87C] resize-y min-h-[80px]"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3 text-xs text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-[var(--color-gold)] resize-y min-h-[80px]"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={submittingComment || !commenterName.trim() || !commentText.trim()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#CFB87C] hover:bg-[#dcc487] text-black font-semibold text-xs tracking-wider uppercase rounded transition-colors disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-gold)] hover:bg-[var(--color-gold)]/90 text-black font-semibold text-xs tracking-wider uppercase rounded transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   {submittingComment ? (
                     <>
@@ -690,9 +711,9 @@ export function PublicListingSharePage() {
               </form>
 
               {/* Comments Display List */}
-              <div className="pt-4 border-t border-[#222] space-y-3">
+              <div className="pt-4 border-t border-[var(--color-border)] space-y-3">
                 {!data.comments || data.comments.length === 0 ? (
-                  <p className="text-xs text-[#666] italic py-2">
+                  <p className="text-xs text-[var(--color-text-secondary)] italic py-2">
                     No comments yet. Be the first to leave feedback!
                   </p>
                 ) : (
@@ -709,13 +730,13 @@ export function PublicListingSharePage() {
                     return (
                       <div
                         key={c.id}
-                        className="bg-[#181818] border border-[#262626] rounded p-3.5 space-y-1.5"
+                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-3.5 space-y-1.5"
                       >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-white">{c.commenter_name}</span>
-                          <span className="text-[11px] text-[#777]">{relativeTime}</span>
+                          <span className="font-bold text-[var(--color-text)]">{c.commenter_name}</span>
+                          <span className="text-[11px] text-[var(--color-text-secondary)]">{relativeTime}</span>
                         </div>
-                        <p className="text-xs text-[#bbb] whitespace-pre-wrap leading-relaxed">
+                        <p className="text-xs text-[var(--color-text)] whitespace-pre-wrap leading-relaxed">
                           {c.comment_text}
                         </p>
                       </div>
@@ -731,9 +752,9 @@ export function PublicListingSharePage() {
             {/* AGENT CONTACT CARD */}
             <div
               id="agent-contact-card"
-              className="sticky top-20 bg-[#141414] border border-[#262626] rounded-md p-6 space-y-5 shadow-xl"
+              className="sticky top-20 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md p-6 space-y-5 shadow-xl"
             >
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#CFB87C] block">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--color-gold)] block">
                 Listing Representation
               </span>
 
@@ -742,10 +763,10 @@ export function PublicListingSharePage() {
                   <img
                     src={data.agent.avatar_url}
                     alt={data.agent.name}
-                    className="size-16 rounded-full object-cover border-2 border-[#CFB87C]"
+                    className="size-16 rounded-full object-cover border-2 border-[var(--color-gold)]"
                   />
                 ) : (
-                  <div className="size-16 rounded-full bg-[#241e15] border-2 border-[#CFB87C] text-[#CFB87C] font-bold text-xl flex items-center justify-center">
+                  <div className="size-16 rounded-full bg-[var(--color-gold)]/10 border-2 border-[var(--color-gold)] text-[var(--color-gold)] font-bold text-xl flex items-center justify-center">
                     {data.agent.name
                       .split(' ')
                       .map((n) => n[0])
@@ -755,15 +776,15 @@ export function PublicListingSharePage() {
                   </div>
                 )}
                 <div>
-                  <h3 className="text-base font-bold text-white">{data.agent.name}</h3>
-                  <p className="text-xs text-[#CFB87C]">LocalPRO Realty Agent</p>
-                  <p className="text-[11px] text-[#777]">DFW Metroplex Real Estate</p>
+                  <h3 className="text-base font-bold text-[var(--color-text)]">{data.agent.name}</h3>
+                  <p className="text-xs text-[var(--color-gold)]">LocalPRO Realty Agent</p>
+                  <p className="text-[11px] text-[var(--color-text-secondary)]">DFW Metroplex Real Estate</p>
                 </div>
               </div>
 
               {/* Agent Custom Brand Logo (if set) */}
               {data.agent.brand_logo_url ? (
-                <div className="pt-2 border-t border-[#222]">
+                <div className="pt-2 border-t border-[var(--color-border)]">
                   <img
                     src={data.agent.brand_logo_url}
                     alt={`${data.agent.name} Brand`}
@@ -777,7 +798,7 @@ export function PublicListingSharePage() {
                 {data.agent.phone ? (
                   <a
                     href={`tel:${data.agent.phone}`}
-                    className="w-full py-2.5 px-4 bg-[#CFB87C] hover:bg-[#dcc487] text-black font-semibold text-xs tracking-wider uppercase rounded transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 bg-[var(--color-gold)] hover:bg-[var(--color-gold)]/90 text-black font-semibold text-xs tracking-wider uppercase rounded transition-colors flex items-center justify-center gap-2"
                   >
                     <Phone className="size-3.5" />
                     Call {data.agent.phone}
@@ -789,7 +810,7 @@ export function PublicListingSharePage() {
                     href={`mailto:${data.agent.email}?subject=Inquiry regarding ${encodeURIComponent(
                       data.address_full,
                     )}`}
-                    className="w-full py-2.5 px-4 bg-[#202020] hover:bg-[#2a2a2a] text-white border border-[#333] font-semibold text-xs tracking-wider uppercase rounded transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] font-semibold text-xs tracking-wider uppercase rounded transition-colors flex items-center justify-center gap-2"
                   >
                     <Mail className="size-3.5" />
                     Email Agent
@@ -798,10 +819,10 @@ export function PublicListingSharePage() {
               </div>
 
               {/* Brokerage Compliance Card */}
-              <div className="pt-4 border-t border-[#222] space-y-2 text-[11px] text-[#777]">
+              <div className="pt-4 border-t border-[var(--color-border)] space-y-2 text-[11px] text-[var(--color-text-secondary)]">
                 <div className="flex items-center gap-2">
                   <img src={lpLogo} alt="LocalPRO Logo" className="h-5 w-auto object-contain" />
-                  <span className="font-semibold text-[#999]">LocalPRO Realty</span>
+                  <span className="font-semibold text-[var(--color-text)]">LocalPRO Realty</span>
                 </div>
                 <p>5801 Headquarters Dr Ste 775, Plano, TX 75024</p>
                 <p>Licensed Brokerage in Texas • Equal Housing Opportunity</p>
@@ -809,7 +830,7 @@ export function PublicListingSharePage() {
                   href="https://localprorealty.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#CFB87C] hover:underline inline-flex items-center gap-1 mt-1"
+                  className="text-[var(--color-gold)] hover:underline inline-flex items-center gap-1 mt-1"
                 >
                   localprorealty.com <ExternalLink className="size-3" />
                 </a>
@@ -899,18 +920,18 @@ export function PublicListingSharePage() {
       ) : null}
 
       {/* 6. FIXED BOTTOM BRANDED FOOTER */}
-      <footer className="border-t border-[#202020] bg-[#0c0c0c] py-8 pb-28 lg:pb-8 text-center text-xs text-[#777] mt-16">
+      <footer className="border-t border-[var(--color-border)] bg-[var(--color-surface-2)] py-8 pb-28 lg:pb-8 text-center text-xs text-[var(--color-text-secondary)] mt-16">
         <div className="max-w-6xl mx-auto px-4 space-y-2">
           <p>© {new Date().getFullYear()} LocalPRO Realty. All rights reserved.</p>
           <p>5801 Headquarters Dr Ste 775, Plano, TX 75024 • Dallas-Fort Worth, Texas</p>
-          <p className="text-[#555] text-[10px]">
+          <p className="text-[var(--color-text-secondary)]/80 text-[10px]">
             Information is deemed reliable but not guaranteed. Equal Housing Opportunity.
           </p>
         </div>
       </footer>
 
       {/* 7. MOBILE STICKY BOTTOM AGENT ACTION BAR (< lg only) */}
-      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-[#262626] bg-[#121212]/95 backdrop-blur-md px-4 py-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.6)] pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))]">
+      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur-md px-4 py-2.5 shadow-[0_-8px_24px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_24px_rgba(0,0,0,0.6)] pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))]">
         <div className="max-w-md mx-auto flex items-center justify-between gap-3">
           {/* Agent Mini Profile - Click to scroll to full card */}
           <button
@@ -922,10 +943,10 @@ export function PublicListingSharePage() {
               <img
                 src={data.agent.avatar_url}
                 alt={data.agent.name}
-                className="size-9 rounded-full object-cover border border-[#CFB87C] shrink-0 group-hover:scale-105 transition-transform"
+                className="size-9 rounded-full object-cover border border-[var(--color-gold)] shrink-0 group-hover:scale-105 transition-transform"
               />
             ) : (
-              <div className="size-9 rounded-full bg-[#241e15] border border-[#CFB87C] text-[#CFB87C] font-bold text-xs flex items-center justify-center shrink-0">
+              <div className="size-9 rounded-full bg-[var(--color-gold)]/10 border border-[var(--color-gold)] text-[var(--color-gold)] font-bold text-xs flex items-center justify-center shrink-0">
                 {data.agent.name
                   .split(' ')
                   .map((n) => n[0])
@@ -935,10 +956,10 @@ export function PublicListingSharePage() {
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white truncate group-hover:text-[#CFB87C] transition-colors">
+              <p className="text-xs font-bold text-[var(--color-text)] truncate group-hover:text-[var(--color-gold)] transition-colors">
                 {data.agent.name}
               </p>
-              <p className="text-[10px] text-[#888] truncate">Listing Agent</p>
+              <p className="text-[10px] text-[var(--color-text-secondary)] truncate">Listing Agent</p>
             </div>
           </button>
 
@@ -947,7 +968,7 @@ export function PublicListingSharePage() {
             {data.agent.phone ? (
               <a
                 href={`tel:${data.agent.phone}`}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-[#CFB87C] hover:bg-[#dcc487] text-black font-semibold text-xs tracking-wider uppercase transition-colors shadow"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-[var(--color-gold)] hover:bg-[var(--color-gold)]/90 text-black font-semibold text-xs tracking-wider uppercase transition-colors shadow"
                 title={`Call ${data.agent.phone}`}
               >
                 <Phone className="size-3.5" />
@@ -960,7 +981,7 @@ export function PublicListingSharePage() {
                 href={`mailto:${data.agent.email}?subject=Inquiry regarding ${encodeURIComponent(
                   data.address_full,
                 )}`}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-[#202020] hover:bg-[#2a2a2a] text-white border border-[#333] font-semibold text-xs tracking-wider uppercase transition-colors shadow"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] font-semibold text-xs tracking-wider uppercase transition-colors shadow"
                 title="Email Agent"
               >
                 <Mail className="size-3.5" />
@@ -969,6 +990,23 @@ export function PublicListingSharePage() {
             ) : null}
           </div>
         </div>
+      </div>
+
+      {/* 8. DIRECT FLOATING THEME TOGGLE (ON THE RIGHT) */}
+      <div className="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] lg:right-6 lg:bottom-6 z-40">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          className="flex size-11 items-center justify-center rounded-full border border-[var(--color-gold-border)] bg-[var(--color-surface)] text-[var(--color-gold)] shadow-[0_4px_16px_rgba(0,0,0,0.35)] backdrop-blur-md transition-all hover:scale-105 hover:border-[var(--color-gold)] hover:shadow-[0_0_16px_rgba(207,184,124,0.3)] active:scale-95 cursor-pointer"
+        >
+          {theme === 'dark' ? (
+            <Sun className="size-5 text-[var(--color-gold)]" />
+          ) : (
+            <Moon className="size-5 text-[var(--color-gold)]" />
+          )}
+        </button>
       </div>
     </div>
   )

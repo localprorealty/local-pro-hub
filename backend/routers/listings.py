@@ -1050,6 +1050,7 @@ async def add_marketing_asset(
     return {"success": True, "marketing_statuses": marketing_statuses}
 
 
+@router.post("/{listing_id}/marketing/remove-asset")
 @router.delete("/{listing_id}/marketing/status")
 async def delete_marketing_status(
     listing_id: str,

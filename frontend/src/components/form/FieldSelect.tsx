@@ -36,7 +36,7 @@ export function FieldSelect({
           {required ? <span className="text-red-400"> *</span> : null}
         </Label>
         {isPreFilled ? (
-          <span className="rounded bg-[#CFB87C]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[#CFB87C] uppercase">
+          <span className="rounded bg-[var(--color-gold)]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[var(--color-gold)] uppercase">
             from NTREIS
           </span>
         ) : null}

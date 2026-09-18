@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -74,7 +74,10 @@ class Settings(BaseSettings):
     lofty_webhook_url: str = ""
 
     # App
-    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+    cors_origins: str = Field(
+        default="http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",
+        validation_alias=AliasChoices("cors_origins", "cors_origin"),
+    )
     frontend_url: str = ""
     api_host: str = "0.0.0.0"
     api_port: int = 8000

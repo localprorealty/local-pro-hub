@@ -161,7 +161,7 @@ function DashboardContent({ role }: DashboardPageProps) {
         <motion.div
           initial={{ y: -60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex items-center justify-between bg-[#CFB87C] px-6 py-3 text-sm font-bold text-black"
+          className="flex items-center justify-between bg-[var(--color-gold)] px-6 py-3 text-sm font-bold text-[var(--color-black)]"
         >
           <span>
             Listing is LIVE — {liveListing?.address_full ?? 'Your listing'}
@@ -179,7 +179,7 @@ function DashboardContent({ role }: DashboardPageProps) {
 
       <header className="hidden lg:flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between border-b border-[var(--color-border)] px-8 py-8">
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
+          <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-text)]">
             Overview
           </h1>
           <div className="mt-4 flex flex-wrap gap-6">
@@ -193,7 +193,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                   className={`text-sm transition-colors ${
                     isActive
                       ? 'border-b border-[var(--color-gold)] pb-1 text-[var(--color-gold)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-white)]'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                   }`}
                 >
                   {tabLabel(tab)} ({tabCounts[tab]})
@@ -207,10 +207,10 @@ function DashboardContent({ role }: DashboardPageProps) {
             <button
               type="button"
               onClick={() => navigate('/listing/new')}
-              className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-gold)] bg-[var(--color-gold)] px-4 py-2 font-[family-name:var(--font-display)] text-xs font-bold tracking-wide text-black uppercase transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-gold)] bg-[var(--color-gold)] px-4 py-2 font-[family-name:var(--font-display)] text-xs font-bold tracking-wide text-[var(--color-black)] uppercase transition-opacity hover:opacity-90"
             >
               <Plus className="size-4" />
-              Start New Listing
+              Start A Transaction
             </button>
           ) : null}
           <label className="relative hidden sm:block">
@@ -223,7 +223,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                   ? 'Search address, MLS, or agent...'
                   : 'Search listings...'
               }
-              className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
+              className="h-10 w-64 rounded-sm border-0 border-b border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus-visible:border-[var(--color-gold)]"
             />
           </label>
           <NotificationBell />
@@ -232,9 +232,9 @@ function DashboardContent({ role }: DashboardPageProps) {
       </header>
 
       {/* Mobile subheader: pipeline tabs and quick New button */}
-      <div className="flex lg:hidden flex-col gap-3 border-b border-[var(--color-border)] px-4 py-3 bg-[#0a0a0a]">
+      <div className="flex lg:hidden flex-col gap-3 border-b border-[var(--color-border)] px-4 py-3 bg-[var(--color-bg-base)]">
         {liveBannerId ? (
-          <div className="flex items-center justify-between rounded bg-[#CFB87C] px-3 py-2 text-xs font-bold text-black">
+          <div className="flex items-center justify-between rounded bg-[var(--color-gold)] px-3 py-2 text-xs font-bold text-[var(--color-black)]">
             <span>Listing is LIVE — {liveListing?.address_full ?? 'Your listing'}</span>
             <button type="button" onClick={() => setLiveBannerId(null)} aria-label="Dismiss">
               <X className="size-3.5" />
@@ -265,7 +265,7 @@ function DashboardContent({ role }: DashboardPageProps) {
             <button
               type="button"
               onClick={() => navigate('/listing/new')}
-              className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--color-gold)] bg-[var(--color-gold)] px-2.5 py-1 text-[11px] font-bold text-black uppercase hover:bg-[var(--color-gold)]/90 transition-colors"
+              className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--color-gold)] bg-[var(--color-gold)] px-2.5 py-1 text-[11px] font-bold text-[var(--color-black)] uppercase hover:bg-[var(--color-gold)]/90 transition-colors"
             >
               <Plus className="size-3" />
               New
@@ -290,7 +290,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search listings..."
-                    className="h-10 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-white)]"
+                    className="h-10 w-full rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] pr-3 pl-10 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus-visible:border-[var(--color-gold)]"
                   />
                 </label>
               </div>
@@ -320,7 +320,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                 </div>
                 <p className="text-sm text-[var(--color-text-secondary)]">
                   Showing{' '}
-                  <span className="font-semibold text-[var(--color-white)]">
+                  <span className="font-semibold text-[var(--color-text)]">
                     {filteredListings.length}
                   </span>{' '}
                   pipelines
@@ -332,7 +332,7 @@ function DashboardContent({ role }: DashboardPageProps) {
                   Loading listings...
                 </p>
               ) : error ? (
-                <div className="rounded-sm border border-red-500/40 bg-red-500/10 p-6 text-red-200">
+                <div className="rounded-sm border border-red-500/40 bg-red-500/10 p-6 text-red-700 dark:text-red-200">
                   {error}
                 </div>
               ) : filteredListings.length === 0 ? (

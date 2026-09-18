@@ -24,7 +24,7 @@ export function Waveform({ energyLevel = 0, active = false, className }: Wavefor
         return (
           <motion.div
             key={index}
-            className="w-1.5 rounded-full bg-[#CFB87C]"
+            className="w-1.5 rounded-full bg-[var(--color-gold)]"
             animate={{
               height: active ? height : [12, 18, 12],
             }}

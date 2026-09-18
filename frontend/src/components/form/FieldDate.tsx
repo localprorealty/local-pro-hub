@@ -42,7 +42,7 @@ export function FieldDate({
           {required ? <span className="text-red-400"> *</span> : null}
         </Label>
         {isPreFilled ? (
-          <span className="rounded bg-[#CFB87C]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[#CFB87C] uppercase">
+          <span className="rounded bg-[var(--color-gold)]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[var(--color-gold)] uppercase">
             from NTREIS
           </span>
         ) : null}
@@ -55,11 +55,11 @@ export function FieldDate({
               fieldInputClass,
               'flex w-full items-center justify-between px-3 text-left text-sm',
               fieldBorderClass(required, value, isPreFilled),
-              !value && 'text-[#888888]',
+              !value && 'text-[var(--color-text-secondary)]',
             )}
           >
             {selected ? format(selected, 'MM/dd/yyyy') : 'Select date...'}
-            <CalendarIcon className="size-4 text-[#888888]" />
+            <CalendarIcon className="size-4 text-[var(--color-text-secondary)]" />
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto p-0">

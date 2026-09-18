@@ -317,7 +317,7 @@ function App() {
             path="/admin/templates"
             element={
               <ProtectedRoute state={authState} allowedRoles={['admin']}>
-                <AdminTemplatesPage />
+                <AdminTemplatesPage role="admin" />
               </ProtectedRoute>
             }
           />
@@ -380,7 +380,7 @@ function App() {
             path="/templates"
             element={
               <ProtectedRoute state={authState} allowedRoles={['agent', 'admin', 'transaction_coordinator']}>
-                <AdminTemplatesPage />
+                <AdminTemplatesPage role={authState.profile?.role === 'admin' ? 'admin' : 'agent'} />
               </ProtectedRoute>
             }
           />

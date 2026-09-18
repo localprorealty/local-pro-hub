@@ -1,8 +1,8 @@
 export const fieldInputClass =
-  'h-10 rounded-lg border-[#333333] bg-[#111111] text-white focus-visible:border-[#CFB87C] focus-visible:ring-[#CFB87C]/50'
+  'h-10 rounded-lg border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] focus-visible:border-[var(--color-gold)] focus-visible:ring-[var(--color-gold-border)]'
 
 export const fieldLabelClass =
-  'font-[family-name:var(--font-display)] text-[11px] tracking-wider text-[#888888] uppercase'
+  'font-[family-name:var(--font-display)] text-[11px] tracking-wider text-[var(--color-text-secondary)] uppercase'
 
 export function fieldBorderClass(required: boolean, value: unknown, isPreFilled = false): string {
   const empty =

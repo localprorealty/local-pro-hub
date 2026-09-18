@@ -33,11 +33,11 @@ export function ConfirmSaveDialog({
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
-        className="max-w-md border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-white)] sm:max-w-md"
+        className="max-w-md border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] sm:max-w-md"
         data-size="default"
       >
         <AlertDialogHeader className="text-left">
-          <AlertDialogTitle className="font-[family-name:var(--font-display)] text-lg text-[var(--color-white)]">
+          <AlertDialogTitle className="font-[family-name:var(--font-display)] text-lg text-[var(--color-text)]">
             {title}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-[var(--color-text-secondary)]">
@@ -55,14 +55,14 @@ export function ConfirmSaveDialog({
                   {change.from}
                 </span>
                 <span className="text-[var(--color-text-secondary)]"> → </span>
-                <span className="text-[var(--color-white)]">{change.to}</span>
+                <span className="text-[var(--color-text)]">{change.to}</span>
               </li>
             ))}
           </ul>
         ) : null}
 
         <AlertDialogFooter className="sm:justify-end">
-          <AlertDialogCancel className="rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-white)] hover:bg-[var(--color-surface-3)]">
+          <AlertDialogCancel className="rounded-sm border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-surface-3)]">
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
@@ -71,7 +71,7 @@ export function ConfirmSaveDialog({
               e.preventDefault()
               onConfirm()
             }}
-            className="rounded-sm bg-[var(--color-gold)] text-[var(--color-black)] hover:bg-[#dcc487]"
+            className="rounded-sm bg-[var(--color-gold)] text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
           >
             {isLoading ? 'Saving...' : confirmLabel}
           </AlertDialogAction>

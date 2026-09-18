@@ -63,6 +63,7 @@ To prevent repeating the same issues when resuming theme development, keep these
 * **Symptom**: On `/profile` (and other pages), fields like Full Name, Phone, MLS ID, Bio, Agent License, and HeyGen API Key appeared completely blank in light mode, leading users to believe their data was lost or deleted.
 * **Root Cause**: The background tokens were switched to light mode (`#ffffff`), but input styling in `UserProfileForm.tsx`, `ProfilePage.tsx`, and `AdminUserRoster.tsx` retained hardcoded `text-white` or `text-[var(--color-white)]` rather than using responsive semantic tokens (`text-[var(--color-text)]` or `text-foreground`).
 * **Prevention**: Whenever background variables swap, all text color classes must be semantic tokens (`text-[var(--color-text)]`), and the base `Input` component (`frontend/src/components/ui/input.tsx`) must default to `text-foreground`.
+* **Critical Rule for Field Styles**: Any shared field/input style constant must use `--color-text`, never `--color-white`, for text color — this has caused the invisible-text bug twice now.
 
 ### Bug 2: Toggle Placement Inconsistency & Layout Overlaps
 * **Symptom**: The theme toggle was manually added per-shell and per-page (`MissionShell`, `AdminShell`, `ListingMissionHeader`, `ListingDetailPage`), causing it to disappear on sub-pages with custom headers (such as `PhotographyPage` or `ListingMissionLayout`), and when fixed positioning was tested, it collided with the top-right `<ProfileMenu />`.

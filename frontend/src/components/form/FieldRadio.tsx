@@ -29,7 +29,7 @@ export function FieldRadio({
           {required ? <span className="text-red-400"> *</span> : null}
         </Label>
         {isPreFilled ? (
-          <span className="rounded bg-[#CFB87C]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[#CFB87C] uppercase">
+          <span className="rounded bg-[var(--color-gold)]/15 px-1.5 py-0.5 text-[9px] tracking-wide text-[var(--color-gold)] uppercase">
             from NTREIS
           </span>
         ) : null}
@@ -47,8 +47,8 @@ export function FieldRadio({
               className={cn(
                 'rounded-full border px-4 py-2 text-xs transition-colors',
                 selected
-                  ? 'border-[#CFB87C] bg-[#CFB87C] font-semibold text-black'
-                  : 'border-[#444444] bg-[#1a1a1a] text-[#888888] hover:border-[#666666]',
+                  ? 'border-[var(--color-gold)] bg-[var(--color-gold)] font-semibold text-black'
+                  : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]',
               )}
             >
               {option}

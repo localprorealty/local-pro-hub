@@ -60,18 +60,18 @@ export default function CapProgressCard() {
     ]
   }, [capProgress])
 
-  const COLORS = ['#CFB87C', '#2a2a2a'] // gold for paid, dark for remaining
+  const COLORS = ['var(--color-gold)', 'var(--color-surface-3)'] // gold for paid, surface-3 for remaining
 
   if (isLoading) {
     return (
       <div className="w-full border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm min-h-[220px] animate-pulse flex flex-col justify-between">
-        <div className="h-4 bg-zinc-800 rounded w-1/4"></div>
+        <div className="h-4 bg-[var(--color-surface-3)] rounded w-1/4"></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-          <div className="flex justify-center items-center h-28 bg-zinc-800/40 rounded-full w-28 mx-auto"></div>
+          <div className="flex justify-center items-center h-28 bg-[var(--color-surface-3)]/60 rounded-full w-28 mx-auto"></div>
           <div className="space-y-3">
-            <div className="h-3 bg-zinc-800 rounded w-full"></div>
-            <div className="h-3 bg-zinc-800 rounded w-5/6"></div>
-            <div className="h-3 bg-zinc-800 rounded w-2/3"></div>
+            <div className="h-3 bg-[var(--color-surface-3)] rounded w-full"></div>
+            <div className="h-3 bg-[var(--color-surface-3)] rounded w-5/6"></div>
+            <div className="h-3 bg-[var(--color-surface-3)] rounded w-2/3"></div>
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function CapProgressCard() {
 
   if (error) {
     return (
-      <div className="w-full border border-red-500/30 bg-red-500/10 p-5 rounded-sm text-red-200 text-xs">
+      <div className="w-full border border-red-500/30 bg-red-500/10 p-5 rounded-sm text-red-700 dark:text-red-200 text-xs">
         {error}
       </div>
     )
@@ -133,9 +133,9 @@ export default function CapProgressCard() {
               <h4 className="text-sm font-semibold text-[var(--color-gold)] uppercase tracking-wider mb-1">
                 🎉 You've Capped Out!
               </h4>
-              <p className="text-xs text-gray-300 leading-relaxed font-light">
+              <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed font-light">
                 Congratulations! You keep a larger share of every deal until{' '}
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-[var(--color-text)]">
                   {capProgress.next_anniversary ? new Date(capProgress.next_anniversary).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -166,7 +166,7 @@ export default function CapProgressCard() {
 
               {/* Overlay center text */}
               <div className="absolute top-[70px] left-[70px] -translate-x-1/2 -translate-y-1/2 text-center select-none pointer-events-none">
-                <span className="block text-xl font-bold font-sans text-white leading-none">
+                <span className="block text-xl font-bold font-sans text-[var(--color-text)] leading-none">
                   {capProgress.percent_complete}%
                 </span>
                 <span className="block text-[9px] text-[var(--color-text-secondary)] uppercase tracking-wider mt-0.5">
@@ -183,7 +183,7 @@ export default function CapProgressCard() {
             <span className="text-[9px] uppercase tracking-wider text-[var(--color-text-secondary)] block">
               Cap Amount
             </span>
-            <span className="text-base font-bold text-white block">
+            <span className="text-base font-bold text-[var(--color-text)] block">
               {formatCurrency(capProgress.cap_amount)}
             </span>
           </div>
@@ -206,7 +206,7 @@ export default function CapProgressCard() {
             <span className="text-[9px] uppercase tracking-wider text-[var(--color-text-secondary)] block">
               Remaining
             </span>
-            <span className="text-base font-bold text-white block">
+            <span className="text-base font-bold text-[var(--color-text)] block">
               {formatCurrency(capProgress.cap_remaining)}
             </span>
           </div>
@@ -215,7 +215,7 @@ export default function CapProgressCard() {
             <span className="text-[9px] uppercase tracking-wider text-[var(--color-text-secondary)] block">
               Split
             </span>
-            <span className="text-base font-bold text-white block">
+            <span className="text-base font-bold text-[var(--color-text)] block">
               {capProgress.commission_split || '—'}
             </span>
           </div>
@@ -224,7 +224,7 @@ export default function CapProgressCard() {
             <span className="text-[9px] uppercase tracking-wider text-[var(--color-text-secondary)] block">
               Monthly Fee
             </span>
-            <span className="text-base font-bold text-white block">
+            <span className="text-base font-bold text-[var(--color-text)] block">
               {capProgress.monthly_fee || '—'}
             </span>
           </div>

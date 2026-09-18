@@ -30,8 +30,8 @@ export function FieldRoomRow({
   const patch = (next: Partial<RoomRowValue>) => onChange({ ...value, ...next })
 
   return (
-    <div className="rounded-lg border border-[#2a2a2a] bg-[#111111]/50 p-4">
-      <Label className={cn(fieldLabelClass, 'mb-3 block text-[#CFB87C]')}>{label}</Label>
+    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 p-4">
+      <Label className={cn(fieldLabelClass, 'mb-3 block text-[var(--color-gold)]')}>{label}</Label>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {showRoomName ? (
           <div className="col-span-2 space-y-1 md:col-span-4">
@@ -75,7 +75,7 @@ export function FieldRoomRow({
             <button
               type="button"
               onClick={() => setFeaturesOpen((o) => !o)}
-              className="flex h-10 w-full items-center justify-between rounded-lg border border-[#333333] bg-[#111111] px-3 text-xs text-[#888888]"
+              className="flex h-10 w-full items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-xs text-[var(--color-text-secondary)]"
             >
               Features ({value.features?.length ?? 0})
               <ChevronDown

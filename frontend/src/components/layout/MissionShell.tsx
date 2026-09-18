@@ -5,6 +5,7 @@ import { ArrowLeft, Menu } from 'lucide-react'
 import { AgentSidebar } from '@/components/layout/AgentSidebar'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
+import { FloatingUtilityStack } from '@/components/theme/FloatingUtilityStack'
 import {
   Sheet,
   SheetContent,
@@ -40,21 +41,21 @@ export function MissionShell({
   const homePath = role === 'photographer' ? '/photographer/calendar' : '/dashboard'
 
   return (
-    <main className="relative min-h-svh">
+    <main className="relative min-h-svh bg-[var(--color-bg-base)] text-[var(--color-text)]">
       {/* Universal Mobile Sticky Top Bar (visible only below lg) */}
-      <header className="sticky top-0 z-30 flex lg:hidden items-center justify-between border-b border-[var(--color-border)] bg-[#0a0a0a]/95 px-4 py-3 backdrop-blur-md">
+      <header className="sticky top-0 z-30 flex lg:hidden items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-base)]/95 px-4 py-3 backdrop-blur-md">
         <div className="flex items-center gap-2.5 min-w-0">
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="flex size-9 shrink-0 items-center justify-center rounded-sm text-[var(--color-text-secondary)] hover:bg-[#1a1a1a] hover:text-white"
+                className="flex size-9 shrink-0 items-center justify-center rounded-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
                 aria-label="Open navigation menu"
               >
                 <Menu className="size-5" />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] p-0 bg-[#0a0a0a] border-r border-[var(--color-border)]">
+            <SheetContent side="left" className="w-[280px] p-0 bg-[var(--color-surface)] border-r border-[var(--color-border)] text-[var(--color-text)]">
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation Menu</SheetTitle>
               </SheetHeader>
@@ -65,7 +66,7 @@ export function MissionShell({
           {backTo ? (
             <Link
               to={backTo}
-              className="shrink-0 rounded-sm p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
+              className="shrink-0 rounded-sm p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
               aria-label="Back"
             >
               <ArrowLeft className="size-5" />
@@ -84,7 +85,7 @@ export function MissionShell({
 
           {title ? (
             <div className="min-w-0 border-l border-[var(--color-border)]/60 pl-2.5">
-              <h1 className="truncate font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--color-white)]">
+              <h1 className="truncate font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--color-text)]">
                 {title}
               </h1>
             </div>
@@ -100,14 +101,14 @@ export function MissionShell({
       <div className="grid min-h-svh lg:grid-cols-[220px_1fr] w-full min-w-0">
         <AgentSidebar role={role} />
 
-        <section className="flex min-h-svh flex-col bg-[#0a0a0a] w-full min-w-0">
+        <section className="flex min-h-svh flex-col bg-[var(--color-bg-base)] text-[var(--color-text)] w-full min-w-0">
           {headerSlot ? (
             headerSlot
           ) : hideDefaultHeader ? null : (
             <header className="hidden lg:flex items-start justify-between border-b border-[var(--color-border)] px-8 py-8">
               <div>
                 {title ? (
-                  <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-white)]">
+                  <h1 className="font-[family-name:var(--font-display)] text-2xl text-[var(--color-text)]">
                     {title}
                   </h1>
                 ) : null}
@@ -124,6 +125,8 @@ export function MissionShell({
           <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 w-full min-w-0">{children}</div>
         </section>
       </div>
+
+      <FloatingUtilityStack formPageLayout={false} />
     </main>
   )
 }

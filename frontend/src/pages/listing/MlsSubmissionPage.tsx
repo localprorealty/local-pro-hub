@@ -22,6 +22,7 @@ import {
 } from '@/lib/ntreis-sections'
 import { getSupabaseClient } from '@/lib/supabase'
 import { fetchUserProfile } from '@/lib/users'
+import { CHROME_WEBSTORE_URL } from '@/lib/constants'
 
 function MlsSubmissionContent() {
   const { id } = useParams<{ id: string }>()
@@ -152,21 +153,21 @@ function MlsSubmissionContent() {
                 }`}
               />
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-[var(--color-text)]">
                   {extensionDetected
                     ? 'LP Fill extension detected'
                     : 'Extension not installed'}
                 </p>
                 {extensionDetected ? (
-                  <p className="text-xs text-emerald-400/80">V2.4.1 connected</p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">V2.4.1 connected</p>
                 ) : (
                   <a
-                    href="https://chrome.google.com/webstore"
+                    href={CHROME_WEBSTORE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[#CFB87C] underline"
+                    className="text-xs text-[var(--color-gold)] underline hover:text-[var(--color-gold)]/80"
                   >
-                    Download from Chrome Web Store
+                    Get it from the Chrome Web Store
                   </a>
                 )}
               </div>
@@ -175,7 +176,7 @@ function MlsSubmissionContent() {
               type="button"
               variant="outline"
               onClick={() => window.open('https://ntrdd.mlsmatrix.com/Matrix/Input', '_blank', 'noopener,noreferrer')}
-              className="w-full sm:w-auto shrink-0 justify-center rounded-sm border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[#1a1a1a]"
+              className="w-full sm:w-auto shrink-0 justify-center rounded-sm border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
             >
               Open NTREIS Matrix
               <ExternalLink className="ml-2 size-3.5" />
@@ -183,8 +184,8 @@ function MlsSubmissionContent() {
           </div>
         </div>
 
-        <div className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-5 space-y-3">
-          <h5 className="text-xs tracking-wider text-white uppercase font-semibold">LocalPRO Listing Credentials</h5>
+        <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-3 shadow-sm">
+          <h5 className="text-xs tracking-wider text-[var(--color-text)] uppercase font-semibold">LocalPRO Listing Credentials</h5>
           <p className="text-xs text-[var(--color-text-secondary)]">
             Copy your LocalPRO Listing ID to load it inside the Chrome Extension helper.
           </p>
@@ -192,18 +193,18 @@ function MlsSubmissionContent() {
             <button
               type="button"
               onClick={() => void handleCopyListingId()}
-              className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[#111111] border border-[#2a2a2a] text-xs font-semibold text-[#CFB87C] hover:bg-[#2a2a2a] transition-colors"
+              className="inline-flex items-center justify-center h-10 px-5 rounded-sm bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-gold)] hover:bg-[var(--color-surface-3)] transition-colors"
             >
               {copiedListingId ? 'Copied!' : 'Copy Listing ID'}
             </button>
             <span className="text-xs text-[var(--color-text-secondary)]">
-              (ID: <strong className="text-white font-mono break-all">{id}</strong>)
+              (ID: <strong className="text-[var(--color-text)] font-mono break-all">{id}</strong>)
             </span>
           </div>
         </div>
 
-        <section className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-6">
-          <h2 className="text-sm font-semibold tracking-wide text-white uppercase">
+        <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
+          <h2 className="text-sm font-semibold tracking-wide text-[var(--color-text)] uppercase">
             How to submit your listing
           </h2>
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-[var(--color-text-secondary)]">
@@ -212,7 +213,7 @@ function MlsSubmissionContent() {
               <button
                 type="button"
                 onClick={() => window.open('https://ntrdd.mlsmatrix.com/Matrix/Input', '_blank', 'noopener,noreferrer')}
-                className="inline-flex items-center gap-1 text-[#CFB87C] hover:underline"
+                className="inline-flex items-center gap-1 text-[var(--color-gold)] hover:underline"
               >
                 NTREIS Matrix
                 <ExternalLink className="size-3" />
@@ -224,13 +225,13 @@ function MlsSubmissionContent() {
           </ol>
         </section>
 
-        <section className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-6">
+        <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
           <div className="flex items-center justify-between gap-4 border-b border-[var(--color-border)] pb-4">
-            <p className="text-sm text-white">
-              <span className="font-semibold text-[#CFB87C]">{completeCount}</span>
+            <p className="text-sm text-[var(--color-text)]">
+              <span className="font-semibold text-[var(--color-gold)]">{completeCount}</span>
               <span className="text-[var(--color-text-secondary)]"> / {totalCount} sections complete</span>
             </p>
-            <span className="text-sm font-semibold text-[#CFB87C]">{progressPct}%</span>
+            <span className="text-sm font-semibold text-[var(--color-gold)]">{progressPct}%</span>
           </div>
 
           <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto pr-1">
@@ -239,11 +240,11 @@ function MlsSubmissionContent() {
               return (
                 <li
                   key={row.name}
-                  className="flex items-center justify-between gap-3 rounded-sm border border-[var(--color-border)]/60 bg-[#0a0a0a]/50 px-4 py-2.5"
+                  className="flex items-center justify-between gap-3 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5"
                 >
-                  <div className="flex items-center gap-2 text-sm text-white">
+                  <div className="flex items-center gap-2 text-sm text-[var(--color-text)]">
                     {synced ? (
-                      <Check className="size-4 text-emerald-400" aria-hidden />
+                      <Check className="size-4 text-emerald-600 dark:text-emerald-400" aria-hidden />
                     ) : (
                       <span className="size-4 rounded-full border border-[var(--color-border)]" />
                     )}
@@ -256,7 +257,7 @@ function MlsSubmissionContent() {
           </ul>
         </section>
 
-        <section className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-6">
+        <section className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
           <p className="text-sm text-[var(--color-text-secondary)]">
             {allComplete
               ? 'All sections complete. Submit in NTREIS when ready.'
@@ -268,9 +269,9 @@ function MlsSubmissionContent() {
               type="checkbox"
               checked={confirmedSubmitted}
               onChange={(event) => setConfirmedSubmitted(event.target.checked)}
-              className="mt-1 accent-[#CFB87C]"
+              className="mt-1 accent-[var(--color-gold)]"
             />
-            <span className="text-sm text-white">
+            <span className="text-sm text-[var(--color-text)]">
               I have reviewed and submitted this listing on NTREIS
             </span>
           </label>
@@ -279,7 +280,7 @@ function MlsSubmissionContent() {
             type="button"
             disabled={!confirmedSubmitted || isAdvancing}
             onClick={() => void handleContinue()}
-            className="mt-6 h-12 w-full rounded-sm bg-[#CFB87C] text-sm font-bold tracking-wide text-[#0a0a0a] uppercase hover:bg-[#dcc487] disabled:opacity-50"
+            className="mt-6 h-12 w-full rounded-sm bg-[var(--color-gold)] text-sm font-bold tracking-wide text-black uppercase hover:bg-[var(--color-gold)]/90 disabled:opacity-50"
           >
             {isAdvancing ? (
               <>
@@ -292,7 +293,7 @@ function MlsSubmissionContent() {
           </Button>
 
           {actionError ? (
-            <p className="mt-4 text-sm text-red-300" role="alert">
+            <p className="mt-4 text-sm text-red-600 dark:text-red-300" role="alert">
               {actionError}
             </p>
           ) : null}

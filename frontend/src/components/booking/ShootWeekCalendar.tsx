@@ -44,11 +44,19 @@ function dayStatus(
 }
 
 function statusClass(status: DayStatus, selected: boolean): string {
-  if (selected) return 'border-2 border-[#CFB87C] bg-[#1a1a1a] text-white'
-  if (status === 'blocked') return 'bg-[#3a1515] text-[#cccccc]'
-  if (status === 'booked') return 'bg-[#3a2f10] text-[#cccccc]'
-  if (status === 'past') return 'bg-[#141414] text-[#555555]'
-  return 'bg-white text-[#0a0a0a]'
+  if (selected) {
+    return 'border-2 border-[var(--color-gold)] bg-[var(--color-gold)]/15 text-[var(--color-text)] font-bold ring-1 ring-[var(--color-gold)]/50'
+  }
+  if (status === 'blocked') {
+    return 'bg-rose-100/70 text-rose-900 border border-rose-300/60 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/40 opacity-60'
+  }
+  if (status === 'booked') {
+    return 'bg-amber-100/70 text-amber-900 border border-amber-300/60 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40 opacity-80'
+  }
+  if (status === 'past') {
+    return 'bg-[var(--color-surface-3)]/40 text-[var(--color-text-secondary)] opacity-40'
+  }
+  return 'bg-[var(--color-surface-2)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[var(--color-gold)]/60'
 }
 
 export function ShootWeekCalendar({
@@ -102,38 +110,38 @@ export function ShootWeekCalendar({
   }
 
   return (
-    <div className="rounded-sm border border-[var(--color-border)] bg-[#1a1a1a] p-4">
+    <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => onWeekChange(shift())}
-            className="rounded-sm p-1 text-[#CFB87C] hover:bg-[#CFB87C]/10"
+            className="rounded-sm p-1 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10"
             aria-label="Previous"
           >
             <ChevronLeft className="size-5" />
           </button>
-          <p className="font-[family-name:var(--font-display)] text-sm text-white">
+          <p className="font-[family-name:var(--font-display)] text-sm text-[var(--color-text)] font-medium">
             {headerLabel}
           </p>
           <button
             type="button"
             onClick={() => onWeekChange(shiftForward())}
-            className="rounded-sm p-1 text-[#CFB87C] hover:bg-[#CFB87C]/10"
+            className="rounded-sm p-1 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10"
             aria-label="Next"
           >
             <ChevronRight className="size-5" />
           </button>
         </div>
-        <div className="flex rounded-sm border border-[var(--color-border)] text-[10px] uppercase tracking-widest">
+        <div className="flex rounded-sm border border-[var(--color-border)] text-[10px] uppercase tracking-widest overflow-hidden">
           <button
             type="button"
             onClick={() => onViewModeChange('week')}
             className={cn(
-              'px-3 py-1.5',
+              'px-3 py-1.5 transition-colors',
               viewMode === 'week'
-                ? 'bg-[#CFB87C] text-[#0a0a0a]'
-                : 'text-[var(--color-text-secondary)]',
+                ? 'bg-[var(--color-gold)] text-black font-semibold'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
             )}
           >
             Week
@@ -142,10 +150,10 @@ export function ShootWeekCalendar({
             type="button"
             onClick={() => onViewModeChange('month')}
             className={cn(
-              'px-3 py-1.5',
+              'px-3 py-1.5 transition-colors',
               viewMode === 'month'
-                ? 'bg-[#CFB87C] text-[#0a0a0a]'
-                : 'text-[var(--color-text-secondary)]',
+                ? 'bg-[var(--color-gold)] text-black font-semibold'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
             )}
           >
             Month
@@ -189,13 +197,13 @@ export function ShootWeekCalendar({
 
       <div className="mt-4 flex flex-wrap gap-3 text-[10px] text-[var(--color-text-secondary)]">
         <span className="flex items-center gap-1.5">
-          <span className="size-3 rounded-sm bg-white" /> Available
+          <span className="size-3 rounded-sm bg-[var(--color-surface-2)] border border-[var(--color-border)]" /> Available
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-3 rounded-sm bg-[#3a1515]" /> Blocked
+          <span className="size-3 rounded-sm bg-rose-500/80" /> Blocked
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-3 rounded-sm bg-[#3a2f10]" /> Booked
+          <span className="size-3 rounded-sm bg-amber-500/80" /> Booked
         </span>
       </div>
     </div>

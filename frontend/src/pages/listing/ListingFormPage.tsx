@@ -7,6 +7,7 @@ import { DeleteDraftButton } from '@/components/listings/DeleteDraftButton'
 import { ListingIdBadge } from '@/components/listings/ListingIdBadge'
 import { PropertySearchStep } from '@/components/listing/PropertySearchStep'
 import { NtreisFormBody } from '@/components/form/NtreisFormBody'
+import { FloatingUtilityStack } from '@/components/theme/FloatingUtilityStack'
 import {
   formatPropertyAddress,
   generateListingDescription,
@@ -278,7 +279,7 @@ function ListingFormContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-svh items-center justify-center bg-[#0a0a0a] text-[#888888]">
+      <main className="flex min-h-svh items-center justify-center bg-[var(--color-bg-base)] text-[var(--color-text-secondary)]">
         Loading listing...
       </main>
     )
@@ -286,9 +287,9 @@ function ListingFormContent() {
 
   if (loadError || !listing) {
     return (
-      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-[#0a0a0a] text-red-300">
+      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-[var(--color-bg-base)] text-red-300">
         <p>{loadError ?? 'Listing not found.'}</p>
-        <Link to="/dashboard" className="text-[#CFB87C] hover:underline">
+        <Link to="/dashboard" className="text-[var(--color-gold)] hover:underline">
           Back to dashboard
         </Link>
       </main>
@@ -296,30 +297,30 @@ function ListingFormContent() {
   }
 
   return (
-    <main className="min-h-svh bg-[#0a0a0a]">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[#2a2a2a] bg-[#0a0a0a]/95 px-6 py-4 backdrop-blur-sm md:px-10">
+    <main className="min-h-svh bg-[var(--color-bg-base)] text-[var(--color-text)]">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-base)]/95 px-6 py-4 backdrop-blur-sm md:px-10">
         <div className="flex items-center gap-3">
           <Link
             to={`/listing/${listing.id}`}
-            className="shrink-0 rounded-sm p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[#1a1a1a] hover:text-white"
+            className="shrink-0 rounded-sm p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]"
             aria-label="Back to listing hub"
           >
             <ArrowLeft className="size-5" />
           </Link>
           <Link
             to="/dashboard"
-            className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[#CFB87C]"
+            className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[var(--color-gold)]"
           >
             LP
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-display)] text-sm text-white">
+        <div className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-display)] text-sm text-[var(--color-text)]">
           <span>New Listing</span>
-          <span className="text-[#555555]">·</span>
-          <span className="rounded border border-[#CFB87C]/40 bg-[#CFB87C]/10 px-2 py-0.5 text-xs text-[#CFB87C]">
+          <span className="text-[var(--color-text-tertiary)]">·</span>
+          <span className="rounded border border-[var(--color-gold-border)] bg-[var(--color-gold-dim)] px-2 py-0.5 text-xs text-[var(--color-gold)]">
             {TYPE_LABEL[listing.listing_type]}
           </span>
-          <span className="text-[#555555]">·</span>
+          <span className="text-[var(--color-text-tertiary)]">·</span>
           <ListingIdBadge id={listing.id} />
         </div>
         <div className="flex items-center gap-4">
@@ -336,8 +337,8 @@ function ListingFormContent() {
             className={`text-xs ${saveStatus === 'error'
                 ? 'text-red-400'
                 : saveStatus === 'saving'
-                  ? 'text-[#888888]'
-                  : 'text-[#CFB87C]'
+                  ? 'text-[var(--color-text-secondary)]'
+                  : 'text-[var(--color-gold)]'
               }`}
           >
             {saveIndicator}
@@ -363,6 +364,8 @@ function ListingFormContent() {
           onStageAdvanced={() => navigate(`/listing/${listing.id}`)}
         />
       )}
+
+      <FloatingUtilityStack formPageLayout={true} />
     </main>
   )
 }

@@ -66,7 +66,7 @@ export function SubmissionPortalSidebar({
   return (
     <aside className="h-fit space-y-6">
       <div>
-        <p className="text-[10px] tracking-[0.2em] text-[#CFB87C] uppercase">
+        <p className="text-[10px] tracking-[0.2em] text-[var(--color-gold)] uppercase">
           Submission Portal
         </p>
         {mlsRef ? (
@@ -84,8 +84,8 @@ export function SubmissionPortalSidebar({
               to={step.path(listingId)}
               className={`flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors ${
                 active
-                  ? 'bg-[#CFB87C]/15 font-medium text-[#CFB87C]'
-                  : 'text-[var(--color-text-secondary)] hover:bg-[#1a1a1a] hover:text-white'
+                  ? 'bg-[var(--color-gold)]/15 font-medium text-[var(--color-gold)]'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]'
               }`}
             >
               <Icon className="size-4 shrink-0" aria-hidden />
@@ -99,15 +99,15 @@ export function SubmissionPortalSidebar({
         <Button
           type="button"
           variant="outline"
-          className="h-9 w-full rounded-sm border-[#CFB87C]/50 bg-transparent text-xs tracking-widest text-[#CFB87C] uppercase hover:bg-[#CFB87C]/10"
+          className="h-9 w-full rounded-sm border-[var(--color-gold)]/50 bg-transparent text-xs tracking-widest text-[var(--color-gold)] uppercase hover:bg-[var(--color-gold)]/10"
         >
           Save draft
         </Button>
         <div className="flex gap-4 text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
-          <button type="button" className="hover:text-[#CFB87C]">
+          <button type="button" className="hover:text-[var(--color-gold)]">
             Settings
           </button>
-          <button type="button" className="hover:text-[#CFB87C]">
+          <button type="button" className="hover:text-[var(--color-gold)]">
             Support
           </button>
         </div>
@@ -126,7 +126,7 @@ export function PipelineDotNav({ activeIndex }: { activeIndex: 0 | 1 | 2 }) {
         <span
           key={index}
           className={`size-2 rounded-full ${
-            index === activeIndex ? 'bg-[#CFB87C]' : 'bg-[var(--color-border)]'
+            index === activeIndex ? 'bg-[var(--color-gold)]' : 'bg-[var(--color-border)]'
           }`}
         />
       ))}
@@ -136,7 +136,7 @@ export function PipelineDotNav({ activeIndex }: { activeIndex: 0 | 1 | 2 }) {
 
 export function SyncedBadge() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-sm bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-emerald-400 uppercase">
+    <span className="inline-flex items-center gap-1.5 rounded-sm border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-emerald-700 dark:text-emerald-400 uppercase">
       <CheckSquare className="size-3" aria-hidden />
       Synced
     </span>

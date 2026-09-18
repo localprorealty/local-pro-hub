@@ -64,7 +64,7 @@ export function NotificationBell() {
         >
           <Bell className="size-4" />
           {unreadCount > 0 ? (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-gold)] px-1 text-[10px] font-bold text-black ring-2 ring-[#0a0a0a]">
+            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-gold)] px-1 text-[10px] font-bold text-[var(--color-black)] ring-2 ring-[var(--color-bg-base)]">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           ) : null}
@@ -72,13 +72,13 @@ export function NotificationBell() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-80 rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-surface-2)] p-1 text-[var(--color-white)]"
+        className="w-80 rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-surface-2)] p-1 text-[var(--color-text)]"
       >
         <DropdownMenuLabel className="font-normal px-2 py-1.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <MessageSquare className="size-3.5 text-[var(--color-gold)]" />
-              <span className="text-xs font-semibold tracking-wider text-white uppercase">
+              <span className="text-xs font-semibold tracking-wider text-[var(--color-text)] uppercase">
                 Client Feedback
               </span>
             </div>
@@ -94,7 +94,7 @@ export function NotificationBell() {
         {unreadList.length === 0 ? (
           <div className="py-6 px-4 text-center">
             <p className="text-xs text-[var(--color-text-secondary)]">No unread client feedback.</p>
-            <p className="mt-1 text-[10px] text-zinc-500">
+            <p className="mt-1 text-[10px] text-[var(--color-text-tertiary)]">
               When visitors comment on your public share link, you&apos;ll be notified here.
             </p>
           </div>
@@ -115,7 +115,7 @@ export function NotificationBell() {
                   className="cursor-pointer flex flex-col items-start gap-1 p-2.5 text-left transition-colors focus:bg-[var(--color-gold-dim)]"
                 >
                   <div className="flex w-full items-center justify-between gap-2">
-                    <span className="truncate text-xs font-semibold text-white">
+                    <span className="truncate text-xs font-semibold text-[var(--color-text)]">
                       {c.address_full}
                     </span>
                     <span className="shrink-0 text-[10px] text-[var(--color-text-secondary)]">

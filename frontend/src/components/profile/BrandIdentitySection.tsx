@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { uploadBrandLogo, deleteBrandLogo } from '@/lib/users'
 
 const fieldClass =
-  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
+  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
 
 export type BrandIdentityPayload = {
   brand_logo_url: string | null
@@ -88,12 +88,12 @@ export function BrandIdentitySection({
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-6">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-6">
       <div className="border-b border-[var(--color-border)]/60 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Palette className="size-4 text-[var(--color-gold)]" />
           <div>
-            <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-white)]">
+            <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text)]">
               Marketing Brand Identity
             </h3>
             <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
@@ -114,7 +114,7 @@ export function BrandIdentitySection({
           </Label>
           <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {logoUrl ? (
-              <div className="relative flex h-20 w-44 items-center justify-center rounded-sm border border-[var(--color-border)] bg-[#141414] p-2">
+              <div className="relative flex h-20 w-44 items-center justify-center rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2">
                 <img
                   src={logoUrl}
                   alt="Brand logo"
@@ -122,7 +122,7 @@ export function BrandIdentitySection({
                 />
               </div>
             ) : (
-              <div className="flex h-20 w-44 items-center justify-center rounded-sm border border-dashed border-[var(--color-border)] bg-[#141414] text-xs text-[var(--color-text-secondary)]">
+              <div className="flex h-20 w-44 items-center justify-center rounded-sm border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs text-[var(--color-text-secondary)]">
                 No logo uploaded
               </div>
             )}
@@ -135,7 +135,7 @@ export function BrandIdentitySection({
                   size="sm"
                   disabled={isUploadingLogo}
                   onClick={() => logoInputRef.current?.click()}
-                  className="h-8 border-[var(--color-border)] bg-transparent text-xs text-white hover:bg-[#2a2a2a]"
+                  className="h-8 border-[var(--color-border)] bg-transparent text-xs text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                 >
                   {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change Logo' : 'Upload Logo'}
                 </Button>
@@ -239,7 +239,7 @@ export function BrandIdentitySection({
           <Button
             type="submit"
             disabled={isSaving || isUploadingLogo}
-            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[#dcc487] disabled:opacity-60"
+            className="h-10 rounded-sm bg-[var(--color-gold)] px-6 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)] disabled:opacity-60"
           >
             {isSaving ? 'Saving branding...' : 'Save Branding Changes'}
           </Button>

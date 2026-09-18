@@ -75,7 +75,7 @@ export function PipelineListingCard({
       <div className="w-1.5 shrink-0 bg-[var(--color-gold)] transition-all group-hover:w-2" />
 
       <div className="flex flex-[1.5] flex-col justify-center px-6 py-5">
-        <h3 className="text-lg font-semibold leading-tight text-[var(--color-white)]">
+        <h3 className="text-lg font-semibold leading-tight text-[var(--color-text)]">
           {listing.address_full ?? 'Unnamed listing'}
         </h3>
         {(() => {
@@ -118,7 +118,7 @@ export function PipelineListingCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="font-mono text-[#CFB87C] hover:underline"
+              className="font-mono text-[var(--color-gold)] hover:underline"
             >
               {listing.brokermint_transaction_id}
             </a>
@@ -146,7 +146,7 @@ export function PipelineListingCard({
             />
           ))}
         </div>
-        <p className="text-sm text-[var(--color-white)]">Current phase</p>
+        <p className="text-sm text-[var(--color-text)]">Current phase</p>
         <p className="text-sm font-semibold text-[var(--color-gold)]">
           {STAGE_LABEL[listing.stage]}
         </p>
@@ -157,7 +157,7 @@ export function PipelineListingCard({
           <p className="text-[11px] tracking-wide text-[var(--color-text-secondary)] uppercase">
             Go Live Date
           </p>
-          <p className="text-lg font-semibold text-[var(--color-white)]">
+          <p className="text-lg font-semibold text-[var(--color-text)]">
             {formatGoLiveDate(listing.go_live_date)}
           </p>
         </div>
@@ -177,7 +177,7 @@ export function PipelineListingCard({
             <Link
               to={`/listing/${listing.id}/form`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center justify-center whitespace-nowrap shrink-0 gap-1.5 text-xs font-bold tracking-wider text-[var(--color-text-secondary)] hover:text-white uppercase border border-[var(--color-border)] px-3.5 py-1.5 rounded-sm hover:border-[var(--color-gold)] transition-colors"
+              className="inline-flex items-center justify-center whitespace-nowrap shrink-0 gap-1.5 text-xs font-bold tracking-wider text-[var(--color-text-secondary)] hover:text-[var(--color-text)] uppercase border border-[var(--color-border)] px-3.5 py-1.5 rounded-sm hover:border-[var(--color-gold)] transition-colors"
             >
               View Form
             </Link>

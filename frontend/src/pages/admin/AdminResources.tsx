@@ -30,16 +30,16 @@ export default function AdminResourcesPage() {
             return (
               <article
                 key={r.id}
-                className="rounded-md border border-[var(--color-border)] bg-[#1a1a1a] p-6 hover:border-[var(--color-gold-border)] transition-colors flex flex-col justify-between"
+                className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 hover:border-[var(--color-gold-border)] transition-colors flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="rounded bg-[#2a2a2a] px-2 py-0.5 text-[10px] font-semibold text-[#CFB87C] uppercase tracking-wider">
+                    <span className="rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-gold)] uppercase tracking-wider">
                       {r.type}
                     </span>
                     <Icon className="size-5 text-[var(--color-gold)]" />
                   </div>
-                  <h3 className="text-base font-semibold text-white mt-4">{r.title}</h3>
+                  <h3 className="text-base font-semibold text-[var(--color-text)] mt-4">{r.title}</h3>
                   <p className="text-xs text-[var(--color-text-secondary)] mt-2 leading-relaxed">
                     {r.description}
                   </p>
@@ -48,7 +48,7 @@ export default function AdminResourcesPage() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#CFB87C] hover:text-white uppercase tracking-wider"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--color-gold)] hover:text-[var(--color-text)] uppercase tracking-wider transition-colors"
                   >
                     <Download className="size-4" />
                     Access Files

@@ -29,7 +29,7 @@ import {
 } from '@/lib/vendors'
 
 const fieldClass =
-  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-white)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
+  'h-10 rounded-sm border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-gold)]'
 
 export function PhotographerVendorsSection() {
   const [vendors, setVendors] = useState<AgentVendor[]>([])
@@ -129,12 +129,12 @@ export function PhotographerVendorsSection() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-4">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
       <div className="flex items-center justify-between border-b border-[var(--color-border)]/60 pb-3">
         <div className="flex items-center gap-2.5">
           <Building2 className="size-4 text-[var(--color-gold)]" />
           <div>
-            <h4 className="text-sm font-semibold text-white">Preferred Photographer Vendors</h4>
+            <h4 className="text-sm font-semibold text-[var(--color-text)]">Preferred Photographer Vendors</h4>
             <p className="text-[11px] text-[var(--color-text-secondary)]">
               Manage your preferred photographer vendor directory for quick order links and email dispatch.
             </p>
@@ -145,7 +145,7 @@ export function PhotographerVendorsSection() {
             type="button"
             size="sm"
             onClick={openNewVendorForm}
-            className="h-8 gap-1.5 rounded-sm bg-[var(--color-gold)] px-3 text-xs font-semibold text-black hover:bg-[#dcc487]"
+            className="h-8 gap-1.5 rounded-sm bg-[var(--color-gold)] px-3 text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
           >
             <Plus className="size-3.5" />
             {vendors.length === 0 ? 'Add Vendor' : 'New'}
@@ -169,14 +169,14 @@ export function PhotographerVendorsSection() {
             <button
               type="button"
               onClick={() => setIsEditingVendor(false)}
-              className="text-xs text-zinc-400 hover:text-white"
+              className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
             >
               <X className="size-4" />
             </button>
           </div>
 
           <div>
-            <Label className="text-xs text-zinc-300">Vendor / Business Name *</Label>
+            <Label className="text-xs text-[var(--color-text-secondary)]">Vendor / Business Name *</Label>
             <Input
               value={vendorName}
               onChange={(e) => setVendorName(e.target.value)}
@@ -187,7 +187,7 @@ export function PhotographerVendorsSection() {
           </div>
 
           <div>
-            <Label className="text-xs text-zinc-300">Ordering Website URL</Label>
+            <Label className="text-xs text-[var(--color-text-secondary)]">Ordering Website URL</Label>
             <Input
               value={vendorUrl}
               onChange={(e) => setVendorUrl(e.target.value)}
@@ -199,7 +199,7 @@ export function PhotographerVendorsSection() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <Label className="text-xs text-zinc-300">Contact Email</Label>
+              <Label className="text-xs text-[var(--color-text-secondary)]">Contact Email</Label>
               <Input
                 value={vendorEmail}
                 onChange={(e) => setVendorEmail(e.target.value)}
@@ -209,7 +209,7 @@ export function PhotographerVendorsSection() {
               />
             </div>
             <div>
-              <Label className="text-xs text-zinc-300">Phone</Label>
+              <Label className="text-xs text-[var(--color-text-secondary)]">Phone</Label>
               <Input
                 value={vendorPhone}
                 onChange={(e) => setVendorPhone(e.target.value)}
@@ -220,7 +220,7 @@ export function PhotographerVendorsSection() {
           </div>
 
           <div>
-            <Label className="text-xs text-zinc-300">Default Package / Order Notes</Label>
+            <Label className="text-xs text-[var(--color-text-secondary)]">Default Package / Order Notes</Label>
             <Input
               value={vendorNotes}
               onChange={(e) => setVendorNotes(e.target.value)}
@@ -235,7 +235,7 @@ export function PhotographerVendorsSection() {
               variant="outline"
               size="sm"
               onClick={() => setIsEditingVendor(false)}
-              className="h-8 text-xs text-white"
+              className="h-8 text-xs text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
             >
               Cancel
             </Button>
@@ -243,7 +243,7 @@ export function PhotographerVendorsSection() {
               type="submit"
               size="sm"
               disabled={isSavingVendor || !vendorName.trim()}
-              className="h-8 bg-[var(--color-gold)] text-xs font-semibold text-black hover:bg-[#dcc487]"
+              className="h-8 bg-[var(--color-gold)] text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
             >
               {isSavingVendor ? 'Saving...' : 'Save Vendor'}
             </Button>
@@ -251,7 +251,7 @@ export function PhotographerVendorsSection() {
         </form>
       ) : vendors.length === 0 ? (
         <div className="rounded-lg border border-dashed border-[var(--color-border)] p-5 text-center">
-          <p className="text-xs text-zinc-300 font-medium">No external photographer saved</p>
+          <p className="text-xs text-[var(--color-text-secondary)] font-medium">No external photographer saved</p>
           <p className="mt-1 text-[11px] text-[var(--color-text-secondary)]">
             Add your photographer to quickly open their ordering portal and dispatch order emails
             directly from Mission Control.
@@ -260,7 +260,7 @@ export function PhotographerVendorsSection() {
             type="button"
             size="sm"
             onClick={openNewVendorForm}
-            className="mt-3 h-8 bg-[var(--color-gold)] text-xs font-semibold text-black hover:bg-[#dcc487]"
+            className="mt-3 h-8 bg-[var(--color-gold)] text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
           >
             + Add Photographer
           </Button>
@@ -270,11 +270,11 @@ export function PhotographerVendorsSection() {
           {vendors.map((v) => (
             <div
               key={v.id}
-              className="rounded-lg border border-[var(--color-border)] bg-[#161616] p-4 text-xs space-y-2"
+              className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-xs space-y-2"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-semibold text-white text-sm">{v.name}</p>
+                  <p className="font-semibold text-[var(--color-text)] text-sm">{v.name}</p>
                   {v.website_url ? (
                     <a
                       href={v.website_url}
@@ -293,7 +293,7 @@ export function PhotographerVendorsSection() {
                     variant="ghost"
                     size="sm"
                     onClick={() => openEditVendorForm(v)}
-                    className="h-7 px-2 text-[11px] text-zinc-300 hover:text-white"
+                    className="h-7 px-2 text-[11px] text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                   >
                     Edit
                   </Button>
@@ -310,14 +310,14 @@ export function PhotographerVendorsSection() {
               </div>
 
               {(v.email || v.phone) && (
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-zinc-400 border-t border-[var(--color-border)]/50 pt-2 text-[11px]">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[var(--color-text-secondary)] border-t border-[var(--color-border)]/50 pt-2 text-[11px]">
                   {v.email && <span>Email: {v.email}</span>}
                   {v.phone && <span>Phone: {v.phone}</span>}
                 </div>
               )}
 
               {v.notes && (
-                <p className="text-[11px] text-zinc-400 italic">Package note: {v.notes}</p>
+                <p className="text-[11px] text-[var(--color-text-secondary)] italic">Package note: {v.notes}</p>
               )}
             </div>
           ))}
@@ -414,11 +414,11 @@ export function GmailDispatchSection() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[#101010] p-6 space-y-4">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
       <div className="flex items-center justify-between border-b border-[var(--color-border)]/60 pb-3">
         <div className="flex items-center gap-2">
           <Mail className="size-4 text-[var(--color-gold)]" />
-          <h4 className="text-sm font-semibold text-white">Gmail Order Dispatch</h4>
+          <h4 className="text-sm font-semibold text-[var(--color-text)]">Gmail Order Dispatch</h4>
         </div>
 
         {/* Info Icon with Popover / Modal Guidance */}
@@ -436,41 +436,41 @@ export function GmailDispatchSection() {
 
       {/* Interactive Info / Tooltip Box */}
       {showTooltip && (
-        <div className="rounded-lg border border-[var(--color-gold)]/30 bg-[#17150e] p-3.5 text-xs text-zinc-300 space-y-2.5 relative">
+        <div className="rounded-lg border border-[var(--color-gold-border)] bg-[var(--color-gold-dim)] p-3.5 text-xs text-[var(--color-text-secondary)] space-y-2.5 relative">
           <button
             type="button"
             onClick={() => setShowTooltip(false)}
-            className="absolute top-2 right-2 text-zinc-400 hover:text-white"
+            className="absolute top-2 right-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
           >
             <X className="size-3.5" />
           </button>
-          <p className="font-semibold text-white">
+          <p className="font-semibold text-[var(--color-text)]">
             This is completely optional &mdash; skip it and LocalPRO Hub will send vendor emails
             on your behalf automatically.
           </p>
           <p className="leading-relaxed">
-            <strong className="text-white">Why connect Gmail?</strong>
+            <strong className="text-[var(--color-text)]">Why connect Gmail?</strong>
             <br />
             Connecting an App Password allows order emails to be sent directly from your own
             Google address, so vendor replies land straight in your inbox and the sent email
             appears in your Gmail Sent folder.
           </p>
           <div className="leading-relaxed space-y-1">
-            <strong className="text-white">How to create an App Password in 1 minute:</strong>
-            <ol className="list-decimal pl-4 space-y-0.5 text-zinc-300">
+            <strong className="text-[var(--color-text)]">How to create an App Password in 1 minute:</strong>
+            <ol className="list-decimal pl-4 space-y-0.5 text-[var(--color-text-secondary)]">
               <li>
-                Go to your <strong className="text-white">Google Account &gt; Security</strong>.
+                Go to your <strong className="text-[var(--color-text)]">Google Account &gt; Security</strong>.
               </li>
               <li>
                 Under <em>How you sign in to Google</em>, select{' '}
-                <strong className="text-white">2-Step Verification &gt; App Passwords</strong>.
+                <strong className="text-[var(--color-text)]">2-Step Verification &gt; App Passwords</strong>.
               </li>
               <li>
                 Name it <em>&ldquo;LocalPRO Hub&rdquo;</em> and copy the generated 16-letter code.
               </li>
             </ol>
           </div>
-          <p className="text-[11px] text-[var(--color-gold)]/90 border-t border-[var(--color-gold)]/20 pt-2 flex items-start gap-1.5">
+          <p className="text-[11px] text-[var(--color-gold)] border-t border-[var(--color-gold-border)] pt-2 flex items-start gap-1.5">
             <Lock className="size-3.5 shrink-0 mt-0.5" />
             <span>
               <strong>Security Guarantee</strong>: Your App Password is encrypted at rest using
@@ -491,13 +491,13 @@ export function GmailDispatchSection() {
         </div>
       ) : gmailStatus.is_configured ? (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 text-xs">
-            <CheckCircle2 className="size-5 text-emerald-400 shrink-0" />
+          <div className="flex items-center gap-3 rounded-lg border border-emerald-600/20 bg-emerald-500/10 dark:border-emerald-500/30 dark:bg-emerald-500/5 p-4 text-xs">
+            <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <div className="flex-1">
-              <p className="font-semibold text-emerald-300 text-sm">Gmail Connected</p>
-              <p className="text-zinc-400 mt-0.5">
+              <p className="font-semibold text-emerald-800 dark:text-emerald-300 text-sm">Gmail Connected</p>
+              <p className="text-[var(--color-text-secondary)] mt-0.5">
                 Orders will be sent directly from{' '}
-                <strong className="text-white">{gmailStatus.gmail_email}</strong>.
+                <strong className="text-[var(--color-text)]">{gmailStatus.gmail_email}</strong>.
               </p>
             </div>
           </div>
@@ -509,7 +509,7 @@ export function GmailDispatchSection() {
               size="sm"
               disabled={isSavingGmail}
               onClick={() => setShowDisconnectConfirm(true)}
-              className="h-8 text-xs text-red-300 border-red-500/30 hover:bg-red-500/10"
+              className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-300 dark:hover:text-red-200 border-red-500/30"
             >
               {isSavingGmail ? 'Disconnecting...' : 'Disconnect Gmail'}
             </Button>
@@ -517,13 +517,13 @@ export function GmailDispatchSection() {
         </div>
       ) : (
         <form onSubmit={handleConnectGmail} className="space-y-3 text-xs">
-          <p className="text-zinc-400 text-[11px]">
+          <p className="text-[var(--color-text-secondary)] text-[11px]">
             Enter your Gmail address and 16-letter App Password to send vendor orders directly
             from your mailbox.
           </p>
 
           <div>
-            <Label className="text-xs text-zinc-300">Gmail Address</Label>
+            <Label className="text-xs text-[var(--color-text-secondary)]">Gmail Address</Label>
             <Input
               value={gmailEmail}
               onChange={(e) => setGmailEmail(e.target.value)}
@@ -535,7 +535,7 @@ export function GmailDispatchSection() {
           </div>
 
           <div>
-            <Label className="text-xs text-zinc-300">Google App Password (16 letters)</Label>
+            <Label className="text-xs text-[var(--color-text-secondary)]">Google App Password (16 letters)</Label>
             <Input
               value={appPassword}
               onChange={(e) => setAppPassword(e.target.value)}
@@ -547,14 +547,14 @@ export function GmailDispatchSection() {
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-[11px] text-zinc-500 flex items-center gap-1">
+            <span className="text-[11px] text-[var(--color-text-tertiary)] flex items-center gap-1">
               <Lock className="size-3" /> Encrypted at rest
             </span>
             <Button
               type="submit"
               size="sm"
               disabled={isSavingGmail || !gmailEmail.trim() || !appPassword.trim()}
-              className="h-8 bg-[var(--color-gold)] text-xs font-semibold text-black hover:bg-[#dcc487]"
+              className="h-8 bg-[var(--color-gold)] text-xs font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
             >
               {isSavingGmail ? (
                 <>

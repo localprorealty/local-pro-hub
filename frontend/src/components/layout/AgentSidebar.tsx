@@ -47,7 +47,7 @@ function SidebarNavLink({
         `flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-xs tracking-wide uppercase transition-colors ${
           isActive
             ? 'border-l-4 border-[var(--color-gold)] bg-[var(--color-surface-3)] pl-2 text-[var(--color-gold)]'
-            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-white)]'
+            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]'
         }`
       }
     >
@@ -96,7 +96,7 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
     <aside
       className={
         isDrawer
-          ? `flex h-full flex-col overflow-hidden bg-[#0a0a0a] ${className ?? ''}`
+          ? `flex h-full flex-col overflow-hidden bg-[var(--color-surface)] text-[var(--color-text)] ${className ?? ''}`
           : `sticky top-0 hidden lg:flex h-svh flex-col overflow-hidden border-r border-[var(--color-border)] ${shellPanelClass} ${className ?? ''}`
       }
     >
@@ -109,7 +109,7 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
           <p className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tighter text-[var(--color-gold)]">
             LP
           </p>
-          <h2 className="mt-1 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-white)]">
+          <h2 className="mt-1 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text)]">
             Mission Control
           </h2>
         </NavLink>
@@ -157,7 +157,7 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
             <SidebarNavLink
               to="/listing/new"
               icon={<Plus className="size-4" />}
-              label="New Listing"
+              label="New Transaction"
               onClick={onNavigate}
             />
           ) : null}

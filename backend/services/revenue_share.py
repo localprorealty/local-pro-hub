@@ -197,17 +197,21 @@ async def calculate_running_earnings(
     recipient_id: str,
     contributor_id: str,
     generation: int,
-    cap_year_start: date
+    cap_year_start: date,
+    exclude_commission_id: Optional[str] = None
 ) -> float:
-    """Calculates the sum of already earned payouts for this cap cycle configuration."""
-    res = supabase.table("revenue_share_earnings")\
+    """Calculates the sum of already earned transaction split payouts for this cap cycle configuration."""
+    query = supabase.table("revenue_share_earnings")\
         .select("amount")\
         .eq("recipient_user_id", recipient_id)\
         .eq("contributing_user_id", contributor_id)\
         .eq("generation", generation)\
-        .eq("cap_year_start", cap_year_start.isoformat())\
-        .execute()
+        .eq("cap_year_start", cap_year_start.isoformat())
         
+    if exclude_commission_id:
+        query = query.neq("bm_commission_id", exclude_commission_id)
+        
+    res = query.execute()
     return sum(float(r["amount"] or 0) for r in res.data) if res.data else 0.0
 
 
@@ -285,15 +289,20 @@ async def revenue_share_earnings_job(supabase, closing_date_from: date = LAUNCH_
                     if is_unlocked:
                         rate = float(settings[f"gen{gen}_rate"])
                         max_payout = float(settings[f"gen{gen}_max_payout"])
+                        completion_bonus = float(settings.get(f"gen{gen}_completion_bonus", 0.0))
+                        # Split-only ceiling: transaction splits can only reach (max_payout - completion_bonus),
+                        # e.g. Gen 1: $3,200 - $1,000 = $2,200.
+                        # Allows optional explicit gen{N}_split_cap override if configured in settings.
+                        split_cap = float(settings.get(f"gen{gen}_split_cap", max(0.0, max_payout - completion_bonus)))
                         
                         raw_earning = company_split * rate
                         
-                        # Calculate already earned this cap year from this contributor
+                        # Calculate already earned transaction split earnings this cap year from this contributor
                         already_earned = await calculate_running_earnings(
-                            supabase, sponsor_id, contributor_id, gen, cap_year_start
+                            supabase, sponsor_id, contributor_id, gen, cap_year_start, exclude_commission_id=comm_id
                         )
                         
-                        remaining_room = max(0.0, max_payout - already_earned)
+                        remaining_room = max(0.0, split_cap - already_earned)
                         payout_amount = min(raw_earning, remaining_room)
                         
                         if payout_amount > 0:

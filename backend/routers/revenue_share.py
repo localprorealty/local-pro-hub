@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from datetime import date, datetime, timezone
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, Depends
@@ -305,6 +306,62 @@ async def get_payment_ledger_endpoint(admin_id: str = Depends(require_admin)):
     return suggestions
 
 
+@router.get("/agent-summaries")
+async def get_agent_summaries_endpoint(admin_id: str = Depends(require_admin)):
+    """
+    Admin only. Splitwise-style summary of revenue share per agent:
+    Total Earned, Total Paid, and Remaining Owed.
+    Sorted by Remaining Owed descending.
+    """
+    client = get_service_client()
+    
+    users_res = client.table("users").select("id, full_name, email").execute()
+    users_map = {u["id"]: u for u in (users_res.data or [])}
+    
+    earnings_res = client.table("revenue_share_earnings").select("recipient_user_id, amount").execute()
+    bonuses_res = client.table("revenue_share_completion_bonuses").select("recipient_user_id, amount").execute()
+    payments_res = client.table("revenue_share_payments").select("recipient_user_id, cash_amount, credit_amount, status").eq("status", "paid").execute()
+    
+    earned_map = defaultdict(float)
+    paid_map = defaultdict(float)
+    recipient_ids = set()
+    
+    for e in (earnings_res.data or []):
+        rid = e.get("recipient_user_id")
+        if rid:
+            recipient_ids.add(rid)
+            earned_map[rid] += float(e.get("amount") or 0)
+        
+    for b in (bonuses_res.data or []):
+        rid = b.get("recipient_user_id")
+        if rid:
+            recipient_ids.add(rid)
+            earned_map[rid] += float(b.get("amount") or 0)
+        
+    for p in (payments_res.data or []):
+        rid = p.get("recipient_user_id")
+        if rid:
+            paid_map[rid] += float(p.get("cash_amount") or 0) + float(p.get("credit_amount") or 0)
+        
+    summaries = []
+    for rid in recipient_ids:
+        u = users_map.get(rid, {})
+        tot_earned = round(earned_map[rid], 2)
+        tot_paid = round(paid_map[rid], 2)
+        owed = round(tot_earned - tot_paid, 2)
+        summaries.append({
+            "user_id": rid,
+            "name": u.get("full_name") or "Unknown Agent",
+            "email": u.get("email") or "",
+            "total_earned": tot_earned,
+            "total_paid": tot_paid,
+            "remaining_owed": owed
+        })
+        
+    summaries.sort(key=lambda x: x["remaining_owed"], reverse=True)
+    return summaries
+
+
 @router.post("/payments")
 async def create_payment_endpoint(body: PaymentCreateBody, admin_id: str = Depends(require_admin)):
     """Admin only. Record payout details, link contributions, and sync credit back to BrokerMint."""
@@ -482,11 +539,20 @@ async def get_my_earnings_endpoint(user: dict = Depends(get_current_user)):
         "generation_breakdown": {g: round(val, 2) for g, val in generation_breakdown.items()}
     }
     
+    # Get global revenue share settings for generation rates
+    settings_res = client.table("revenue_share_settings")\
+        .select("*")\
+        .order("updated_at", desc=True)\
+        .limit(1)\
+        .execute()
+    settings_data = settings_res.data[0] if settings_res.data else {}
+
     return {
         "eligible": True,
         "earnings": sorted(earnings_list, key=lambda x: x["created_at"], reverse=True),
         "payments": payments_res.data or [],
-        "summary": summary
+        "summary": summary,
+        "settings": settings_data
     }
 
 

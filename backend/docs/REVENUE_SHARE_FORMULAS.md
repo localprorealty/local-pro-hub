@@ -39,8 +39,11 @@ launch day:
 amount = commission.calculated_dollar_amount x gen{N}_rate
 ```
 
-Capped so the running total for `(recipient, contributing_agent, generation,
-cap_year)` never exceeds `gen{N}_max_payout`.
+Capped so the running total of transaction split earnings for `(recipient, contributing_agent, generation,
+cap_year)` never exceeds `gen{N}_split_cap` (which defaults to `gen{N}_max_payout - gen{N}_completion_bonus`,
+e.g. $3,200 - $1,000 = $2,200 for Gen 1). The completion bonus ($1,000 for Gen 1) is tracked independently
+in `revenue_share_completion_bonuses`, guaranteeing that the sum of split earnings + completion bonus
+never overshoots `gen{N}_max_payout`.
 
 ## 3. Eligibility (to receive revenue share)
 

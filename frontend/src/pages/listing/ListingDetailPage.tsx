@@ -234,7 +234,7 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <NotificationBell />
+          <NotificationBell role={menuRole} />
           <ProfileMenu role={menuRole} />
         </div>
       </header>

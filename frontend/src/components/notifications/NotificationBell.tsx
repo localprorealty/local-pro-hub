@@ -11,9 +11,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import type { UserRole } from '@/lib/auth'
 import { fetchUnreadComments, type UnreadComment } from '@/lib/public-share'
+import { getSupabaseClient } from '@/lib/supabase'
 
-export function NotificationBell() {
+type NotificationBellProps = {
+  role?: UserRole
+}
+
+export function NotificationBell({ role }: NotificationBellProps = {}) {
+  // Visitor comments on public share links are strictly an agent feature.
+  // If role is explicitly admin, skip rendering and polling.
+  if (role === 'admin') {
+    return null
+  }
+
   const navigate = useNavigate()
   const [unreadList, setUnreadList] = useState<UnreadComment[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -29,26 +41,59 @@ export function NotificationBell() {
   }, [])
 
   useEffect(() => {
-    void loadUnread()
+    let isMounted = true
 
-    // Refresh on window focus or when comments are marked read
-    const handleFocus = () => void loadUnread()
-    const handleCommentsRead = () => void loadUnread()
+    const setupPolling = async () => {
+      // If role was not passed as a prop, check Supabase user role to avoid admin polling
+      if (!role) {
+        try {
+          const session = (await getSupabaseClient().auth.getSession()).data.session
+          if (!session) return
+          const { data } = await getSupabaseClient()
+            .from('users')
+            .select('role')
+            .eq('id', session.user.id)
+            .maybeSingle()
+          if (data?.role === 'admin') {
+            return
+          }
+        } catch {
+          // fallback to normal agent behavior
+        }
+      }
 
-    window.addEventListener('focus', handleFocus)
-    window.addEventListener('comments-read', handleCommentsRead)
-
-    // Poll every 45 seconds for new visitor comments
-    const interval = setInterval(() => {
+      if (!isMounted) return
       void loadUnread()
-    }, 45000)
+
+      // Refresh on window focus or when comments are marked read
+      const handleFocus = () => void loadUnread()
+      const handleCommentsRead = () => void loadUnread()
+
+      window.addEventListener('focus', handleFocus)
+      window.addEventListener('comments-read', handleCommentsRead)
+
+      // Poll every 45 seconds for new visitor comments
+      const interval = setInterval(() => {
+        void loadUnread()
+      }, 45000)
+
+      return () => {
+        window.removeEventListener('focus', handleFocus)
+        window.removeEventListener('comments-read', handleCommentsRead)
+        clearInterval(interval)
+      }
+    }
+
+    let teardown: (() => void) | undefined
+    void setupPolling().then((cleanup) => {
+      if (cleanup) teardown = cleanup
+    })
 
     return () => {
-      window.removeEventListener('focus', handleFocus)
-      window.removeEventListener('comments-read', handleCommentsRead)
-      clearInterval(interval)
+      isMounted = false
+      if (teardown) teardown()
     }
-  }, [loadUnread])
+  }, [loadUnread, role])
 
   const handleSelectComment = (listingId: string) => {
     navigate(`/listing/${listingId}?tab=share`)

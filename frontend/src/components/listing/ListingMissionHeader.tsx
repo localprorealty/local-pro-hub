@@ -53,7 +53,7 @@ export function ListingMissionHeader({
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <NotificationBell />
+        <NotificationBell role={role} />
         <ProfileMenu role={role} email={email} />
       </div>
     </header>

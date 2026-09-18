@@ -14,7 +14,6 @@ import {
 
 import { shellPanelClass } from '@/components/layout/GridBackground'
 import { QuickLinks } from '@/components/layout/QuickLinks'
-import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { ProfileMenu } from '@/components/profile/ProfileMenu'
 import { FloatingUtilityStack } from '@/components/theme/FloatingUtilityStack'
 import {
@@ -221,7 +220,6 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <NotificationBell />
           <ProfileMenu role="admin" />
         </div>
       </header>
@@ -242,7 +240,6 @@ export function AdminShell({ title, eyebrow = 'Admin', children }: AdminShellPro
               <h2 className="font-[family-name:var(--font-display)] text-3xl">{title}</h2>
             </div>
             <div className="flex items-center gap-3">
-              <NotificationBell />
               <ProfileMenu role="admin" />
             </div>
           </header>

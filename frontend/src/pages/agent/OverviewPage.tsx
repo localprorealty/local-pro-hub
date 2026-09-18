@@ -383,26 +383,34 @@ function OverviewContent() {
                     <div className="space-y-4">
                       <h4 className="text-xs uppercase tracking-widest text-[var(--color-gold)] font-bold">Generation Breakdown</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
-                        {(
-                          [
-                            { g: 1, rate: '13.75%' },
-                            { g: 2, rate: '5.31%' },
-                            { g: 3, rate: '4.25%' },
-                            { g: 4, rate: '3.18%' },
-                            { g: 5, rate: '2.12%' },
-                          ]
-                        ).map(item => {
-                          const amt = revData.summary.generation_breakdown[item.g] || 0
+                        {[1, 2, 3, 4, 5].map(g => {
+                          const rawRate = revData?.settings?.[`gen${g}_rate`]
+                          let rateLabel = ''
+                          if (rawRate !== undefined && rawRate !== null) {
+                            const pct = Number(rawRate) * 100
+                            rateLabel = `${pct.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}%`
+                          } else {
+                            const fallbackRates: Record<number, string> = {
+                              1: '13.75%',
+                              2: '5.31%',
+                              3: '1.875%',
+                              4: '1.565%',
+                              5: '2.50%',
+                            }
+                            rateLabel = fallbackRates[g] || '0%'
+                          }
+
+                          const amt = revData.summary.generation_breakdown[g] || 0
                           const contributors = Array.from(new Set(
                             revData.earnings
-                              .filter((e: any) => e.generation === item.g)
+                              .filter((e: any) => e.generation === g)
                               .map((e: any) => e.contributor)
                           )) as string[]
 
                           return (
-                            <div key={item.g} className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 rounded-sm space-y-3 flex flex-col justify-between">
+                            <div key={g} className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 rounded-sm space-y-3 flex flex-col justify-between">
                               <div className="space-y-1">
-                                <span className="text-[10px] uppercase text-[var(--color-text-secondary)] font-bold block">Gen {item.g} ({item.rate})</span>
+                                <span className="text-[10px] uppercase text-[var(--color-text-secondary)] font-bold block">Gen {g} ({rateLabel})</span>
                                 <span className="text-lg font-bold text-[var(--color-text)] block">{formatCurrency(amt)}</span>
                               </div>
                               {contributors.length > 0 ? (

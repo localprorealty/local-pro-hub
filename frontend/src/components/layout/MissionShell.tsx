@@ -93,7 +93,7 @@ export function MissionShell({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <NotificationBell />
+          <NotificationBell role={role} />
           <ProfileMenu role={role} email={email} />
         </div>
       </header>
@@ -117,7 +117,7 @@ export function MissionShell({
                 ) : null}
               </div>
               <div className="flex items-center gap-3">
-                <NotificationBell />
+                <NotificationBell role={role} />
                 <ProfileMenu role={role} email={email} />
               </div>
             </header>

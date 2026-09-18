@@ -1384,3 +1384,32 @@ async def delete_listing_image(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete image: {e}")
 
+
+# ---------------------------------------------------------------------------
+# Visitor Feedback & Comment Notifications (Canonical /listings/comments routes)
+# ---------------------------------------------------------------------------
+
+@router.get("/comments/unread")
+async def get_unread_comments_listing_endpoint(
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    """
+    Retrieve all unread visitor feedback/comments across all of this agent's listings.
+    Canonical route for GET /listings/comments/unread.
+    """
+    from routers.public_share import get_unread_comments
+    return await get_unread_comments(agent_id=agent_id)
+
+
+@router.post("/{listing_id}/comments/mark-read")
+async def mark_listing_comments_read_listing_endpoint(
+    listing_id: str,
+    agent_id: str = Depends(require_agent),
+) -> dict[str, Any]:
+    """
+    Mark all unread comments for a given listing as read.
+    Canonical route for POST /listings/{listing_id}/comments/mark-read.
+    """
+    from routers.public_share import mark_listing_comments_read
+    return await mark_listing_comments_read(listing_id=listing_id, agent_id=agent_id)
+

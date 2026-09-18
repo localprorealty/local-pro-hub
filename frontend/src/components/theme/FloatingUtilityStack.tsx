@@ -4,6 +4,12 @@ import { HelpCircle, Moon, Sun, Sparkles, X } from 'lucide-react'
 import { useTheme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
 
+/**
+ * Feature flag for North AI Advisor entry point.
+ * Set to true when North AI Advisor is ready to launch.
+ */
+export const NORTH_ENABLED = false
+
 type FloatingUtilityStackProps = {
   className?: string
   /**
@@ -60,23 +66,25 @@ export function FloatingUtilityStack({
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="mb-2.5 flex flex-col items-center gap-2.5"
             >
-              {/* Slot 1: Future North AI Advisor Entry Point */}
-              <div className="group relative flex items-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    // Future North AI trigger
-                  }}
-                  title="North AI Advisor (Coming Soon)"
-                  aria-label="North AI Advisor (Coming Soon)"
-                  className="relative flex size-10 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-gold)] shadow-md transition-all hover:scale-105 hover:border-[var(--color-gold)] hover:bg-[var(--color-surface-2)] active:scale-95"
-                >
-                  <Sparkles className="size-4" />
-                </button>
-                <div className="pointer-events-none absolute left-12 lg:left-auto lg:right-12 hidden whitespace-nowrap rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-xs font-medium text-[var(--color-text)] shadow-lg group-hover:flex">
-                  North AI <span className="ml-1.5 text-[10px] text-[var(--color-gold)] uppercase tracking-wider font-semibold">Soon</span>
+              {/* Slot 1: Future North AI Advisor Entry Point (Gated behind NORTH_ENABLED) */}
+              {NORTH_ENABLED && (
+                <div className="group relative flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Future North AI trigger
+                    }}
+                    title="North AI Advisor (Coming Soon)"
+                    aria-label="North AI Advisor (Coming Soon)"
+                    className="relative flex size-10 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-gold)] shadow-md transition-all hover:scale-105 hover:border-[var(--color-gold)] hover:bg-[var(--color-surface-2)] active:scale-95"
+                  >
+                    <Sparkles className="size-4" />
+                  </button>
+                  <div className="pointer-events-none absolute left-12 lg:left-auto lg:right-12 hidden whitespace-nowrap rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-xs font-medium text-[var(--color-text)] shadow-lg group-hover:flex">
+                    North AI <span className="ml-1.5 text-[10px] text-[var(--color-gold)] uppercase tracking-wider font-semibold">Soon</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Slot 2: Theme Toggle Button */}
               <div className="group relative flex items-center">

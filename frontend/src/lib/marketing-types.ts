@@ -1,6 +1,12 @@
 export type MarketingStep = 'upload' | 'payment' | 'generate'
 
-export type MarketingAssetTab = 'just_sold' | 'flyer' | 'book'
+export type MarketingAssetTab =
+  | 'just_sold'
+  | 'under_contract'
+  | 'open_house'
+  | 'new_listing'
+  | 'flyer'
+  | 'book'
 
 export type PhotoCategory =
   | 'hero'
@@ -49,6 +55,9 @@ export type NeighborhoodGuide = {
 
 export type MarketingPageType =
   | 'just_sold'
+  | 'under_contract'
+  | 'open_house'
+  | 'new_listing'
   | 'flyer'
   | 'flyer_footer'
   | 'neighborhood'

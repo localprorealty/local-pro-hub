@@ -55,6 +55,7 @@ import {
   getMlsPath,
   getPhotographyPath,
   getNextStage,
+  listingSpecsFromForm,
   stageIndex,
   type ListingRow,
   type ListingStage,
@@ -324,6 +325,8 @@ export function ListingDetailsPanel({
   ]
 
   const currentStageIdx = stageIndex(listing.stage)
+  const specs = listingSpecsFromForm(listing.form_data)
+  const hasSpecs = specs.beds !== '—' || specs.baths !== '—' || specs.sqft !== '—'
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1fr_260px]">
@@ -340,6 +343,16 @@ export function ListingDetailsPanel({
               </h3>
               <div className="mt-1.5 flex flex-wrap items-center gap-2">
                 <ListingIdBadge id={listing.id} />
+                {listing.form_data?.subdivision ? (
+                  <span className="text-xs text-[var(--color-text-secondary)]">
+                    · {String(listing.form_data.subdivision)}
+                  </span>
+                ) : null}
+                {listing.form_data?.year_built ? (
+                  <span className="text-xs text-[var(--color-text-secondary)]">
+                    · Built {String(listing.form_data.year_built)}
+                  </span>
+                ) : null}
                 {(() => {
                   const agentObj = Array.isArray(listing.agent) ? listing.agent[0] : listing.agent
                   const agentName = agentObj?.full_name
@@ -372,7 +385,11 @@ export function ListingDetailsPanel({
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 border-t border-[var(--color-border)]/40 pt-4">
+          <div
+            className={`grid ${
+              hasSpecs ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-3'
+            } gap-2 sm:gap-4 border-t border-[var(--color-border)]/40 pt-4`}
+          >
             <div>
               <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
                 Type
@@ -394,9 +411,43 @@ export function ListingDetailsPanel({
                 List Price
               </p>
               <p className="text-xs sm:text-sm font-medium text-[var(--color-text)] truncate">
-                {listing.list_price ? `$${listing.list_price.toLocaleString()}` : 'N/A'}
+                {listing.list_price
+                  ? `$${listing.list_price.toLocaleString()}`
+                  : listing.form_data?.list_price
+                    ? `$${Number(String(listing.form_data.list_price).replace(/[^0-9.]/g, '')).toLocaleString()}`
+                    : 'N/A'}
               </p>
             </div>
+            {hasSpecs && (
+              <>
+                <div>
+                  <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                    Beds
+                  </p>
+                  <p className="text-xs sm:text-sm font-medium text-[var(--color-text)]">
+                    {specs.beds}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                    Baths
+                  </p>
+                  <p className="text-xs sm:text-sm font-medium text-[var(--color-text)]">
+                    {specs.baths}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] sm:text-xs tracking-wide text-[var(--color-text-secondary)] uppercase">
+                    SqFt
+                  </p>
+                  <p className="text-xs sm:text-sm font-medium text-[var(--color-text)] truncate">
+                    {specs.sqft !== '—' && !Number.isNaN(Number(specs.sqft))
+                      ? Number(specs.sqft).toLocaleString()
+                      : specs.sqft}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -526,7 +577,7 @@ export function ListingDetailsPanel({
                       asChild
                       className="h-10 rounded-sm bg-[var(--color-gold)] px-5 font-semibold text-[var(--color-black)] hover:bg-[var(--color-gold-hover)]"
                     >
-                      <Link to={formPath}>Continue NTREIS form →</Link>
+                      <Link to={formPath}>Complete NTREIS form →</Link>
                     </Button>
                   ) : null}
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Download, Eye, Loader2, Sparkles } from 'lucide-react'
+import { Download, Eye, Image as ImageIcon, Loader2, Sparkles } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -9,6 +9,8 @@ import {
 } from '@/components/marketing/AiRefinementPanel'
 import { buildBookRefinementPages } from '@/components/marketing/book-refinement-pages'
 import { JustSoldTemplate } from '@/components/marketing/JustSoldTemplate'
+import { SocialPostTemplate } from '@/components/marketing/SocialPostTemplate'
+import { SocialPhotoSelector } from '@/components/marketing/SocialPhotoSelector'
 import { ListingBookTemplate } from '@/components/marketing/ListingBookTemplate'
 import { ListingFlyerTemplate } from '@/components/marketing/ListingFlyerTemplate'
 import { getListingBookPageIds } from '@/components/marketing/listing-book/book-page-ids'
@@ -50,6 +52,9 @@ import { api } from '@/lib/api'
 
 const TABS: { id: MarketingAssetTab; label: string }[] = [
   { id: 'just_sold', label: 'Just Sold' },
+  { id: 'under_contract', label: 'Under Contract' },
+  { id: 'open_house', label: 'Open House' },
+  { id: 'new_listing', label: 'New Listing' },
   { id: 'flyer', label: 'Listing Flyer' },
   { id: 'book', label: 'Listing Book' },
 ]
@@ -97,6 +102,7 @@ function MarketingAssetsContent() {
   })
   const previewContainerRef = useRef<HTMLDivElement>(null)
 
+  const [selectedSocialPhotos, setSelectedSocialPhotos] = useState<Record<string, string>>({})
   const [hasCheckedDraft, setHasCheckedDraft] = useState(false)
   const [isDraftRestored, setIsDraftRestored] = useState(false)
   const [showDraftSelector, setShowDraftSelector] = useState(false)
@@ -155,6 +161,7 @@ function MarketingAssetsContent() {
       if (draft.neighborhoodGuide) setNeighborhoodGuide(draft.neighborhoodGuide)
       if (draft.refinementHistory) setRefinementHistory(draft.refinementHistory)
       if (draft.undoStacks) setUndoStacks(draft.undoStacks)
+      if (draft.selectedSocialPhotos) setSelectedSocialPhotos(draft.selectedSocialPhotos)
       if (draft.photos) {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
         const restoredPhotos = (draft.photos as any[]).map((p) => ({
@@ -235,6 +242,7 @@ function MarketingAssetsContent() {
           neighborhoodGuide,
           refinementHistory,
           undoStacks,
+          selectedSocialPhotos,
           photos: serializablePhotos,
         }
 
@@ -305,6 +313,43 @@ function MarketingAssetsContent() {
     'dining',
   ]).map((p) => p.preview)
   const fileSlug = slugifyAddress(listingContext?.address_full ?? 'listing')
+
+  const isSocialTab = (tab: MarketingAssetTab): boolean =>
+    ['just_sold', 'under_contract', 'open_house', 'new_listing'].includes(tab)
+
+  const getActiveSocialPhoto = (tab: MarketingAssetTab): string | null => {
+    const customId = selectedSocialPhotos[tab]
+    if (customId) {
+      const found = photos.find((p) => p.id === customId)
+      if (found) return found.preview
+    }
+    return heroPhoto ?? photos[0]?.preview ?? null
+  }
+
+  const handleSelectSocialPhoto = (photoId: string) => {
+    setSelectedSocialPhotos((prev) => ({
+      ...prev,
+      [activeTab]: photoId,
+    }))
+    setIsDirty(true)
+  }
+
+  const handleAddPhotoDirect = (file: File) => {
+    const newId = `photo-${Date.now()}`
+    const previewUrl = URL.createObjectURL(file)
+    const newPhoto: PhotoUpload = {
+      id: newId,
+      preview: previewUrl,
+      category: 'other',
+      file,
+    }
+    setPhotos((prev) => [...prev, newPhoto])
+    setSelectedSocialPhotos((prev) => ({
+      ...prev,
+      [activeTab]: newId,
+    }))
+    setIsDirty(true)
+  }
 
   useEffect(() => {
     const el = previewContainerRef.current
@@ -518,6 +563,15 @@ function MarketingAssetsContent() {
   const handleDownloadJustSold = () =>
     runDownload(() => downloadAsImage('marketing-just-sold', `localpro-just-sold-${fileSlug}`, 2))
 
+  const handleDownloadUnderContract = () =>
+    runDownload(() => downloadAsImage('marketing-under-contract', `localpro-under-contract-${fileSlug}`, 2))
+
+  const handleDownloadOpenHouse = () =>
+    runDownload(() => downloadAsImage('marketing-open-house', `localpro-open-house-${fileSlug}`, 2))
+
+  const handleDownloadNewListing = () =>
+    runDownload(() => downloadAsImage('marketing-new-listing', `localpro-new-listing-${fileSlug}`, 2))
+
   const handleDownloadFlyerPng = () =>
     runDownload(() => downloadAsImage('marketing-flyer', `localpro-flyer-${fileSlug}`, 2))
 
@@ -634,8 +688,8 @@ function MarketingAssetsContent() {
             </div>
           ) : null}
 
-          {/* Mobile Segmented Control: [ Preview | Edit Copy & AI ] */}
-          {refinementPages.length > 0 ? (
+          {/* Mobile Segmented Control: [ Preview | Edit Copy & AI / Choose Photo ] */}
+          {refinementPages.length > 0 || isSocialTab(activeTab) ? (
             <div className="grid grid-cols-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-1 xl:hidden">
               <button
                 type="button"
@@ -658,8 +712,17 @@ function MarketingAssetsContent() {
                     : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
                 }`}
               >
-                <Sparkles className="size-3.5" />
-                Edit Copy & AI
+                {isSocialTab(activeTab) ? (
+                  <>
+                    <ImageIcon className="size-3.5" />
+                    Choose Photo
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="size-3.5" />
+                    Edit Copy & AI
+                  </>
+                )}
               </button>
             </div>
           ) : null}
@@ -667,7 +730,7 @@ function MarketingAssetsContent() {
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
             <div
               className={`min-w-0 flex-1 overflow-hidden rounded-md border border-[var(--color-border)] bg-[var(--color-surface-2)] ${
-                refinementPages.length > 0 && mobileViewMode === 'edit'
+                (refinementPages.length > 0 || isSocialTab(activeTab)) && mobileViewMode === 'edit'
                   ? 'hidden xl:block'
                   : 'block'
               }`}
@@ -684,11 +747,46 @@ function MarketingAssetsContent() {
                       transition={{ duration: 0.2 }}
                     >
                       {activeTab === 'just_sold' ? (
-                        <JustSoldTemplate
+                        <SocialPostTemplate
+                          variant="just_sold"
                           context={listingContext}
                           agent={agentProfile}
-                          heroPhoto={heroPhoto}
+                          heroPhoto={getActiveSocialPhoto('just_sold')}
                           scale={justSoldScale}
+                          elementId="marketing-just-sold"
+                        />
+                      ) : null}
+
+                      {activeTab === 'under_contract' ? (
+                        <SocialPostTemplate
+                          variant="under_contract"
+                          context={listingContext}
+                          agent={agentProfile}
+                          heroPhoto={getActiveSocialPhoto('under_contract')}
+                          scale={justSoldScale}
+                          elementId="marketing-under-contract"
+                        />
+                      ) : null}
+
+                      {activeTab === 'open_house' ? (
+                        <SocialPostTemplate
+                          variant="open_house"
+                          context={listingContext}
+                          agent={agentProfile}
+                          heroPhoto={getActiveSocialPhoto('open_house')}
+                          scale={justSoldScale}
+                          elementId="marketing-open-house"
+                        />
+                      ) : null}
+
+                      {activeTab === 'new_listing' ? (
+                        <SocialPostTemplate
+                          variant="new_listing"
+                          context={listingContext}
+                          agent={agentProfile}
+                          heroPhoto={getActiveSocialPhoto('new_listing')}
+                          scale={justSoldScale}
+                          elementId="marketing-new-listing"
                         />
                       ) : null}
 
@@ -744,13 +842,27 @@ function MarketingAssetsContent() {
                   isRefining={isRefining}
                 />
               </div>
+            ) : isSocialTab(activeTab) ? (
+              <div
+                className={`w-full xl:w-auto shrink-0 ${
+                  mobileViewMode === 'edit' ? 'block' : 'hidden xl:block'
+                }`}
+              >
+                <SocialPhotoSelector
+                  tabLabel={TABS.find((t) => t.id === activeTab)?.label ?? 'Social Post'}
+                  photos={photos}
+                  selectedPhotoId={selectedSocialPhotos[activeTab] || null}
+                  onSelectPhoto={handleSelectSocialPhoto}
+                  onAddPhoto={handleAddPhotoDirect}
+                />
+              </div>
             ) : null}
           </div>
 
           {downloadError ? (
             <p
               className={`text-sm text-red-300 ${
-                refinementPages.length > 0 && mobileViewMode === 'edit'
+                (refinementPages.length > 0 || isSocialTab(activeTab)) && mobileViewMode === 'edit'
                   ? 'hidden xl:block'
                   : 'block'
               }`}
@@ -762,7 +874,7 @@ function MarketingAssetsContent() {
 
           <div
             className={`flex flex-wrap gap-3 ${
-              refinementPages.length > 0 && mobileViewMode === 'edit'
+              (refinementPages.length > 0 || isSocialTab(activeTab)) && mobileViewMode === 'edit'
                 ? 'hidden xl:flex'
                 : 'flex'
             }`}
@@ -772,6 +884,42 @@ function MarketingAssetsContent() {
                 type="button"
                 disabled={isDownloading}
                 onClick={() => void handleDownloadJustSold()}
+                className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
+              >
+                <Download className="mr-2 size-4" />
+                Download PNG (1080×1080)
+              </Button>
+            ) : null}
+
+            {activeTab === 'under_contract' ? (
+              <Button
+                type="button"
+                disabled={isDownloading}
+                onClick={() => void handleDownloadUnderContract()}
+                className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
+              >
+                <Download className="mr-2 size-4" />
+                Download PNG (1080×1080)
+              </Button>
+            ) : null}
+
+            {activeTab === 'open_house' ? (
+              <Button
+                type="button"
+                disabled={isDownloading}
+                onClick={() => void handleDownloadOpenHouse()}
+                className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
+              >
+                <Download className="mr-2 size-4" />
+                Download PNG (1080×1080)
+              </Button>
+            ) : null}
+
+            {activeTab === 'new_listing' ? (
+              <Button
+                type="button"
+                disabled={isDownloading}
+                onClick={() => void handleDownloadNewListing()}
                 className="rounded-sm bg-[var(--color-gold)] font-semibold text-black hover:bg-[var(--color-gold)]/90"
               >
                 <Download className="mr-2 size-4" />

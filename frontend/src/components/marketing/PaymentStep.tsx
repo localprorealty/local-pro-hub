@@ -4,7 +4,7 @@ import { Check, Loader2, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const PACKAGE_ITEMS = [
-  { id: 'just_sold', label: '✓ Just Sold Post (Instagram)', price: 5 },
+  { id: 'social_posts', label: '✓ Social Posts (Just Sold, Under Contract, Open House, New Listing)', price: 5 },
   { id: 'flyer', label: '✓ New Listing Flyer (Print)', price: 10 },
   { id: 'book', label: '✓ Listing Book (Full PDF)', price: 15 },
 ]
@@ -21,18 +21,25 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
   const [promoApplied, setPromoApplied] = useState(false)
   const [promoError, setPromoError] = useState<string | null>(null)
 
-  const handleApplyPromo = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    if (promoInput.trim().toUpperCase() === 'ILOVELPR') {
+  const applyPromoCode = (code: string) => {
+    const clean = code.trim().toUpperCase()
+    setPromoInput(code.trim().toUpperCase())
+    if (clean === 'ILOVELPR') {
       setPromoApplied(true)
       setPromoError(null)
     } else {
       setPromoApplied(false)
-      setPromoError('Invalid promo code. Enter ILoveLPR for 100% off.')
+      setPromoError('Invalid promo code. Enter ILOVELPR for 100% off.')
     }
   }
 
+  const handleApplyPromo = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    applyPromoCode(promoInput)
+  }
+
   const handlePay = async () => {
+    if (!promoApplied) return
     setIsProcessing(true)
     await new Promise((resolve) => setTimeout(resolve, 1000))
     setIsProcessing(false)
@@ -88,7 +95,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
                 setPromoInput(e.target.value)
                 if (promoError) setPromoError(null)
               }}
-              placeholder="Enter promo code (e.g. ILoveLPR)"
+              placeholder="Enter promo code"
               className="flex-1 rounded-sm border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:border-[var(--color-gold)] focus:outline-none"
             />
             <Button
@@ -100,13 +107,28 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
             </Button>
           </div>
 
+          {!promoApplied && (
+            <div className="mt-2.5 flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <span>Promo code:</span>
+              <button
+                type="button"
+                onClick={() => applyPromoCode('ILOVELPR')}
+                className="inline-flex items-center gap-1.5 rounded border border-[var(--color-gold-border)] bg-[var(--color-gold-dim)] px-2 py-0.5 font-mono text-xs font-bold text-[var(--color-gold)] transition-colors hover:bg-[var(--color-gold)]/25 cursor-pointer"
+              >
+                <Tag className="size-3" />
+                ILOVELPR
+              </button>
+              <span className="text-[11px] text-[var(--color-text-tertiary)]">(Click to apply)</span>
+            </div>
+          )}
+
           {promoError && <p className="mt-2 text-xs text-red-400">{promoError}</p>}
 
           {promoApplied && (
             <div className="mt-3 flex items-center justify-between rounded-sm border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-300">
               <span className="flex items-center gap-1.5 font-medium">
                 <Check className="size-3.5 text-emerald-400" />
-                Promo <strong>ILoveLPR</strong> active ($30 value free)
+                Promo <strong>ILOVELPR</strong> active ($30 value free)
               </span>
               <button
                 type="button"
@@ -114,7 +136,7 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
                   setPromoApplied(false)
                   setPromoInput('')
                 }}
-                className="text-[11px] text-[var(--color-text-secondary)] underline hover:text-[var(--color-text)]"
+                className="text-[11px] text-[var(--color-text-secondary)] underline hover:text-[var(--color-text)] cursor-pointer"
               >
                 Remove
               </button>
@@ -149,9 +171,9 @@ export function PaymentStep({ onPaid }: PaymentStepProps) {
         {/* Action Button */}
         <Button
           type="button"
-          disabled={isProcessing}
+          disabled={isProcessing || !promoApplied}
           onClick={() => void handlePay()}
-          className="mt-6 h-12 w-full rounded-sm bg-[var(--color-gold)] text-base font-bold text-black hover:bg-[var(--color-gold)]/90"
+          className="mt-6 h-12 w-full rounded-sm bg-[var(--color-gold)] text-base font-bold text-black hover:bg-[var(--color-gold)]/90 disabled:cursor-not-allowed disabled:bg-[var(--color-surface-3)] disabled:text-[var(--color-text-secondary)] disabled:border disabled:border-[var(--color-border)] disabled:opacity-60"
         >
           {isProcessing ? (
             <>

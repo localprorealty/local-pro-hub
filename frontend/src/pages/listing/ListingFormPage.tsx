@@ -83,6 +83,7 @@ function ListingFormContent() {
       nextAddress: PropertyAddress,
       nextRets: Record<string, unknown>,
       filledKeys: string[],
+      options?: { redirectToHub?: boolean },
     ) => {
       setIsSubmitting(true)
 
@@ -115,12 +116,22 @@ function ListingFormContent() {
       }
 
       const fullAddress = formatPropertyAddress(nextAddress)
+      let parsedPrice: number | null = null
+      const priceCandidate = nextRets.list_price ?? patch.list_price
+      if (priceCandidate !== undefined && priceCandidate !== null) {
+        const num = parseFloat(String(priceCandidate).replace(/[^0-9.]/g, ''))
+        if (!Number.isNaN(num) && num > 0) {
+          parsedPrice = num
+        }
+      }
+
       if (listingIdRef.current) {
         await getSupabaseClient()
           .from('listings')
           .update({
             address_full: fullAddress || null,
             mls_number: nextAddress.mls_number?.trim() || null,
+            ...(parsedPrice !== null ? { list_price: parsedPrice } : {}),
           })
           .eq('id', listingIdRef.current)
       }
@@ -130,8 +141,6 @@ function ListingFormContent() {
         nextRets.sellers ? nextRets : { ...nextRets, ...(patch.sellers ? { sellers: patch.sellers } : {}) },
       )
       setPreFilledKeys(new Set(updatedFilledKeys))
-      setShowFormSections(true)
-      setIsSubmitting(false)
 
       // If property details were imported (e.g. from PDF import or RETS search), trigger initial description generation
       if (listingIdRef.current && (filledKeys.length > 0 || Object.keys(nextRets).length > 0)) {
@@ -149,8 +158,19 @@ function ListingFormContent() {
             console.warn('Initial description generation skipped or failed:', err)
           })
       }
+
+      setIsSubmitting(false)
+
+      if (options?.redirectToHub && listingIdRef.current) {
+        navigate(`/listing/${listingIdRef.current}`, {
+          state: { propertyFound: true },
+        })
+        return
+      }
+
+      setShowFormSections(true)
     },
-    [persistFormData],
+    [navigate, persistFormData],
   )
 
   useEffect(() => {
@@ -263,11 +283,11 @@ function ListingFormContent() {
       }
     }
 
-    void advanceToForm(nextAddress, nextRets, filledKeys)
+    void advanceToForm(nextAddress, nextRets, filledKeys, { redirectToHub: true })
   }
 
   const handleSkipSearch = () => {
-    void advanceToForm(address, {}, [])
+    void advanceToForm(address, {}, [], { redirectToHub: false })
   }
 
   const saveIndicator =

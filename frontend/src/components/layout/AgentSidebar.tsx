@@ -17,6 +17,7 @@ import type { UserRole } from '@/lib/auth'
 import {
   FEATURE_MARKET_YOURSELF,
 } from '@/lib/featureFlags'
+import { DemoModeToggle } from '@/components/layout/DemoModeToggle'
 
 type AgentSidebarProps = {
   role: Exclude<UserRole, 'admin'>
@@ -113,9 +114,12 @@ export function AgentSidebar({ role, isDrawer = false, onNavigate, className }: 
             Mission Control
           </h2>
         </NavLink>
-        <p className="mt-1 text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
-          LocalPRO Realty
-        </p>
+        <div className="mt-1.5 flex items-center justify-between gap-2">
+          <p className="text-[10px] tracking-widest text-[var(--color-text-secondary)] uppercase">
+            LocalPRO Realty
+          </p>
+          <DemoModeToggle />
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3">

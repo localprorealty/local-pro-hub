@@ -3,6 +3,8 @@ import { PieChart, Pie, Cell } from 'recharts'
 import { Award } from 'lucide-react'
 
 import { getCapProgress, type CapProgress } from '@/lib/brokermint'
+import { useDemoMode } from '@/lib/demo-mode'
+import { DEMO_CAP_PROGRESS } from '@/lib/demo-data'
 
 function formatCurrency(val: number | null | undefined): string {
   if (val === null || val === undefined) return '$0'
@@ -24,9 +26,14 @@ function formatDate(dateStr: string | null): string {
 }
 
 export default function CapProgressCard() {
-  const [capProgress, setCapProgress] = useState<CapProgress | null>(null)
+  const { isDemoMode } = useDemoMode()
+  const [realCapProgress, setRealCapProgress] = useState<CapProgress | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const capProgress = isDemoMode ? DEMO_CAP_PROGRESS : realCapProgress
+  const effectiveLoading = isDemoMode ? false : isLoading
+  const effectiveError = isDemoMode ? null : error
 
   useEffect(() => {
     let active = true
@@ -36,7 +43,7 @@ export default function CapProgressCard() {
         setError(null)
         const progress = await getCapProgress()
         if (active) {
-          setCapProgress(progress)
+          setRealCapProgress(progress)
         }
       } catch (err) {
         if (active) {
@@ -62,7 +69,7 @@ export default function CapProgressCard() {
 
   const COLORS = ['var(--color-gold)', 'var(--color-surface-3)'] // gold for paid, surface-3 for remaining
 
-  if (isLoading) {
+  if (effectiveLoading) {
     return (
       <div className="w-full border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 rounded-sm min-h-[220px] animate-pulse flex flex-col justify-between">
         <div className="h-4 bg-[var(--color-surface-3)] rounded w-1/4"></div>
@@ -78,10 +85,10 @@ export default function CapProgressCard() {
     )
   }
 
-  if (error) {
+  if (effectiveError) {
     return (
       <div className="w-full border border-red-500/30 bg-red-500/10 p-5 rounded-sm text-red-700 dark:text-red-200 text-xs">
-        {error}
+        {effectiveError}
       </div>
     )
   }

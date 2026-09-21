@@ -9,6 +9,11 @@ import { getMyHistory, type TransactionHistory } from '@/lib/brokermint'
 import CapProgressCard from '@/components/overview/CapProgressCard'
 import { api } from '@/lib/api'
 import { FEATURE_REVENUE_DASHBOARD } from '@/lib/featureFlags'
+import { useDemoMode } from '@/lib/demo-mode'
+import {
+  DEMO_TRANSACTION_HISTORY,
+  DEMO_REVENUE_SHARE_DATA,
+} from '@/lib/demo-data'
 
 type ActiveTab = 'history' | 'earnings' | 'revenue_share'
 type StatusFilter = 'all' | 'closed' | 'active' | 'pending' | 'cancelled'
@@ -50,17 +55,24 @@ function getStatusBadgeClass(status: string): string {
 }
 
 function OverviewContent() {
-  const [data, setData] = useState<TransactionHistory | null>(null)
+  const { isDemoMode, setDemoMode } = useDemoMode()
+  const [realData, setRealData] = useState<TransactionHistory | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<ActiveTab>('history')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
   // Revenue Share States
-  const [revData, setRevData] = useState<any>(null)
+  const [realRevData, setRealRevData] = useState<any>(null)
   const [isRevLoading, setIsRevLoading] = useState(false)
   const [policyLoading, setPolicyLoading] = useState(false)
   const [docNoticeOpen, setDocNoticeOpen] = useState(false)
+
+  const data = isDemoMode ? DEMO_TRANSACTION_HISTORY : realData
+  const revData = isDemoMode ? DEMO_REVENUE_SHARE_DATA : realRevData
+  const effectiveLoading = isDemoMode ? false : isLoading
+  const effectiveError = isDemoMode ? null : error
+  const effectiveRevLoading = isDemoMode ? false : isRevLoading
 
   useEffect(() => {
     if (activeTab !== 'revenue_share') return
@@ -69,7 +81,7 @@ function OverviewContent() {
       try {
         setIsRevLoading(true)
         const res = await api<any>('/revenue-share/my-earnings')
-        if (active) setRevData(res)
+        if (active) setRealRevData(res)
       } catch (err) {
         console.error('Error loading revenue share data:', err)
       } finally {
@@ -106,7 +118,7 @@ function OverviewContent() {
         setIsLoading(true)
         setError(null)
         const res = await getMyHistory()
-        if (active) setData(res)
+        if (active) setRealData(res)
       } catch (err) {
         if (active) {
           setError(
@@ -281,11 +293,11 @@ function OverviewContent() {
 
         {tabHeaderSlot}
 
-        {isLoading ? (
+        {effectiveLoading ? (
           <p className="text-sm text-[var(--color-text-secondary)]">Loading dashboard data...</p>
-        ) : error ? (
+        ) : effectiveError ? (
           <div className="rounded-sm border border-red-500/40 bg-red-500/10 p-6 text-red-200">
-            {error}
+            {effectiveError}
           </div>
         ) : (
           <motion.div
@@ -296,7 +308,7 @@ function OverviewContent() {
           >
             {activeTab === 'revenue_share' ? (
               <div className="space-y-8">
-                {isRevLoading ? (
+                {effectiveRevLoading ? (
                   <p className="text-sm text-[var(--color-text-secondary)]">Loading Revenue Share stats...</p>
                 ) : !revData || !revData.eligible ? (
                   <div className="border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 rounded-sm text-center text-xs text-[var(--color-text-secondary)] italic">

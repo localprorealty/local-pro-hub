@@ -38,6 +38,7 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const [bookingSuccess, setBookingSuccess] = useState<string | null>(null)
+  const [infoNotice, setInfoNotice] = useState<string | null>(null)
   const [listing, setListing] = useState<ListingRow | null>(null)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -58,9 +59,12 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
       (role === 'agent' && listing.agent_id === currentUserId))
 
   useEffect(() => {
-    const state = location.state as { bookingSuccess?: string } | null
+    const state = location.state as { bookingSuccess?: string; propertyFound?: boolean } | null
     if (state?.bookingSuccess) {
       setBookingSuccess(state.bookingSuccess)
+      navigate(location.pathname, { replace: true, state: {} })
+    } else if (state?.propertyFound) {
+      setInfoNotice('Property details imported from NTREIS. You can review the property information below and complete the NTREIS form when ready.')
       navigate(location.pathname, { replace: true, state: {} })
     }
   }, [location.pathname, location.state, navigate])
@@ -243,6 +247,19 @@ function ListingDetailContent({ role }: ListingDetailPageProps) {
         <p className="mb-6 rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-gold-dim)] px-4 py-3 text-sm text-[var(--color-gold)]">
           {bookingSuccess}
         </p>
+      ) : null}
+
+      {infoNotice ? (
+        <div className="mb-6 flex items-center justify-between rounded-sm border border-[var(--color-gold-border)] bg-[var(--color-gold-dim)] px-4 py-3 text-sm text-[var(--color-gold)]">
+          <span>✓ {infoNotice}</span>
+          <button
+            type="button"
+            onClick={() => setInfoNotice(null)}
+            className="ml-4 shrink-0 text-xs font-semibold text-[var(--color-gold)]/80 hover:text-[var(--color-gold)] underline"
+          >
+            Dismiss
+          </button>
+        </div>
       ) : null}
 
       {isLoading ? (

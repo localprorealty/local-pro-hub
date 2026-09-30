@@ -258,7 +258,7 @@ export const VIDEO_MAX_AUTO_POLLS = 90
 export const AVATAR_POLL_INTERVAL_MS = 10_000
 export const AVATAR_MAX_AUTO_POLLS = 60
 
-export const TELEPROMPTER_TEMPLATE = `Hi, I'm {name}, a real estate agent with Local Pro Realty in the Dallas–Fort Worth area. LocalPRO Hub is our all-in-one platform — it keeps my listings, marketing, photography, and MLS workflow in one place instead of five different tools. That means I spend less time juggling apps and more time helping North Texas families buy and sell with confidence. I'm proud to work with a team that invests in better tools, and I'm here to guide you every step of the way.`
+export const TELEPROMPTER_TEMPLATE = `Hi, I'm {name}, a real estate agent with LocalPro Realty in the Dallas–Fort Worth area. LocalPRO Hub is our all-in-one platform — it keeps my listings, marketing, photography, and MLS workflow in one place instead of five different tools. That means I spend less time juggling apps and more time helping North Texas families buy and sell with confidence. I'm proud to work with a team that invests in better tools, and I'm here to guide you every step of the way.`
 
 export const VIDEO_TOPICS: VideoTopic[] = [
   { id: 'market_update', label: 'Market Update', description: "What's happening in DFW right now", icon: BarChart3 },

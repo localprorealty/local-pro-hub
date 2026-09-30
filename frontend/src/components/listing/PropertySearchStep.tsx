@@ -333,7 +333,7 @@ export function PropertySearchStep({
                 </div>
                 <div>
                   <p className="text-base font-semibold text-[var(--color-text)]">
-                    {uploading ? 'Parsing report...' : 'Upload Realist Tax PDF'}
+                    {uploading ? 'Parsing report...' : 'Upload Realist Tax PDF From NTREIS'}
                   </p>
                   <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
                     {uploading ? 'Extracting property details using AI...' : 'Drag and drop or click to browse'}

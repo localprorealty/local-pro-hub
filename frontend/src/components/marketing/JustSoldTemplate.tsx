@@ -1,4 +1,4 @@
-import { SocialPostTemplate, type SocialPostTemplateProps } from '@/components/marketing/SocialPostTemplate'
+import { SocialPostTemplate } from '@/components/marketing/SocialPostTemplate'
 import type { AgentMarketingProfile, ListingMarketingContext } from '@/lib/marketing-types'
 
 export type JustSoldTemplateProps = {

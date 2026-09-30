@@ -8,7 +8,6 @@ import {
   type RefinementPageOption,
 } from '@/components/marketing/AiRefinementPanel'
 import { buildBookRefinementPages } from '@/components/marketing/book-refinement-pages'
-import { JustSoldTemplate } from '@/components/marketing/JustSoldTemplate'
 import { SocialPostTemplate } from '@/components/marketing/SocialPostTemplate'
 import { SocialPhotoSelector } from '@/components/marketing/SocialPhotoSelector'
 import { ListingBookTemplate } from '@/components/marketing/ListingBookTemplate'

@@ -581,7 +581,7 @@ async def my_cap_progress(user: dict = Depends(get_current_user)):
             next_anniversary = None
 
     # Sum COMPANY_DOLLAR_CONTRIBUTION since cycle_start_str
-    # This is what the agent has paid toward Local Pro's cap
+    # This is what the agent has paid toward LocalPro's cap
     commissions_result = supabase.table("bm_commissions") \
         .select("calculated_dollar_amount, bm_transactions(closed_at)") \
         .eq("user_id", user["id"]) \

@@ -48,8 +48,8 @@ export function AuthBrandPanel({
             }`}
           >
             {isSignup
-              ? 'Exclusive portal for Local Pro Realty agents. Professionalism in every frame.'
-              : 'Command center for Local Pro Realty'}
+              ? 'Exclusive portal for LocalPro Realty agents. Professionalism in every frame.'
+              : 'Command center for LocalPro Realty'}
           </p>
           {isSignup ? (
             <div className="mt-12 flex items-center justify-center gap-4 md:justify-center">
@@ -65,7 +65,7 @@ export function AuthBrandPanel({
 
       <div className="relative z-10 p-12">
         <p className="text-[12px] text-[var(--color-text-tertiary)]">
-          Local Pro Real Estate · Dallas, TX
+          LocalPro Realty · Dallas, TX
         </p>
       </div>
 

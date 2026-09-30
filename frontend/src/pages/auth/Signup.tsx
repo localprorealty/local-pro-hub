@@ -100,7 +100,7 @@ function rolePageOneCopy(role: UserRole): { title: string; subtitle: string } {
     case 'photographer':
       return {
         title: 'Photographer access',
-        subtitle: 'Join the Local Pro media roster — approval required.',
+        subtitle: 'Join the LocalPro media roster — approval required.',
       }
     case 'admin':
       return {

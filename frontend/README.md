@@ -1,6 +1,6 @@
 # LocalPRO Hub — Frontend
 
-React 18 + Vite + TypeScript app for Local Pro Realty's internal hub (Mission Control).
+React 18 + Vite + TypeScript app for LocalPro Realty's internal hub (Mission Control).
 
 ## Setup
 

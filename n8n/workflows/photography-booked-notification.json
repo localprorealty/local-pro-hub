@@ -101,7 +101,7 @@
         "toEmail": "={{ $json.photographer_email }}",
         "subject": "=New Shoot Booked — {{ $json.property_address }}",
         "emailFormat": "html",
-        "html": "=<p>Hi {{ $json.photographer_name }},</p>\n<p>A new photography shoot has been booked.</p>\n<p><strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Date:</strong> {{ $json.shoot_date }}<br/>\n<strong>Time:</strong> {{ $json.shoot_time }}<br/>\n<strong>Type:</strong> {{ $json.listing_type }}</p>\n<p><strong>Access Instructions:</strong><br/>{{ $json.access_notes }}</p>\n<p><a href=\"{{ $json.app_calendar_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Open LP Hub calendar</a></p>\n<p>Thank you,<br/>Local Pro Realty</p>",
+        "html": "=<p>Hi {{ $json.photographer_name }},</p>\n<p>A new photography shoot has been booked.</p>\n<p><strong>Property:</strong> {{ $json.property_address }}<br/>\n<strong>Date:</strong> {{ $json.shoot_date }}<br/>\n<strong>Time:</strong> {{ $json.shoot_time }}<br/>\n<strong>Type:</strong> {{ $json.listing_type }}</p>\n<p><strong>Access Instructions:</strong><br/>{{ $json.access_notes }}</p>\n<p><a href=\"{{ $json.app_calendar_url }}\" style=\"background:#CFB87C;color:#000;padding:10px 16px;text-decoration:none;font-weight:bold;\">Open LP Hub calendar</a></p>\n<p>Thank you,<br/>LocalPRO Realty</p>",
         "options": {}
       },
       "id": "ph-book-0003-4000-8000-000000000003",

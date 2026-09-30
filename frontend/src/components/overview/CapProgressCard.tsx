@@ -55,7 +55,7 @@ export default function CapProgressCard() {
   const pieData = useMemo(() => {
     if (!capProgress) return []
     return [
-      { name: 'Paid to Local Pro', value: capProgress.cap_paid },
+      { name: 'Paid to LocalPro', value: capProgress.cap_paid },
       { name: 'Remaining', value: capProgress.cap_remaining || 0 },
     ]
   }, [capProgress])

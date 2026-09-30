@@ -1,6 +1,6 @@
 # LocalPRO Hub — Features & Work Completed
 
-**Project:** Internal real estate platform for Local Pro Realty (Dallas, TX)  
+**Project:** Internal real estate platform for LocalPro Realty (Dallas, TX)  
 **Timeline:** ~2–3 days of active build (this chat session)  
 **Stack:** React 18 + Vite + TypeScript · Tailwind CSS v4 · Framer Motion · shadcn/ui · Supabase Auth + Postgres · FastAPI (skeleton)
 

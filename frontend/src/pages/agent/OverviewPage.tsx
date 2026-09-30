@@ -55,7 +55,7 @@ function getStatusBadgeClass(status: string): string {
 }
 
 function OverviewContent() {
-  const { isDemoMode, setDemoMode } = useDemoMode()
+  const { isDemoMode } = useDemoMode()
   const [realData, setRealData] = useState<TransactionHistory | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

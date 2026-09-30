@@ -24,6 +24,7 @@ export type VoiceState =
 type UseVoiceOptions = {
   formData: Record<string, unknown>
   onFieldChange: (key: string, value: unknown) => void
+  activeSectionId?: number
 }
 
 export type StartVoiceSessionOptions = {
@@ -31,7 +32,7 @@ export type StartVoiceSessionOptions = {
   sectionId?: number
 }
 
-export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
+export function useVoice({ formData, onFieldChange, activeSectionId }: UseVoiceOptions) {
   const [sessionOpen, setSessionOpen] = useState(false)
   const [state, setState] = useState<VoiceState>('idle')
   const [currentItem, setCurrentItem] = useState<QueuedVoiceField | null>(null)
@@ -49,6 +50,7 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
   const queueRef = useRef<QueuedVoiceField[]>([])
   const historyRef = useRef<QueuedVoiceField[]>([])
   const sessionSectionIdRef = useRef<number | null>(null)
+  const activeSectionIdRef = useRef<number | undefined>(activeSectionId)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
@@ -60,6 +62,7 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
   const discardRecordingRef = useRef(false)
   const handsFreeRef = useRef(false)
   const handleTranscribeBlobRef = useRef<(blob: Blob) => Promise<void>>(async () => {})
+  const resumeWaitingRef = useRef<() => void>(() => {})
   const formDataRef = useRef(formData)
   const currentItemRef = useRef(currentItem)
   const stateRef = useRef(state)
@@ -70,7 +73,8 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
     stateRef.current = state
     handsFreeRef.current = handsFree
     sessionSectionIdRef.current = sessionSectionId
-  }, [formData, currentItem, state, handsFree, sessionSectionId])
+    activeSectionIdRef.current = activeSectionId
+  }, [formData, currentItem, state, handsFree, sessionSectionId, activeSectionId])
 
   const clearAutoListen = useCallback(() => {
     if (autoListenRef.current) {
@@ -195,14 +199,23 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
       if (handsFreeRef.current) {
         vadCleanupRef.current = createVAD(
           stream,
-          () => {
+          ({ hasSpeech }) => {
             if (stateRef.current !== 'listening') return
             vadCleanupRef.current?.()
             vadCleanupRef.current = null
+
+            // If audio stayed below near-silent noise floor, discard locally and NEVER send to Whisper!
+            if (!hasSpeech) {
+              discardRecordingRef.current = true
+              mediaRecorderRef.current?.stop()
+              resumeWaitingRef.current()
+              return
+            }
+
             setState('processing')
             mediaRecorderRef.current?.stop()
           },
-          { silenceDurationMs: 1500 },
+          { silenceDurationMs: 1500, minSpeechEnergy: 20 },
         )
       }
     } catch {
@@ -224,6 +237,10 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
     setState('waiting')
     scheduleAutoListen()
   }, [scheduleAutoListen])
+
+  useEffect(() => {
+    resumeWaitingRef.current = resumeWaiting
+  }, [resumeWaiting])
 
   const askQuestion = useCallback(
     (item: QueuedVoiceField) => {
@@ -295,6 +312,13 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
         queueRef.current = [...queueRef.current, ...remaining]
       }
 
+      // Spoken skip detection: exactly "skip", "pass", "next", "cancel"
+      const normalized = text.trim().toLowerCase().replace(/[.,!?;:]/g, '')
+      if (['skip', 'pass', 'next', 'cancel'].includes(normalized)) {
+        moveToNextField()
+        return
+      }
+
       if (!text.trim()) {
         const retryMsg = handsFreeRef.current
           ? "I didn't catch that. Please try again."
@@ -336,7 +360,7 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
         resumeWaiting()
       }
     },
-    [fillAndAdvance, resumeWaiting],
+    [fillAndAdvance, moveToNextField, resumeWaiting],
   )
 
   const handleTranscribeBlob = useCallback(
@@ -409,7 +433,8 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
 
   const startSession = useCallback(
     (options: StartVoiceSessionOptions = {}) => {
-      const { includeOptional = false, sectionId } = options
+      const targetSectionId = options.sectionId ?? activeSectionIdRef.current
+      const { includeOptional = false } = options
 
       stopSpeaking()
       cleanupRecording()
@@ -418,14 +443,14 @@ export function useVoice({ formData, onFieldChange }: UseVoiceOptions) {
       setSelectedOptions([])
       historyRef.current = []
       setCanGoBack(false)
-      setSessionSectionId(sectionId ?? null)
-      sessionSectionIdRef.current = sectionId ?? null
+      setSessionSectionId(targetSectionId ?? null)
+      sessionSectionIdRef.current = targetSectionId ?? null
 
-      const queue = buildVoiceQueue(formDataRef.current, includeOptional, sectionId)
+      const queue = buildVoiceQueue(formDataRef.current, includeOptional, targetSectionId)
       if (queue.length === 0) {
         setSessionOpen(true)
         setInfoMessage(
-          sectionId
+          targetSectionId
             ? 'All required fields in this section are already filled!'
             : 'All required fields are already filled!',
         )

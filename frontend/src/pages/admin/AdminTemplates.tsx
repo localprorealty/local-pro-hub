@@ -16,9 +16,19 @@ interface TemplateItem {
   format: string
   updatedAt: string
   size: string
+  url?: string
 }
 
 const INITIAL_TEMPLATES: TemplateItem[] = [
+  {
+    id: 'localpro-hub-agent-guide',
+    name: 'LocalPRO Hub - Agent Guide',
+    category: 'Guides & Manuals',
+    format: 'PDF',
+    updatedAt: '2026-09-30',
+    size: '7.4 MB',
+    url: 'https://hqrjfkhfgamkzebrbtuj.supabase.co/storage/v1/object/public/brokerage-templates/LocalPRO_Hub_Agent_Guide.pdf',
+  },
   { id: '1', name: 'Information About Brokerage Services (IABS)', category: 'Disclosures', format: 'PDF', updatedAt: '2026-08-01', size: '142 KB' },
   { id: '2', name: 'Exclusive Right to Sell Listing Agreement', category: 'Listing Contracts', format: 'PDF', updatedAt: '2026-07-15', size: '284 KB' },
   { id: '3', name: 'One to Four Family Residential Contract (Resale)', category: 'Sales Contracts', format: 'PDF', updatedAt: '2026-07-28', size: '512 KB' },
@@ -80,9 +90,22 @@ export default function AdminTemplatesPage({ role }: AdminTemplatesPageProps = {
     const stored = localStorage.getItem('localpro_brokerage_templates')
     if (stored) {
       try {
-        setTemplates(JSON.parse(stored))
+        const parsed: TemplateItem[] = JSON.parse(stored)
+        // Ensure default templates like LocalPRO Hub - Agent Guide are always present
+        const merged = [...parsed]
+        for (const init of INITIAL_TEMPLATES) {
+          const idx = merged.findIndex((t) => t.id === init.id || t.name === init.name)
+          if (idx === -1) {
+            merged.unshift(init)
+          } else {
+            merged[idx] = { ...init, ...merged[idx], url: init.url || merged[idx].url }
+          }
+        }
+        setTemplates(merged)
+        localStorage.setItem('localpro_brokerage_templates', JSON.stringify(merged))
       } catch {
         setTemplates(INITIAL_TEMPLATES)
+        localStorage.setItem('localpro_brokerage_templates', JSON.stringify(INITIAL_TEMPLATES))
       }
     } else {
       setTemplates(INITIAL_TEMPLATES)
@@ -92,7 +115,7 @@ export default function AdminTemplatesPage({ role }: AdminTemplatesPageProps = {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [isExplicitAdminRoute, role])
 
   // Save to local storage helper
   const saveTemplates = (updatedList: TemplateItem[]) => {
@@ -203,7 +226,7 @@ export default function AdminTemplatesPage({ role }: AdminTemplatesPageProps = {
                           size="sm"
                           className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] h-8 px-2.5"
                           onClick={() => {
-                            window.open('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', '_blank')
+                            window.open(t.url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', '_blank')
                           }}
                         >
                           <Eye className="mr-1 size-3.5" />
@@ -214,6 +237,23 @@ export default function AdminTemplatesPage({ role }: AdminTemplatesPageProps = {
                         variant="ghost"
                         size="sm"
                         className="text-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 h-8 px-2.5"
+                        onClick={async () => {
+                          const fileUrl = t.url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+                          try {
+                            const res = await fetch(fileUrl)
+                            const blob = await res.blob()
+                            const blobUrl = URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.href = blobUrl
+                            a.download = `${t.name}.${t.format.toLowerCase()}`
+                            document.body.appendChild(a)
+                            a.click()
+                            document.body.removeChild(a)
+                            URL.revokeObjectURL(blobUrl)
+                          } catch {
+                            window.open(fileUrl, '_blank')
+                          }
+                        }}
                       >
                         <Download className="mr-1 size-3.5" />
                         Download

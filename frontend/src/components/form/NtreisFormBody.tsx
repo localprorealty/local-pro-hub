@@ -197,7 +197,11 @@ export function NtreisFormBody({
         [scheduleSave],
     )
 
-    const voice = useVoice({ formData, onFieldChange: handleFieldChange })
+    const voice = useVoice({
+        formData,
+        onFieldChange: handleFieldChange,
+        activeSectionId,
+    })
 
     useEffect(() => {
         if (agentMlsId && !formData.agent_id) {
@@ -395,8 +399,8 @@ export function NtreisFormBody({
                 <button
                     type="button"
                     onClick={voice.onMicClick}
-                    aria-label={voice.sessionActive ? 'Voice Fill active' : 'Voice Fill — all sections'}
-                    title={voice.sessionActive ? 'Voice Fill active' : 'Voice Fill — all unfilled fields'}
+                    aria-label={voice.sessionActive ? 'Voice Fill active' : 'Voice Fill — current section'}
+                    title={voice.sessionActive ? 'Voice Fill active' : 'Voice Fill — current section'}
                     className={cn(
                         'flex size-8 shrink-0 items-center justify-center rounded-md border transition-all',
                         voice.sessionActive

@@ -30,7 +30,7 @@ function SocialPostBody({
   // Format address nicely (e.g. 8911 BONTURA RD, GRANBURY, TEXAS 76049)
   const fullAddress =
     context.address_full ||
-    [context.address_line1, context.address_city, context.address_state, context.zip_code]
+    [context.address_line1, context.address_city, context.address_state, context.address_zip]
       .filter(Boolean)
       .join(', ')
 

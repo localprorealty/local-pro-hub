@@ -63,7 +63,7 @@ def main():
         "closing_date": closing_date_ts,
         "buyer_agreement_date": buyer_agreement_ts,
         "buyer_expiration_date": buyer_expiration_ts,
-        # Listing represented by Local Pro Realty (Account ID 15827), buying represented by the contact
+        # Listing represented by LocalPro Realty (Account ID 15827), buying represented by the contact
         "listing_side_representer": {"id": 15827, "type": "Account"},
         "buying_side_representer": {"id": buyer_contact_id, "type": "Contact"} if buyer_contact_id else None,
         # Structuring custom fields as custom_attributes list as required by BrokerMint's API

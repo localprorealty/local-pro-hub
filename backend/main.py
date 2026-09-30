@@ -24,7 +24,7 @@ settings = get_settings()
 
 app = FastAPI(
     title="LocalPRO Hub API",
-    description="Internal API for Local Pro Realty — Dallas, TX",
+    description="Internal API for LocalPro Realty — Dallas, TX",
     version="0.1.0",
 )
 

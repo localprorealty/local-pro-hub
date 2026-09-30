@@ -328,7 +328,7 @@ Revision instruction:
 
 Preserve the following settings where possible:
 Agent Name: {req.agent_name}
-Brokerage: Local Pro Realty (Dallas-Fort Worth, Texas)
+Brokerage: LocalPro Realty (Dallas-Fort Worth, Texas)
 Tone: {req.tone}
 Outfit Style Preference: {outfit_val}
 End with: "{cta_text}"
@@ -972,7 +972,7 @@ async def generate_teleprompter(
     prompt = f"""Write a spoken teleprompter script for a real estate agent recording a 30-second avatar training video.
 
 Agent name: {name}
-Brokerage: Local Pro Realty
+Brokerage: LocalPro Realty
 Market: Dallas–Fort Worth / North Texas
 Product: LocalPRO Hub (all-in-one listings, marketing, photography, MLS workflow)
 
@@ -1305,7 +1305,7 @@ async def generate_video_agent(
 - Visual style: Minimal, premium clean styled visuals. Use brand colors (white, slate gray, gold accents).
 - Chapter Cards & Transitions: Smooth transitions between scenes. Include section headers or title text overlays.
 - Layout Positioning: Place all market graphs, bar charts, tables, and visual card overlays centered near the top of the frame so they never cover the avatar's face or mouth.
-- Agent Branding Footer: Always display the agent's name "{req.agent_name}" and brokerage "Local Pro Realty" clearly at the bottom of the frame throughout the video.
+- Agent Branding Footer: Always display the agent's name "{req.agent_name}" and brokerage "LocalPro Realty" clearly at the bottom of the frame throughout the video.
 """
         storyboard_header = f"[SCENE-BY-SCENE STORYBOARD]\n{scenes_block}\n" if scenes_block else ""
 

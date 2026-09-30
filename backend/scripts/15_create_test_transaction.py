@@ -39,7 +39,7 @@ def get(path: str) -> requests.Response:
 
 def main():
     print("=== STEP 1: Create the test transaction ===")
-    # Using Local Pro Realty LLC's BrokerMint Account ID (15827)
+    # Using LocalPro Realty LLC's BrokerMint Account ID (15827)
     create_payload = {
         "address": "123 Testing Ln",
         "city": "Dallas",

@@ -1,5 +1,5 @@
 # LocalPRO Hub — Project Specification
-**Local Pro Real Estate · Dallas, TX · 110+ Agents**
+**LocalPro Realty · Dallas, TX · 110+ Agents**
 Version 1.0 — May 2026
 
 ---

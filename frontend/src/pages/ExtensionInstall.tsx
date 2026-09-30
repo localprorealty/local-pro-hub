@@ -267,7 +267,7 @@ export default function ExtensionInstallPage({ state }: ExtensionInstallPageProp
             Privacy Policy
           </a>
         </div>
-        <div>&copy; {new Date().getFullYear()} Local Pro Realty LLC. All rights reserved.</div>
+        <div>&copy; {new Date().getFullYear()} LocalPro Realty LLC. All rights reserved.</div>
       </footer>
     </main>
   )

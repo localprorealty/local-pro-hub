@@ -70,7 +70,7 @@ def main():
 
     print("=== STEP 2: Check who BrokerMint already added as participants ===")
     get(f"/v1/transactions/{txn_id}/participants")
-    print("^ Look above: did Tricia / Angie Smith (x2 roles) / Local Pro Realty")
+    print("^ Look above: did Tricia / Angie Smith (x2 roles) / LocalPro Realty")
     print("  already appear here, without us adding them? That answers the")
     print("  'are default participants automatic' question.\n")
 

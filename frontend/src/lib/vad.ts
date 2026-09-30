@@ -1,8 +1,19 @@
-/** Simple energy-based VAD using Web Audio API */
+export type VADOptions = {
+  silenceThreshold?: number
+  silenceDurationMs?: number
+  minSpeechEnergy?: number
+}
+
+export type VADResult = {
+  hasSpeech: boolean
+  peakEnergy: number
+}
+
+/** Simple energy-based VAD using Web Audio API with minimum speech floor check */
 export function createVAD(
   stream: MediaStream,
-  onSilence: () => void,
-  options?: { silenceThreshold?: number; silenceDurationMs?: number },
+  onSilence: (result: VADResult) => void,
+  options?: VADOptions,
 ): () => void {
   const audioContext = new AudioContext()
   const analyser = audioContext.createAnalyser()
@@ -14,9 +25,12 @@ export function createVAD(
   let silenceStart: number | null = null
   let stopped = false
   let rafId = 0
+  let maxEnergy = 0
+  let hasSpeech = false
 
   const silenceThreshold = options?.silenceThreshold ?? 15
   const silenceDurationMs = options?.silenceDurationMs ?? 1500
+  const minSpeechEnergy = options?.minSpeechEnergy ?? 20
 
   function check() {
     if (stopped) return
@@ -24,11 +38,18 @@ export function createVAD(
     analyser.getByteFrequencyData(dataArray)
     const energy = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length
 
+    if (energy > maxEnergy) {
+      maxEnergy = energy
+    }
+    if (energy >= minSpeechEnergy) {
+      hasSpeech = true
+    }
+
     if (energy < silenceThreshold) {
       if (!silenceStart) silenceStart = Date.now()
       else if (Date.now() - silenceStart > silenceDurationMs) {
         stopped = true
-        onSilence()
+        onSilence({ hasSpeech, peakEnergy: maxEnergy })
         return
       }
     } else {

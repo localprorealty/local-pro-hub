@@ -492,7 +492,7 @@ export function buildVoiceQueue(
 export function wantsOptionalFields(transcript: string): boolean {
   const lower = transcript.toLowerCase()
   return (
-    lower.includes('optional') ||
+    /\b(include|add|fill)\s+optional\b/.test(lower) ||
     lower.includes('fill everything') ||
     lower.includes('all fields')
   )

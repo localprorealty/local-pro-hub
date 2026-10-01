@@ -7,7 +7,7 @@ import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException
 from pydantic import BaseModel
 from supabase import create_client
-from services.brokermint_sync import run_full_sync
+from services.brokermint_sync import run_full_sync, sync_and_provision_brokermint_users
 from deps.auth import require_admin, get_current_user
 from config import get_settings
 
@@ -54,6 +54,16 @@ async def trigger_sync(
 
     background_tasks.add_task(run_full_sync, supabase, actual_triggered_by)
     return {"status": "started", "triggered_by": actual_triggered_by}
+
+
+@router.post("/sync-users")
+async def sync_users(
+    authorization: Optional[str] = Header(default=None),
+) -> dict[str, Any]:
+    """Admin only. Fetches all users from BrokerMint and provisions any missing agents."""
+    admin_id = await require_admin(authorization)
+    result = await sync_and_provision_brokermint_users(supabase, admin_id=admin_id)
+    return result
 
 
 @router.get("/sync-health")

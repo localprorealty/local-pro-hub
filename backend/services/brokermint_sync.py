@@ -756,3 +756,138 @@ async def delete_single_transaction(supabase, bm_txn_id: str) -> dict:
         )
 
     return {"status": "deleted", "bm_id": str(bm_txn_id), "rows_affected": len(res.data or [])}
+
+
+async def sync_and_provision_brokermint_users(supabase, admin_id: str | None = None) -> dict:
+    """
+    Fetches all users from BrokerMint.
+    If a BrokerMint user does not exist in LocalPRO Hub:
+      - Automatically provisions a Supabase Auth identity (default password 'localPro123!')
+      - Creates a corresponding active/suspended profile in public.users with BrokerMint cap fields & sponsor
+    If a BrokerMint user already exists:
+      - Refreshes brokermint_id, cap fields, and sponsor_raw in public.users
+    Finally, runs sponsor resolution pass.
+    """
+    if not admin_id:
+        admin_res = (
+            supabase.table("users")
+            .select("id")
+            .eq("role", "admin")
+            .eq("status", "active")
+            .limit(1)
+            .execute()
+        )
+        if admin_res.data:
+            admin_id = admin_res.data[0]["id"]
+
+    bm_users = await get_all_bm_users()
+    res_db = supabase.table("users").select("id, email, brokermint_id").execute()
+    db_by_email = {(u.get("email") or "").lower().strip(): u for u in res_db.data if u.get("email")}
+    db_by_bm_id = {str(u.get("brokermint_id")): u for u in res_db.data if u.get("brokermint_id")}
+
+    provisioned = []
+    updated = []
+    errors = []
+
+    for u in bm_users:
+        bm_id = str(u.get("id") or "")
+        email = (u.get("email") or "").strip().lower()
+        if not email or not bm_id:
+            continue
+
+        first_name = (u.get("first_name") or "").strip()
+        last_name = (u.get("last_name") or "").strip()
+        full_name = f"{first_name} {last_name}".strip()
+        active = u.get("active", True)
+        phone = u.get("phone") or None
+        license_number = u.get("License #") or None
+        cap_fields = parse_cap_fields(u)
+
+        existing = db_by_email.get(email) or db_by_bm_id.get(bm_id)
+
+        if not existing:
+            user_id = None
+            try:
+                created = supabase.auth.admin.create_user({
+                    "email": email,
+                    "password": "localPro123!",
+                    "email_confirm": True,
+                    "user_metadata": {
+                        "full_name": full_name,
+                        "phone": phone or "",
+                        "mls_id": license_number or "",
+                        "brokermint_id": bm_id,
+                        "requested_role": "agent",
+                    },
+                })
+                if created and created.user:
+                    user_id = created.user.id
+            except Exception as e:
+                err_str = str(e).lower()
+                if "already registered" in err_str or "already exists" in err_str or "conflict" in err_str:
+                    try:
+                        auth_list = supabase.auth.admin.list_users()
+                        users_list = getattr(auth_list, "users", auth_list)
+                        for au in users_list:
+                            if getattr(au, "email", "").lower() == email:
+                                user_id = getattr(au, "id")
+                                break
+                    except Exception as e2:
+                        errors.append(f"Failed to lookup auth user for {email}: {e2}")
+                else:
+                    errors.append(f"Failed to create auth user for {email}: {e}")
+
+            if not user_id:
+                continue
+
+            profile_data = {
+                "id": user_id,
+                "email": email,
+                "full_name": full_name,
+                "phone": phone,
+                "role": "agent",
+                "status": "active" if active else "suspended",
+                "approved_at": datetime.now(timezone.utc).isoformat() if active else None,
+                "approved_by": admin_id,
+                "brokermint_id": bm_id,
+                "mls_id": license_number,
+                "sponsor_raw": u.get("Sponsor"),
+                "brokermint_synced_at": datetime.now(timezone.utc).isoformat(),
+                **cap_fields,
+            }
+            try:
+                supabase.table("users").upsert(profile_data, on_conflict="id").execute()
+                provisioned.append({"id": user_id, "name": full_name, "email": email, "bm_id": bm_id})
+                db_by_email[email] = profile_data
+                db_by_bm_id[bm_id] = profile_data
+            except Exception as e:
+                errors.append(f"Failed to insert profile for {email}: {e}")
+        else:
+            # Update existing user's brokermint info
+            update_payload = {
+                "brokermint_id": bm_id,
+                "brokermint_synced_at": datetime.now(timezone.utc).isoformat(),
+                "sponsor_raw": u.get("Sponsor"),
+                **cap_fields,
+            }
+            try:
+                supabase.table("users").update(update_payload).eq("id", existing["id"]).execute()
+                updated.append(email)
+            except Exception as e:
+                errors.append(f"Failed to update user {email}: {e}")
+
+    # Resolve sponsors
+    try:
+        await resolve_sponsors(supabase)
+    except Exception as e:
+        errors.append(f"Sponsor resolution error: {e}")
+
+    return {
+        "status": "success",
+        "total_brokermint": len(bm_users),
+        "provisioned_count": len(provisioned),
+        "updated_count": len(updated),
+        "provisioned": provisioned,
+        "errors": errors,
+        "message": f"BrokerMint user sync complete: {len(provisioned)} new agent(s) provisioned, {len(updated)} updated.",
+    }

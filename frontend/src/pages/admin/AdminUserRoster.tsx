@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Search, Trash2, UserPen } from 'lucide-react'
+import { Plus, RefreshCw, Search, Trash2, UserPen } from 'lucide-react'
 
+import { api } from '@/lib/api'
 import { AgentMilestonesEditor } from '@/components/admin/AgentMilestonesEditor'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { ConfirmSaveDialog } from '@/components/profile/ConfirmSaveDialog'
@@ -165,6 +166,7 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
   const [milestoneRows, setMilestoneRows] = useState<MilestoneFormRow[]>([])
   const [milestoneCounts, setMilestoneCounts] = useState<Record<string, number>>({})
   const [milestonesLoading, setMilestonesLoading] = useState(false)
+  const [isSyncingBm, setIsSyncingBm] = useState(false)
 
   const [newUser, setNewUser] = useState<AdminCreateUserPayload>({
     email: '',
@@ -196,6 +198,31 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
       setIsLoading(false)
     }
   }, [roleFilter])
+
+  const handleSyncBrokerMintUsers = async () => {
+    setIsSyncingBm(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      const res = await api<{
+        status: string
+        total_brokermint: number
+        provisioned_count: number
+        updated_count: number
+        message?: string
+      }>('/brokermint/sync-users', { method: 'POST' })
+
+      setSuccess(
+        res.message ||
+          `BrokerMint sync complete: ${res.provisioned_count} new agent(s) provisioned, ${res.updated_count} updated.`,
+      )
+      await loadUsers()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sync users with BrokerMint.')
+    } finally {
+      setIsSyncingBm(false)
+    }
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -467,6 +494,19 @@ function AdminUserRosterContent({ roleFilter, title, description }: AdminUserRos
             />
           </label>
           <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSyncBrokerMintUsers}
+              disabled={isSyncingBm}
+              className="h-10 rounded-sm border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+            >
+              <RefreshCw
+                className={`mr-2 size-4 ${isSyncingBm ? 'animate-spin text-[var(--color-gold)]' : ''}`}
+                aria-hidden
+              />
+              {isSyncingBm ? 'Syncing...' : 'Sync from BrokerMint'}
+            </Button>
             <Button
               type="button"
               onClick={() => setAddOpen(true)}

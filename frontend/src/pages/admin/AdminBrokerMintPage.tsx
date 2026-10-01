@@ -149,6 +149,8 @@ function AdminBrokerMintContent() {
   const [syncHealth, setSyncHealth] = useState<SyncHealth | null>(null)
   const [isReactivating, setIsReactivating] = useState(false)
   const [reactivateMessage, setReactivateMessage] = useState<string | null>(null)
+  const [isSyncingUsers, setIsSyncingUsers] = useState(false)
+  const [userSyncMessage, setUserSyncMessage] = useState<string | null>(null)
 
   const loadStatus = async (showLoader = true) => {
     if (showLoader) setIsLoading(true)
@@ -285,6 +287,26 @@ function AdminBrokerMintContent() {
     }
   }
 
+  const handleSyncUsers = async () => {
+    setIsSyncingUsers(true)
+    setError(null)
+    setUserSyncMessage(null)
+    try {
+      const res = await api<{
+        status: string
+        total_brokermint: number
+        provisioned_count: number
+        updated_count: number
+        message?: string
+      }>('/brokermint/sync-users', { method: 'POST' })
+      setUserSyncMessage(res.message || `Successfully synced ${res.total_brokermint} users from BrokerMint.`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'User sync execution failed.')
+    } finally {
+      setIsSyncingUsers(false)
+    }
+  }
+
   const statusInfo = log ? getStatusDetails(log.status) : getStatusDetails('never_synced')
 
   // Identify unmatched warnings and general transaction errors
@@ -302,6 +324,18 @@ function AdminBrokerMintContent() {
         {error ? (
           <div className="rounded-sm border border-red-500/40 bg-red-500/10 p-6 text-red-200">
             {error}
+          </div>
+        ) : null}
+
+        {userSyncMessage ? (
+          <div className="rounded-sm border border-emerald-500/40 bg-emerald-500/10 p-4 text-emerald-200 text-sm flex items-center justify-between">
+            <span>{userSyncMessage}</span>
+            <button
+              onClick={() => setUserSyncMessage(null)}
+              className="text-emerald-400 hover:text-emerald-200"
+            >
+              <X className="size-4" />
+            </button>
           </div>
         ) : null}
 
@@ -485,6 +519,17 @@ function AdminBrokerMintContent() {
                 )}
               </div>
               <div className="flex gap-3 shrink-0 flex-wrap">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isSyncingUsers}
+                  onClick={() => void handleSyncUsers()}
+                  className="h-11 rounded-sm border-[var(--color-border)] text-[var(--color-text)] font-bold tracking-widest uppercase hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] px-6"
+                >
+                  <Users className={`mr-2 size-4 ${isSyncingUsers ? 'animate-spin' : ''}`} />
+                  {isSyncingUsers ? 'Syncing Users...' : 'Sync Users'}
+                </Button>
+
                 <Button
                   type="button"
                   disabled={isSyncing || log?.status === 'running'}
